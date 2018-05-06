@@ -1,0 +1,28 @@
+﻿
+Tank track footprints
+Better explosions
+Make end of game better
+Tune stuff
+Fix controllers
+
+Make it work on different sized screens
+3, 2, 1, GO! countdown!
+
+Tank can move around properly (pivoting around "correct" points based on tracks)
+
+Creepy Features
+EMP
+Charging shots
+Modular tanks
+Particles
+Tilemap
+Fancy Camera
+Shader effects
+Bullets that bounce off
+
+
+bullet to tank collisions
+ - basic against rotated rectangle
+ - angle of incidence for richochets and bounces.
+
+
