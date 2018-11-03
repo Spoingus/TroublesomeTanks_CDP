@@ -154,7 +154,7 @@ namespace Tankontroller.World.Particles
             int radius;
             for(int i = 0; i < m_LastParticleIndex; i++)
             {
-                radius = (int)m_Particles[i].Radius + 2 * DGS.PARTICLE_EDGE_THICKNESS;
+                radius = (int)m_Particles[i].Radius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS");
                 m_Rectangle.Width = radius;
                 m_Rectangle.Height = radius;
                 m_Rectangle.X = (int)m_Particles[i].Position.X - radius / 2;
@@ -238,7 +238,7 @@ namespace Tankontroller.World.Particles
             {
                 Vector2 position = m_Point1 + (m_Point2 - m_Point1) * (float)m_Rng.NextDouble();
                 float lifetime = m_Rng.Next(250, 751) * 0.001f;
-                pParticles[i].Initiate(position, Vector2.Zero, 1, m_Rng.Next(5, 15), DGS.COLOUR_DUST, lifetime);
+                pParticles[i].Initiate(position, Vector2.Zero, 1, m_Rng.Next(5, 15), DGS.Instance.GetColour("COLOUR_DUST"), lifetime);
             }
         }
     }

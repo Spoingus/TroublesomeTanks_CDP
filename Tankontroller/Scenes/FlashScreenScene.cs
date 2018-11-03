@@ -25,7 +25,7 @@ namespace Tankontroller.Scenes
             int x = (screenWidth - width) / 2;
             int y = (screenHeight - height) / 2;
             mRectangle = new Rectangle(x, y, width, height);
-            mSecondsLeft = DGS.SECONDS_TO_DISPLAY_FLASH_SCREEN;
+            mSecondsLeft = DGS.Instance.GetInt("SECONDS_TO_DISPLAY_FLASH_SCREEN");
         }
 
         public void Update(float pSeconds)

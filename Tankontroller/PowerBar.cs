@@ -34,7 +34,7 @@ namespace Tankontroller
 
             if (pCharge > 0)
             {
-                int height = (int)((powerBarHeight / 100f) * ((100 / DGS.MAX_CHARGE) * pCharge));
+                int height = (int)((powerBarHeight / 100f) * ((100 / DGS.Instance.GetFloat("MAX_CHARGE")) * pCharge));
                 if (enoughCharge)
                 {
                     pSpriteBatch.Draw(powerBarPower, new Rectangle((int)powerBarPosition.X, (int)(powerBarPosition.Y) + powerBarHeight - height, powerBarWidth, height), null, Color.LightBlue, 0f, new Vector2(0, 0), SpriteEffects.None, 0f);

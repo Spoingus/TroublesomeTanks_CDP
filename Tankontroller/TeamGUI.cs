@@ -61,16 +61,16 @@ namespace Tankontroller
             m_Controller = pController;
             m_HealthBar = new HealthBar(pHealthBar1, pHealthBar2, pHealthBar3, pHealthBar4, pHealthBar5, pHealthBar6, pRectangle, pTank);
 
-            int powerBarWidth = (DGS.SCREENWIDTH / 4) /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
-            int powerBarHeight = DGS.SCREENHEIGHT / 100 * 12;
+            int powerBarWidth = (DGS.Instance.GetInt("SCREENWIDTH") / 4) /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
+            int powerBarHeight = DGS.Instance.GetInt("SCREENHEIGHT") / 100 * 12;
 
-            int powerBar_yValueOffset = -10+DGS.SCREENWIDTH / 100 * 2;
+            int powerBar_yValueOffset = -10+ DGS.Instance.GetInt("SCREENWIDTH") / 100 * 2;
             int jackIcons_yValueOffset = powerBar_yValueOffset + (int)(powerBarHeight * 1.01f) - powerBarWidth;
             int labels_yValueOffset = powerBar_yValueOffset + (int)(powerBarWidth * 1.01f);
 
             mTank = pTank;
 
-            int xValue = DGS.SCREENWIDTH / 100 * 1;
+            int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
             int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
             int xOffset = isOnLeft ? pRectangle.X + pRectangle.Width - (8 * xIncrement) - powerBarWidth : pRectangle.X;
             for (int j = 0; j < 8; j++)
@@ -105,7 +105,7 @@ namespace Tankontroller
             {
                 if(m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
                 {
-                    if(m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.BULLET_CHARGE_DEPLETION)
+                    if(m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
                         m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), true);
                     }

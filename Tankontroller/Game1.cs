@@ -69,16 +69,16 @@ namespace Tankontroller
             mGraphics               = new GraphicsDeviceManager(this);
             Content.RootDirectory   = "Content";
             mSceneManager           = new SceneManager();
-            if (DGS.HAVE_CONTROLLER)
+            if (DGS.Instance.GetBool("HAVE_CONTROLLER"))
             {
-                mController0 = new ModularController(DGS.CONTROLLER0_PORT);
-                mController1 = new ModularController(DGS.CONTROLLER1_PORT);
-                if (DGS.NUM_PLAYERS > 2)
+                mController0 = new ModularController(DGS.Instance.GetString("CONTROLLER0_PORT"));
+                mController1 = new ModularController(DGS.Instance.GetString("CONTROLLER1_PORT"));
+                if (DGS.Instance.GetInt("NUM_PLAYERS") > 2)
                 {
-                    mController2 = new ModularController(DGS.CONTROLLER2_PORT);
-                    if(DGS.NUM_PLAYERS > 3)
+                    mController2 = new ModularController(DGS.Instance.GetString("CONTROLLER2_PORT"));
+                    if (DGS.Instance.GetInt("NUM_PLAYERS") > 3)
                     {
-                        mController3 = new ModularController(DGS.CONTROLLER3_PORT);
+                        mController3 = new ModularController(DGS.Instance.GetString("CONTROLLER3_PORT"));
                     }
                 }
                 
@@ -136,9 +136,9 @@ namespace Tankontroller
 
             mSoundManager = new SoundManager();
 
-            mGraphics.PreferredBackBufferHeight = DGS.SCREENHEIGHT;
-            mGraphics.PreferredBackBufferWidth = DGS.SCREENWIDTH;
-            mGraphics.IsFullScreen = DGS.IS_FULL_SCREEN;
+            mGraphics.PreferredBackBufferHeight = DGS.Instance.GetInt("SCREENHEIGHT");
+            mGraphics.PreferredBackBufferWidth = DGS.Instance.GetInt("SCREENWIDTH");
+            mGraphics.IsFullScreen = DGS.Instance.GetBool("IS_FULL_SCREEN");
             this.Window.Title = "TroubleSome Tanks";
         }
 

@@ -42,7 +42,7 @@ namespace Tankontroller
             }
             public void ResetCharge()
             {
-                charge = DGS.STARTING_CHARGE;
+                charge = DGS.Instance.GetFloat("STARTING_CHARGE");
             }
         };
         protected Color mColour;
@@ -83,7 +83,7 @@ namespace Tankontroller
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.BULLET_CHARGE_DEPLETION) || (pControl != Control.FIRE && mJacks[i].charge > 0));
+                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") ) || (pControl != Control.FIRE && mJacks[i].charge > 0));
                 }
             }
             return false;
@@ -111,13 +111,13 @@ namespace Tankontroller
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    if (mJacks[i].charge < DGS.MAX_CHARGE - amount)
+                    if (mJacks[i].charge < DGS.Instance.GetFloat("MAX_CHARGE") - amount)
                     {
 
                         mJacks[i].charge += amount;
                     }
                     else
-                        mJacks[i].charge = DGS.MAX_CHARGE;
+                        mJacks[i].charge = DGS.Instance.GetFloat("MAX_CHARGE");
                 }
             }
         }
@@ -324,7 +324,7 @@ namespace Tankontroller
                 // J.charge should be between 0 and DGS.MAX_CHARGE
                 int FullByte = 50;
                 float brightness = 0.2f;
-                float decimalCharge = J.charge / DGS.MAX_CHARGE;
+                float decimalCharge = J.charge / DGS.Instance.GetFloat("MAX_CHARGE");
                 float remainingCharge = 8 * decimalCharge;
                 foreach (int i in J.LED_IDS)
                 {
@@ -529,9 +529,14 @@ namespace Tankontroller
             }
 
             System.Threading.Thread.Sleep(10);
-
-            UpdateColors();
-
+            try
+            {
+                UpdateColors();
+            }
+            catch(Exception e)
+            {
+                //do nothing?
+            }
             PullDataThread();
         }
     }

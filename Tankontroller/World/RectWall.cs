@@ -23,7 +23,7 @@ namespace Tankontroller.World
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
-            pSpriteBatch.Draw(m_Texture, m_Rectangle, DGS.COLOUR_WALLS);
+            pSpriteBatch.Draw(m_Texture, m_Rectangle, DGS.Instance.GetColour("COLOUR_WALLS"));
         }
 
         public void DrawOutlines(SpriteBatch pSpriteBatch)

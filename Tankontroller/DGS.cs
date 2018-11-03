@@ -4,68 +4,192 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace Tankontroller
 {
-    static class DGS
+    public class DGS
     {
-        public const float SECONDS_TO_DISPLAY_FLASH_SCREEN = 1.5f;
-        public const float SECONDS_TO_DISPLAY_GAMEOVER_SCREEN = 5.0f;
-        public const float TRACK_DEPLETION_RATE = 10f;//20f;
-        public const float TURRET_DEPLETION_RATE = 5f;//10f;
-        public const float BULLET_RADIUS_POWER_SCALE = 5f;
-        public const float TANK_SPEED = 2f;
-        public const float BASE_TANK_ROTATION_ANGLE = 0.02f;
-        public const float BASE_TURRET_ROTATION_ANGLE = 0.02f;
-        public const float MAX_CHARGE = 200f;
-        public const float CHARGE_AMOUNT = MAX_CHARGE / (4 * 3 * 5); // # lights * # colours per light * # of hits to raise 1 colour
-        public const float STARTING_CHARGE = MAX_CHARGE;//* 0.2f; // twenty percent charge on every port to begin with     
-        public const float BULLET_CHARGE_DEPLETION = MAX_CHARGE / 2;
-        public const int TANK_RADIUS = 25;
-        public const int BLAST_DELAY = 15;
-        public const float BULLET_SPEED = 100;
+        private static DGS mInstance;
+        private DGS()
+        {
+            mBools = new Dictionary<string, bool>();
+            mInts = new Dictionary<string, int>();
+            mFloats = new Dictionary<string, float>();
+            mColours = new Dictionary<string, Color>();
+            mStrings = new Dictionary<string, string>();
 
-        public const bool HAVE_CONTROLLER = true;
-        public const int NUM_PLAYERS = 4;
-        public const string CONTROLLER0_PORT = "COM3";
-        public const string CONTROLLER1_PORT = "COM5";
-        public const string CONTROLLER2_PORT = "COM12";
-        public const string CONTROLLER3_PORT = "COM13";
+            LoadFile("Content/DGS.txt");
+            
+        }
+        public static DGS Instance
+        {
+            get {
+                if(mInstance == null)
+                {
+                    mInstance = new DGS();
+                }
+                return mInstance;
+            }
+        }
 
-        public const float GAME_START_COUNTDOWN = 3.0f;
+        public void AddFloat(string pVariableName, float pValue)
+        {
+            mFloats.Add(pVariableName, pValue);
+        }
+        public void AddInt(string pVariableName, int pValue)
+        {
+            mInts.Add(pVariableName, pValue);
+        }
+        public void AddBool(string pVariableName, bool pValue)
+        {
+            mBools.Add(pVariableName, pValue);
+        }
+        public void AddString(string pVariableName, string pValue)
+        {
+            mStrings.Add(pVariableName, pValue);
+        }
+        public void AddColour(string pVariableName, Color pValue)
+        {
+            mColours.Add(pVariableName, pValue);
+        }
 
-        public const int SCREEN_RESIZE_HACK = 1;
+        public void LoadFile(string pFilePath)
+        {
+            using (StreamReader reader = new StreamReader(pFilePath))
+            {
+                string line;
+                while((line = reader.ReadLine())!= null)
+                {
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        continue;
+                    }
+                    // line contains text
+                    line = line.Trim();
+                    if(line.Substring(0,2) == "//")
+                    {
+                        //line is a comment, skip
+                        continue;
+                    }
+                    LoadLine(line);
+                }
+            }
+        }
+        private void LoadLine(string pLine)
+        {
+            char[] splitters = { ' ', '=', ';' };
+            string[] tokens = pLine.Split(splitters);
+            string typeString = "";
+            string variableString = "";
+            string valueString = "";
+            int count = 0;
+            foreach(string token in tokens)
+            {
+                if(String.IsNullOrEmpty(token))
+                {
+                    continue;
+                }
+                if(count == 0)
+                {
+                    typeString = token.Trim();
+                }
+                else if(count == 1)
+                {
+                    variableString = token.Trim();
+                }
+                else if (count == 2)
+                {
+                    valueString = token.Trim();
+                }
+                count++;
+            }
+            if(typeString == "float")
+            {
+                float value = float.Parse(valueString);
+                AddFloat(variableString, value);
+            }
+            else if (typeString == "int")
+            {
+                int value = int.Parse(valueString);
+                AddInt(variableString, value);
+            }
+            else if (typeString == "Color")
+            {
+                string rString = valueString.Substring(0, 2);
+                string gString = valueString.Substring(2, 2);
+                string bString = valueString.Substring(4, 2);
 
-        public const int SCREENWIDTH = 1920/ SCREEN_RESIZE_HACK; // screen smaller hack
-        public const int SCREENHEIGHT = 1000/ SCREEN_RESIZE_HACK; // screen smaller hack
+                int r = int.Parse(rString, System.Globalization.NumberStyles.HexNumber);
+                int g = int.Parse(gString, System.Globalization.NumberStyles.HexNumber);
+                int b = int.Parse(bString, System.Globalization.NumberStyles.HexNumber);
 
-        public const bool IS_FULL_SCREEN = false;
+                Color value = new Color(r, g, b);
+                AddColour(variableString, value);
+            }
+            else if (typeString == "bool")
+            {
+                bool value = bool.Parse(valueString);
+                AddBool(variableString, value);
+            }
+            else if (typeString == "string")
+            {
+                AddString(variableString, valueString);
+            }
 
-        public const float TRACK_OFFSET = 17;
-        public const float TRACK_OFFSET_SQRD = TRACK_OFFSET * TRACK_OFFSET;
-        private const int TANK_WIDTH = 44 / SCREEN_RESIZE_HACK;// screen smaller hack
-        private const int TANK_HEIGHT = 59 / SCREEN_RESIZE_HACK;// screen smaller hack
-        private const int TANK_FRONT_BUFFER = 5;
-        public static Vector2[] TANK_CORNERS = { new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, TANK_WIDTH / 2), new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, TANK_WIDTH / 2) };
-        #region Tank Render Constants
-        // These are to help with places where rendering is tightly coupled to physics
 
-        #endregion
 
-        public const int PARTICLE_EDGE_THICKNESS = 2;
 
-        #region Colours
+        }
 
-        public static Color COLOUR_GROUND = Color.Khaki;// new Color(220, 205, 50);
-        public static Color COLOUR_WALLS = Color.SlateGray;//new Color(127, 93, 26);
-        public static Color COLOUR_TANK1 = Color.SteelBlue; //new Color(50, 160, 255);
-        public static Color COLOUR_TANK2 = Color.Goldenrod; //new Color(255, 105, 30);
-        public static Color COLOUR_TANK3 = Color.SeaGreen;
-        public static Color COLOUR_TANK4 = Color.LightPink;
-        public static Color COLOUR_DUST = Color.Gainsboro;
-      //  public static Color COLOUR_FIRE = Color.DarkOrange;
-      //  public static Color COLOUR_TRACK_PRINT = Color.DarkKhaki;
+        private Dictionary<string, bool> mBools;
+        private Dictionary<string, float> mFloats;
+        private Dictionary<string, int> mInts;
+        private Dictionary<string, string> mStrings;
+        private Dictionary<string, Color> mColours;
 
-        #endregion
+        public string GetString(string pKey)
+        {
+            if (mStrings.ContainsKey(pKey))
+            {
+                return mStrings[pKey];
+            }
+            return "";
+        }
+        public int GetInt(string pKey)
+        {
+            if (mInts.ContainsKey(pKey))
+            {
+                return mInts[pKey];
+            }
+            return 0;
+        }
+        public float GetFloat(string pKey)
+        {
+            if (mFloats.ContainsKey(pKey))
+            {
+                return mFloats[pKey];
+            }
+            return 0.0f;
+        }
+        public bool GetBool(string pKey)
+        {
+            if (mBools.ContainsKey(pKey))
+            {
+                return mBools[pKey];
+            }
+            return false;
+        }
+        public Color GetColour(string pKey)
+        {
+            if (mColours.ContainsKey(pKey))
+            {
+                return mColours[pKey];
+            }
+            return Color.Black;
+        }
+       
+
+
     }
 }

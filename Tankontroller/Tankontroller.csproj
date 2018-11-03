@@ -83,6 +83,9 @@
     <Content Include="Content\BrokenTank.png" />
     <Content Include="Content\charge.png" />
     <Content Include="Content\circle.png" />
+    <Content Include="Content\DGS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\fire.png" />
     <Content Include="Content\healthbar_engineer_01.png" />
     <Content Include="Content\healthbar_engineer_02.png" />

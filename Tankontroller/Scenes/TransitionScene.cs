@@ -23,14 +23,14 @@ namespace Tankontroller.Scenes
             mNextScene = pNextScene;
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
             
-            mRectangle = new Rectangle(0, 0, DGS.SCREENWIDTH, DGS.SCREENHEIGHT);
-            mSecondsLeft = DGS.SECONDS_TO_DISPLAY_FLASH_SCREEN;
+            mRectangle = new Rectangle(0, 0, DGS.Instance.GetInt("SCREENWIDTH"), DGS.Instance.GetInt("SCREENHEIGHT"));
+            mSecondsLeft = DGS.Instance.GetInt("SECONDS_TO_DISPLAY_FLASH_SCREEN");
             GeneratePreviousTexture();
             GenerateNextTexture();
             mPreviousPosition = new Vector2(0, 0);
             mVelocity = new Vector2(0, 0);
             mAcceleration = new Vector2(0, 1);
-            mNextPosition = new Vector2(0, -DGS.SCREENHEIGHT);
+            mNextPosition = new Vector2(0, -DGS.Instance.GetInt("SCREENHEIGHT"));
         }
 
         public void GeneratePreviousTexture()

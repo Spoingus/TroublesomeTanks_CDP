@@ -11,6 +11,9 @@ namespace Tankontroller.World
 {
     public class Tank
     {
+
+        private Vector2[] TANK_CORNERS = { new Vector2(DGS.Instance.GetInt("TANK_HEIGHT") / 2 - DGS.Instance.GetInt("TANK_FRONT_BUFFER"), -DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(-DGS.Instance.GetInt("TANK_HEIGHT") / 2, -DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(-DGS.Instance.GetInt("TANK_HEIGHT") / 2, DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(DGS.Instance.GetInt("TANK_HEIGHT") / 2 - DGS.Instance.GetInt("TANK_FRONT_BUFFER"), DGS.Instance.GetInt("TANK_WIDTH") / 2) };
+
         private float mRotation;
         private float mOldRotation;
         private Vector3 mPosition;
@@ -144,8 +147,8 @@ namespace Tankontroller.World
         public Vector2 GetIndexedCorner(int pIndex)
         {
             Vector3 temp = Vector3.Zero;
-            temp.X = DGS.TANK_CORNERS[pIndex].X;
-            temp.Y = DGS.TANK_CORNERS[pIndex].Y;
+            temp.X = TANK_CORNERS[pIndex].X;
+            temp.Y = TANK_CORNERS[pIndex].Y;
             temp = Vector3.Transform(temp, Matrix.CreateRotationZ(mRotation));
             temp = temp + mPosition;
             return new Vector2(temp.X, temp.Y);
@@ -188,8 +191,8 @@ namespace Tankontroller.World
                 Vector3 temp = Vector3.Zero;
                 for(int i = 0; i < 4; i++)
                 {
-                    temp.X = DGS.TANK_CORNERS[i].X * m_Scale;
-                    temp.Y = DGS.TANK_CORNERS[i].Y * m_Scale;
+                    temp.X = TANK_CORNERS[i].X * m_Scale;
+                    temp.Y = TANK_CORNERS[i].Y * m_Scale;
                     temp = Vector3.Transform(temp, Matrix.CreateRotationZ(mRotation));
                     temp = temp + mPosition;
                     pCorners[i].X = temp.X;
@@ -215,25 +218,25 @@ namespace Tankontroller.World
         }
         public void BothTracksForward()
         {
-            Translate(DGS.TANK_SPEED);
+            Translate(DGS.Instance.GetFloat("TANK_SPEED"));
             RightTrackFrameForwards();
             LeftTrackFrameForwards();
         }
         public void BothTracksBackward()
         {
-            Translate(-DGS.TANK_SPEED);
+            Translate(-DGS.Instance.GetFloat("TANK_SPEED"));
             RightTrackFrameBackwards();
             LeftTrackFrameBackwards();
         }
         public void LeftTrackForward() {
-            Rotate(DGS.BASE_TANK_ROTATION_ANGLE);
+            Rotate(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"));
             LeftTrackFrameForwards();
-            AdvancedTrackRotation(DGS.BASE_TANK_ROTATION_ANGLE, true);
+            AdvancedTrackRotation(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), true);
         }
 
         private void AdvancedTrackRotation(float pAngle, bool pForwards)
         {
-                float arcLength = (float)Math.Sqrt(2 * DGS.TRACK_OFFSET_SQRD - 2 * DGS.TRACK_OFFSET_SQRD * Math.Cos(pAngle));
+                float arcLength = (float)Math.Sqrt(2 * DGS.Instance.GetFloat("TRACK_OFFSET_SQRD") - 2 * DGS.Instance.GetFloat("TRACK_OFFSET_SQRD") * Math.Cos(pAngle));
                 arcLength = pForwards ? arcLength : arcLength * -1 ;
                 Vector3 translationVector = new Vector3(arcLength, 0, 0);
                 translationVector = Vector3.Transform(translationVector, Matrix.CreateRotationZ(mRotation));
@@ -241,8 +244,8 @@ namespace Tankontroller.World
                 mPosition += translationVector;
         }
         public void RightTrackForward() { 
-            Rotate(-DGS.BASE_TANK_ROTATION_ANGLE); 
-            AdvancedTrackRotation(-DGS.BASE_TANK_ROTATION_ANGLE, true);
+            Rotate(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE")); 
+            AdvancedTrackRotation(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), true);
             RightTrackFrameForwards(); }
 
         public bool PointIsInTank(Vector2 pPoint)
@@ -264,17 +267,17 @@ namespace Tankontroller.World
         }
 
         public void LeftTrackBackward() {
-            Rotate(-DGS.BASE_TANK_ROTATION_ANGLE);
+            Rotate(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"));
             LeftTrackFrameBackwards();
-            AdvancedTrackRotation(-DGS.BASE_TANK_ROTATION_ANGLE, false);
+            AdvancedTrackRotation(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), false);
         }
         public void RightTrackBackward() { 
-            Rotate(DGS.BASE_TANK_ROTATION_ANGLE); 
+            Rotate(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE")); 
             RightTrackFrameBackwards();
-            AdvancedTrackRotation(DGS.BASE_TANK_ROTATION_ANGLE, false);
+            AdvancedTrackRotation(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), false);
         }
-        public void CannonLeft() { mCannonRotation -= DGS.BASE_TURRET_ROTATION_ANGLE; }
-        public void CannonRight() { mCannonRotation += DGS.BASE_TURRET_ROTATION_ANGLE; }
+        public void CannonLeft() { mCannonRotation -= DGS.Instance.GetFloat("BASE_TURRET_ROTATION_ANGLE"); }
+        public void CannonRight() { mCannonRotation += DGS.Instance.GetFloat("BASE_TURRET_ROTATION_ANGLE"); }
 
         public Matrix LocalTransform
         {
@@ -313,7 +316,7 @@ namespace Tankontroller.World
                 float cannonRotation = GetCannonWorldRotation();
                 Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
                 Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-                m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * DGS.BULLET_SPEED, Colour()));
+                m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * DGS.Instance.GetFloat("BULLET_SPEED"), Colour()));
                 m_TimePrimed = -1;
                 return true;
             }
@@ -372,10 +375,10 @@ namespace Tankontroller.World
         public void CollideWithPlayArea(Rectangle pRectangle)
         {
             Vector2 tankPos = GetWorldPosition();
-            if ((tankPos.X <= pRectangle.Left + DGS.TANK_RADIUS) ||
-                (tankPos.X >= pRectangle.Right - DGS.TANK_RADIUS) ||
-                (tankPos.Y >= pRectangle.Bottom - DGS.TANK_RADIUS) ||
-                (tankPos.Y <= pRectangle.Top + DGS.TANK_RADIUS))
+            if ((tankPos.X <= pRectangle.Left + DGS.Instance.GetFloat("TANK_RADIUS")) ||
+                (tankPos.X >= pRectangle.Right - DGS.Instance.GetFloat("TANK_RADIUS")) ||
+                (tankPos.Y >= pRectangle.Bottom - DGS.Instance.GetFloat("TANK_RADIUS")) ||
+                (tankPos.Y <= pRectangle.Top + DGS.Instance.GetFloat("TANK_RADIUS")))
             {
                 PutBack();
             }
