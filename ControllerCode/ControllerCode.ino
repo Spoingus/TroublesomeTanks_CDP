@@ -46,22 +46,29 @@ void sendData()
   byte i;
   byte check = 0;
   // Send the packet start
-  Serial.write(255);
-  Serial.write('D');
-  Serial.write(sizeof(ports));
+  //Serial.write(255);
+ // Serial.write('D');
+ // Serial.write(sizeof(ports));
+ Serial.println("---------------------------------");
   for (i=0; i < sizeof(ports); i++)
   {
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.print(analogRead(ports[i]));
+    Serial.print(" - ");
     // Get the value and divide to make a single byte
     int data = analogRead(ports[i]) >> 2;
+    Serial.println(data);
 #if TEST_MODE == 1
     data = i;
 #endif
     // Bit stuff, we never send 255 as that is a flag value
     if (data == 255 ) data = 254;
-    Serial.write(data);
+  //  Serial.write(data);
+    
     check = check + data;    
   }
-  Serial.write(check);
+ // Serial.write(check);
 }
 
 // the loop routine runs over and over again forever:
@@ -121,4 +128,3 @@ void colorFill(byte r, byte b, byte g) {
   } 
   strip.show();
 }
-
