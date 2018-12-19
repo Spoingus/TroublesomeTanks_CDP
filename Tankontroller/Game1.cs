@@ -174,8 +174,8 @@ namespace Tankontroller
             mSoundManager.Add("Sounds/Tank_Clang2");
             mSoundManager.Add("Sounds/Tank_Clang3");
 
-            mSceneManager.Push(new FlashScreenScene());
-           // mSceneManager.Push(new GameScene());
+           // mSceneManager.Push(new FlashScreenScene());
+            mSceneManager.Push(new GameScene());
 
             // TODO: use this.Content to load your game content here
         }

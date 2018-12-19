@@ -19,7 +19,7 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(64, PIN, NEO_GRB + NEO_KHZ800);
 
-#define TEST_MODE 0
+//#define TEST_MODE 0
 
 // the setup routine runs once when you press reset:
 void setup() {                
@@ -46,29 +46,32 @@ void sendData()
   byte i;
   byte check = 0;
   // Send the packet start
-  //Serial.write(255);
- // Serial.write('D');
- // Serial.write(sizeof(ports));
- Serial.println("---------------------------------");
+  Serial.write(255);
+  Serial.write('D');
+  Serial.write(sizeof(ports));
+ //Serial.println("---------------------------------");
   for (i=0; i < sizeof(ports); i++)
   {
-    Serial.print(i);
+   /* Serial.print(i);
     Serial.print(": ");
     Serial.print(analogRead(ports[i]));
     Serial.print(" - ");
-    // Get the value and divide to make a single byte
-    int data = analogRead(ports[i]) >> 2;
-    Serial.println(data);
+    // Get the value and divide to make a single byte*/
+  //  int data = analogRead(ports[i]) >> 2;
+    //Serial.println(data);
+    byte id = IdentifyConnection(i);
 #if TEST_MODE == 1
-    data = i;
+ //   data = i;
 #endif
     // Bit stuff, we never send 255 as that is a flag value
-    if (data == 255 ) data = 254;
-  //  Serial.write(data);
+ //   if (data == 255 ) data = 254;
+    Serial.write(id);
+  //Serial.print("bit shift");
+ // Serial.println(id);
     
-    check = check + data;    
+    check = check + id;    
   }
- // Serial.write(check);
+  Serial.write(check);
 }
 
 // the loop routine runs over and over again forever:
@@ -81,6 +84,93 @@ void loop() {
    if ( command == 'P')
      receivePanel();
   }
+}
+
+byte IdentifyConnection(byte port) {
+  int id = 0;
+  int data = analogRead(ports[port]);
+  int tolerance = 10;
+  //Serial.print("Port: ");
+  //Serial.print(port);
+  //Serial.print(" is connected to ");
+  if(IsNearly(data, 1021, tolerance)) {    
+  //  Serial.println("nothing");
+    return 0;
+  }
+  else if(IsNearly(data, 932, tolerance)) {    
+  //  Serial.println("charge - unpressed");
+    return 1;
+  }
+  else if(IsNearly(data, 181, tolerance)) {    
+  //  Serial.println("charge - pressed");
+    return 2;
+  }
+  else if(IsNearly(data, 608, tolerance)) {    
+  //  Serial.println("right forward - unpressed");
+    return 3;
+  }
+  else if(IsNearly(data, 7, tolerance)) {    
+  //  Serial.println("right forward - pressed");
+    return 4;
+  }
+  else if(IsNearly(data, 699, tolerance)) {    
+   // Serial.println("right backward - unpressed");
+    return 5;
+  }
+  else if(IsNearly(data, 21, tolerance)) {    
+  //  Serial.println("right backward - pressed");
+    return 6;
+  }
+  else if(IsNearly(data, 785, tolerance)) {    
+   // Serial.println("left forward - unpressed");
+    return 7;
+  }
+  else if(IsNearly(data, 45, tolerance)) {    
+    //Serial.println("left forward - pressed");
+    return 8;
+  }
+  else if(IsNearly(data, 836, tolerance)) {    
+   // Serial.println("left backward - unpressed");
+    return 9;
+  }
+  else if(IsNearly(data, 93, tolerance)) {    
+   // Serial.println("left backward - pressed");
+    return 10;
+  }
+  else if(IsNearly(data, 959, tolerance)) {    
+   // Serial.println("gun fire - unpressed");
+    return 11;
+  }
+  else if(IsNearly(data, 327, tolerance)) {    
+   // Serial.println("gun fire - pressed");
+    return 12;
+  }
+  else if(IsNearly(data, 1002, tolerance)) {    
+   // Serial.println("gun right - unpressed");
+    return 13;
+  }
+  else if(IsNearly(data, 511, tolerance)) {    
+   // Serial.println("gun right - pressed");
+    return 14;
+  }
+  else if(IsNearly(data, 978, tolerance)) {    
+   // Serial.println("gun left - unpressed");
+    return 15;
+  }
+  else if(IsNearly(data, 402, tolerance)) {    
+   // Serial.println("gun left - pressed");
+    return 16;
+  }
+}
+
+bool IsNearly(int data, int target, int tolerance) {
+  int lowerBound = target - tolerance;
+  int upperBound = target + tolerance;
+  if (data > lowerBound && data < upperBound) {
+    return true;
+  }
+  return false;
+   
 }
 
 byte GetCh()
@@ -117,7 +207,7 @@ void receivePanel()
       strip.show();
     }
     else {
-      colorFill(0,0,20);
+    //  colorFill(20,0,0);
     }
 }
 

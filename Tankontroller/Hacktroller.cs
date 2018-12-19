@@ -97,7 +97,7 @@ namespace Tankontroller
 
         static byte[] frameBuffer = new byte[64 * 3];
 
-        static int tolerance= 1; // SJG I changed this from 1 to 3 because some pins seemed dodgy
+        static int tolerance= 0; // SJG I changed this from 1 to 3 because some pins seemed dodgy
 
         PortState[] portStates = new PortState[numPins];
 
@@ -105,31 +105,31 @@ namespace Tankontroller
         {
             
 
-            new stateMap(ControllerState.RIGHT_TRACK_FORWARDS, 152),
-            new stateMap(ControllerState.RIGHT_TRACK_FORWARDS_PRESSED, 000),
+            new stateMap(ControllerState.RIGHT_TRACK_FORWARDS, 3),
+            new stateMap(ControllerState.RIGHT_TRACK_FORWARDS_PRESSED, 4),
             
-            new stateMap(ControllerState.RIGHT_TRACK_BACKWARDS, 175), 
-            new stateMap(ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED, 5),
+            new stateMap(ControllerState.RIGHT_TRACK_BACKWARDS, 5), 
+            new stateMap(ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED, 6),
 
-            new stateMap(ControllerState.LEFT_TRACK_FORWARDS, 195),
-            new stateMap(ControllerState.LEFT_TRACK_FORWARDS_PRESSED, 11),
+            new stateMap(ControllerState.LEFT_TRACK_FORWARDS, 7),
+            new stateMap(ControllerState.LEFT_TRACK_FORWARDS_PRESSED, 8),
 
-            new stateMap(ControllerState.LEFT_TRACK_BACKWARDS, 208),
-            new stateMap(ControllerState.LEFT_TRACK_BACKWARDS_PRESSED, 23),
+            new stateMap(ControllerState.LEFT_TRACK_BACKWARDS, 9),
+            new stateMap(ControllerState.LEFT_TRACK_BACKWARDS_PRESSED, 10),
 
-            new stateMap(ControllerState.CHARGE, 233),
-            new stateMap(ControllerState.CHARGE_PRESSED, 44),
+            new stateMap(ControllerState.CHARGE, 1),
+            new stateMap(ControllerState.CHARGE_PRESSED, 2),
 
-            new stateMap(ControllerState.FIRE, 240),
-            new stateMap(ControllerState.FIRE_PRESSED, 81),
+            new stateMap(ControllerState.FIRE, 11),
+            new stateMap(ControllerState.FIRE_PRESSED, 12),
 
-            new stateMap(ControllerState.TURRET_RIGHT, 244),
-            new stateMap(ControllerState.TURRET_RIGHT_PRESSED, 100),
+            new stateMap(ControllerState.TURRET_RIGHT, 13),
+            new stateMap(ControllerState.TURRET_RIGHT_PRESSED, 14),
 
-            new stateMap(ControllerState.TURRET_LEFT, 250),
-            new stateMap(ControllerState.TURRET_LEFT_PRESSED, 126),
+            new stateMap(ControllerState.TURRET_LEFT, 15),
+            new stateMap(ControllerState.TURRET_LEFT_PRESSED, 16),
 
-            new stateMap(ControllerState.NOT_CONNECTED, 254)
+            new stateMap(ControllerState.NOT_CONNECTED, 0)
         };
 
         ControllerState DecodeState(int reading)
