@@ -1,186 +1,35 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A7E6027B-85BE-4D75-BCB6-5B8C74D760B5}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tankontroller</RootNamespace>
-    <AssemblyName>Tankontroller</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <MonoGamePlatform>Windows</MonoGamePlatform>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Windows\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Windows\Release\</OutputPath>
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <RollForward>Major</RollForward>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
   </PropertyGroup>
   <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Controller.cs" />
-    <Compile Include="DGS.cs" />
-    <Compile Include="Game1.cs" />
-    <Compile Include="Hacktroller.cs" />
-    <Compile Include="HealthBar.cs" />
-    <Compile Include="JackIcon.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="PortMapping.cs" />
-    <Compile Include="PortNumLabel.cs" />
-    <Compile Include="PowerBar.cs" />
-    <Compile Include="Scenes\GameOverScene.cs" />
-    <Compile Include="Scenes\TransitionScene.cs" />
-    <Compile Include="SoundManager.cs" />
-    <Compile Include="TeamGUI.cs" />
-    <Compile Include="World\Bullet.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scenes\Button.cs" />
-    <Compile Include="Scenes\ButtonList.cs" />
-    <Compile Include="Scenes\GameScene.cs" />
-    <Compile Include="Scenes\IScene.cs" />
-    <Compile Include="Scenes\FlashScreenScene.cs" />
-    <Compile Include="Scenes\SceneManager.cs" />
-    <Compile Include="Scenes\StartScene.cs" />
-    <Compile Include="World\Particles\ParticleSystem.cs" />
-    <Compile Include="World\Particles\TrackSystem.cs" />
-    <Compile Include="World\RectWall.cs" />
-    <Compile Include="World\Tank.cs" />
-    <Compile Include="World\TheWorld.cs" />
+    <None Remove="Icon.ico" />
+    <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
+    <EmbeddedResource Include="Icon.ico" />
+    <EmbeddedResource Include="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\block.png" />
-    <Content Include="Content\BrokenTank.png" />
-    <Content Include="Content\charge.png" />
-    <Content Include="Content\circle.png" />
-    <Content Include="Content\DGS.txt">
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Content\DGS.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\fire.png" />
-    <Content Include="Content\healthbar_engineer_01.png" />
-    <Content Include="Content\healthbar_engineer_02.png" />
-    <Content Include="Content\healthbar_engineer_03.png" />
-    <Content Include="Content\healthbar_engineer_04.png" />
-    <Content Include="Content\healthbar_engineer_05.png" />
-    <Content Include="Content\healthbar_engineer_06.png" />
-    <Content Include="Content\healthbar_robo_01.png" />
-    <Content Include="Content\healthbar_robo_02.png" />
-    <Content Include="Content\healthbar_robo_03.png" />
-    <Content Include="Content\healthbar_robo_04.png" />
-    <Content Include="Content\healthbar_robo_05.png" />
-    <Content Include="Content\healthbar_robo_06.png" />
-    <Content Include="Content\healthbar_winterjack_01.png" />
-    <Content Include="Content\healthbar_winterjack_02.png" />
-    <Content Include="Content\healthbar_winterjack_03.png" />
-    <Content Include="Content\healthbar_winterjack_04.png" />
-    <Content Include="Content\healthbar_winterjack_05.png" />
-    <Content Include="Content\healthbar_winterjack_06.png" />
-    <Content Include="Content\healthbar_yeti_01.png" />
-    <Content Include="Content\healthbar_yeti_02.png" />
-    <Content Include="Content\healthbar_yeti_03.png" />
-    <Content Include="Content\healthbar_yeti_04.png" />
-    <Content Include="Content\healthbar_yeti_05.png" />
-    <Content Include="Content\healthbar_yeti_06.png" />
-    <Content Include="Content\leftTrackBackwards.png" />
-    <Content Include="Content\leftTrackForward.png" />
-    <Content Include="Content\none.png" />
-    <Content Include="Content\cannonFire.png" />
-    <Content Include="Content\port1.png" />
-    <Content Include="Content\port2.png" />
-    <Content Include="Content\port3.png" />
-    <Content Include="Content\port4.png" />
-    <Content Include="Content\port5.png" />
-    <Content Include="Content\port6.png" />
-    <Content Include="Content\port7.png" />
-    <Content Include="Content\port8.png" />
-    <Content Include="Content\powerBar_power.png" />
-    <Content Include="Content\powerBar_border.png" />
-    <Content Include="Content\bullet.png" />
-    <Content Include="Content\Button_Push.wav" />
-    <Content Include="Content\exitButton.png" />
-    <Content Include="Content\FromHere.mp3" />
-    <Content Include="Content\healthbar_rodrigo_01.png" />
-    <Content Include="Content\healthbar_rodrigo_02.png" />
-    <Content Include="Content\healthbar_rodrigo_03.png" />
-    <Content Include="Content\healthbar_rodrigo_04.png" />
-    <Content Include="Content\healthbar_rodrigo_05.png" />
-    <Content Include="Content\healthbar_rodrigo_07.png" />
-    <Content Include="Content\healthbar_shanya_01.png" />
-    <Content Include="Content\healthbar_shanya_02.png" />
-    <Content Include="Content\healthbar_shanya_03.png" />
-    <Content Include="Content\healthbar_shanya_04.png" />
-    <Content Include="Content\healthbar_shanya_05.png" />
-    <Content Include="Content\healthbar_shanya_06.png" />
-    <Content Include="Content\menuButton.png" />
-    <Content Include="Content\Music\Music_intro.wav" />
-    <Content Include="Content\Music\Music_loopable.wav" />
-    <Content Include="Content\Music\Music_start.wav" />
-    <Content Include="Content\rightTrackBackwards.png" />
-    <Content Include="Content\rightTrackForward.png" />
-    <Content Include="Content\Sounds\Tank_Clang1.wav" />
-    <Content Include="Content\Sounds\Tank_Clang2.wav" />
-    <Content Include="Content\Sounds\Tank_Clang3.wav" />
-    <Content Include="Content\Sounds\Tank_Gun.wav" />
-    <Content Include="Content\Sounds\Tank_Tracks.wav" />
-    <Content Include="Content\startBackground.png" />
-    <Content Include="Content\selogo.png" />
-    <Content Include="Content\startButton.png" />
-    <Content Include="Content\arrow.png" />
-    <Content Include="Content\cannon.png" />
-    <Content Include="Content\Tank track B-L.png" />
-    <Content Include="Content\Tank track B-R.png" />
-    <Content Include="Content\Tank track W-L.png" />
-    <Content Include="Content\Tank track W-R.png" />
-    <Content Include="Content\Tank-B-05.png" />
-    <Content Include="Content\track.png" />
-    <Content Include="Content\turretLeft.png" />
-    <Content Include="Content\turretRight.png" />
-    <Content Include="Icon.ico" />
-    <Content Include="todo.txt" />
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <MonoGameContentReference Include="Content\Content.mgcb" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Content\selogo.xnb" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
+    <Message Text="Restoring dotnet tools" Importance="High" />
+    <Exec Command="dotnet tool restore" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
