@@ -16,6 +16,7 @@ namespace Tankontroller.Scenes
 {
     public class GameScene : IScene
     {
+        private List<IController> mControllers;
         private IController mController0;
         private IController mController1;
         private IController mController2;
@@ -53,6 +54,7 @@ namespace Tankontroller.Scenes
 
         public GameScene()
         {
+            mControllers = new List<IController>();
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             m_TankBaseTexture = game.CM().Load<Texture2D>("Tank-B-05");
             m_TankBrokenTexture = game.CM().Load<Texture2D>("BrokenTank");
@@ -105,19 +107,10 @@ namespace Tankontroller.Scenes
             mPlayAreaOutlineRectangle = new Rectangle(mPlayAreaRectangle.X - 5, mPlayAreaRectangle.Y - 5, mPlayAreaRectangle.Width + 10, mPlayAreaRectangle.Height + 10);
             introMusicInstance = game.ReplaceCurrentMusicInstance("Music/Music_intro", false);
 
-            mController0 = Tankontroller.Instance().Controller0();
-            mController1 = Tankontroller.Instance().Controller1();
-            mController2 = Tankontroller.Instance().Controller2();
-            mController3 = Tankontroller.Instance().Controller3();
-            mController0.ResetJacks();
-            mController1.ResetJacks();
-            if (DGS.Instance.GetInt("NUM_PLAYERS") > 2)
+            for(int i = 0; i < DGS.Instance.GetInt("NUM_PLAYERS"); i++)
             {
-                mController2.ResetJacks();
-                if (DGS.Instance.GetInt("NUM_PLAYERS") > 3)
-                {
-                    mController3.ResetJacks();
-                }
+                IController controller = Tankontroller.Instance().GetController(i);
+                controller.ResetJacks();
             }
             
             //loopMusicInstance = game.GetSoundManager().GetLoopableSoundEffectInstance("Music/Music_loopable");  // Put the name of your song here instead of "song_title"
@@ -285,7 +278,7 @@ namespace Tankontroller.Scenes
             int textureHeight = (int)(textureWidth * textureHeightOverWidth);
 
             m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK1"), Tankontroller.Instance().Controller0(),
+                DGS.Instance.GetColour("COLOUR_TANK1"), Tankontroller.Instance().GetController(0),
                 tankPositions[0].X, tankPositions[0].Y, tankRotations[0], tankScale,
                 game.CM().Load<Texture2D>("healthbar_winterjack_06"),
                 game.CM().Load<Texture2D>("healthbar_winterjack_05"),
@@ -299,7 +292,7 @@ namespace Tankontroller.Scenes
             tankRotation = (float)Math.PI;
 
             m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().Controller1(),
+                DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().GetController(1),
                 tankPositions[1].X, tankPositions[1].Y, tankRotations[1], tankScale,
                 game.CM().Load<Texture2D>("healthbar_engineer_06"),
                 game.CM().Load<Texture2D>("healthbar_engineer_05"),
@@ -319,7 +312,7 @@ namespace Tankontroller.Scenes
                 
                 
                 m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().Controller2(),
+                DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().GetController(2),
                 tankPositions[2].X, tankPositions[2].Y, tankRotations[2], tankScale,
                 game.CM().Load<Texture2D>("healthbar_robo_06"),
                 game.CM().Load<Texture2D>("healthbar_robo_05"),
@@ -336,7 +329,7 @@ namespace Tankontroller.Scenes
                     tankYPosition = pPlayArea.Y + pPlayArea.Height / 2 + 50;
                     
                     m_Teams.Add(new Player(
-        DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().Controller3(),
+        DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(3),
         tankPositions[3].X, tankPositions[3].Y, tankRotations[3], tankScale,
         game.CM().Load<Texture2D>("healthbar_yeti_06"),
         game.CM().Load<Texture2D>("healthbar_yeti_05"),
@@ -403,7 +396,16 @@ namespace Tankontroller.Scenes
 
             List<Vector2> tankPositions = new List<Vector2>();
             List<float> tankRotations = new List<float>();
-            if (DGS.Instance.GetInt("NUM_PLAYERS") == 2)
+            if (DGS.Instance.GetInt("NUM_PLAYERS") == 1)
+            {
+                float xPosition = pPlayArea.X + outerBlockXOffset;
+                float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
+                Vector2 tankPosition = new Vector2(xPosition, yPosition);
+                tankPositions.Add(tankPosition);
+                tankRotations.Add(0);
+
+            }
+            else if (DGS.Instance.GetInt("NUM_PLAYERS") == 2)
             {
                 float xPosition = pPlayArea.X + outerBlockXOffset;
                 float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
@@ -499,7 +501,7 @@ namespace Tankontroller.Scenes
             int textureHeight = (int)(textureWidth * textureHeightOverWidth);
 
             m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK1"), Tankontroller.Instance().Controller0(),
+                DGS.Instance.GetColour("COLOUR_TANK1"), Tankontroller.Instance().GetController(0),
                 tankPositions[0].X, tankPositions[0].Y, tankRotations[0], tankScale,
                 game.CM().Load<Texture2D>("healthbar_winterjack_06"),
                 game.CM().Load<Texture2D>("healthbar_winterjack_05"),
@@ -508,60 +510,61 @@ namespace Tankontroller.Scenes
                 game.CM().Load<Texture2D>("healthbar_winterjack_02"),
                 game.CM().Load<Texture2D>("healthbar_winterjack_01"),
                 new Rectangle(0, 0, textureWidth, textureHeight), true));
-
-            tankXPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-            tankRotation = (float)Math.PI;
-
-            m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().Controller1(),
-                tankPositions[1].X, tankPositions[1].Y, tankRotations[1], tankScale,
-                game.CM().Load<Texture2D>("healthbar_engineer_06"),
-                game.CM().Load<Texture2D>("healthbar_engineer_05"),
-                game.CM().Load<Texture2D>("healthbar_engineer_04"),
-                game.CM().Load<Texture2D>("healthbar_engineer_03"),
-                game.CM().Load<Texture2D>("healthbar_engineer_02"),
-                game.CM().Load<Texture2D>("healthbar_engineer_01"),
-                new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth, 0, textureWidth, textureHeight), false));
-            if (DGS.Instance.GetInt("NUM_PLAYERS") > 2)
+            if (DGS.Instance.GetInt("NUM_PLAYERS") > 1)
             {
+                tankXPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
                 tankRotation = (float)Math.PI;
-                if (DGS.Instance.GetInt("NUM_PLAYERS") <= 3)
-                {
-                    tankXPosition = pPlayArea.Width / 2 + 35;
-                    tankRotation = (float)Math.PI / 2;
-                }
-
 
                 m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().Controller2(),
-                tankPositions[2].X, tankPositions[2].Y, tankRotations[2], tankScale,
-                game.CM().Load<Texture2D>("healthbar_robo_06"),
-                game.CM().Load<Texture2D>("healthbar_robo_05"),
-                game.CM().Load<Texture2D>("healthbar_robo_04"),
-                game.CM().Load<Texture2D>("healthbar_robo_03"),
-                game.CM().Load<Texture2D>("healthbar_robo_02"),
-                game.CM().Load<Texture2D>("healthbar_robo_01"),
-                new Rectangle(0 + textureWidth, 0, textureWidth, textureHeight), true));
-
-                tankXPosition = pPlayArea.X + outerBlockXOffset;
-                tankRotation = 0;
-                if (DGS.Instance.GetInt("NUM_PLAYERS") > 3)
+                    DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().GetController(1),
+                    tankPositions[1].X, tankPositions[1].Y, tankRotations[1], tankScale,
+                    game.CM().Load<Texture2D>("healthbar_engineer_06"),
+                    game.CM().Load<Texture2D>("healthbar_engineer_05"),
+                    game.CM().Load<Texture2D>("healthbar_engineer_04"),
+                    game.CM().Load<Texture2D>("healthbar_engineer_03"),
+                    game.CM().Load<Texture2D>("healthbar_engineer_02"),
+                    game.CM().Load<Texture2D>("healthbar_engineer_01"),
+                    new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth, 0, textureWidth, textureHeight), false));
+                if (DGS.Instance.GetInt("NUM_PLAYERS") > 2)
                 {
-                    tankYPosition = pPlayArea.Y + pPlayArea.Height / 2 + 50;
+                    tankRotation = (float)Math.PI;
+                    if (DGS.Instance.GetInt("NUM_PLAYERS") <= 3)
+                    {
+                        tankXPosition = pPlayArea.Width / 2 + 35;
+                        tankRotation = (float)Math.PI / 2;
+                    }
+
 
                     m_Teams.Add(new Player(
-        DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().Controller3(),
-        tankPositions[3].X, tankPositions[3].Y, tankRotations[3], tankScale,
-        game.CM().Load<Texture2D>("healthbar_yeti_06"),
-        game.CM().Load<Texture2D>("healthbar_yeti_05"),
-        game.CM().Load<Texture2D>("healthbar_yeti_04"),
-        game.CM().Load<Texture2D>("healthbar_yeti_03"),
-        game.CM().Load<Texture2D>("healthbar_yeti_02"),
-        game.CM().Load<Texture2D>("healthbar_yeti_01"),
-        new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth * 2, 0, textureWidth, textureHeight), false));
+                    DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().GetController(2),
+                    tankPositions[2].X, tankPositions[2].Y, tankRotations[2], tankScale,
+                    game.CM().Load<Texture2D>("healthbar_robo_06"),
+                    game.CM().Load<Texture2D>("healthbar_robo_05"),
+                    game.CM().Load<Texture2D>("healthbar_robo_04"),
+                    game.CM().Load<Texture2D>("healthbar_robo_03"),
+                    game.CM().Load<Texture2D>("healthbar_robo_02"),
+                    game.CM().Load<Texture2D>("healthbar_robo_01"),
+                    new Rectangle(0 + textureWidth, 0, textureWidth, textureHeight), true));
+
+                    tankXPosition = pPlayArea.X + outerBlockXOffset;
+                    tankRotation = 0;
+                    if (DGS.Instance.GetInt("NUM_PLAYERS") > 3)
+                    {
+                        tankYPosition = pPlayArea.Y + pPlayArea.Height / 2 + 50;
+
+                        m_Teams.Add(new Player(
+                        DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(4),
+                        tankPositions[3].X, tankPositions[3].Y, tankRotations[3], tankScale,
+                        game.CM().Load<Texture2D>("healthbar_yeti_06"),
+                        game.CM().Load<Texture2D>("healthbar_yeti_05"),
+                        game.CM().Load<Texture2D>("healthbar_yeti_04"),
+                        game.CM().Load<Texture2D>("healthbar_yeti_03"),
+                        game.CM().Load<Texture2D>("healthbar_yeti_02"),
+                        game.CM().Load<Texture2D>("healthbar_yeti_01"),
+                        new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth * 2, 0, textureWidth, textureHeight), false));
+                    }
                 }
             }
-
 
             m_World = new TheWorld(pPlayArea, Walls);
         }
@@ -697,8 +700,12 @@ namespace Tankontroller.Scenes
             Escape();
 
             IntroFinished();
-            mController0.UpdateController();
-            mController1.UpdateController();
+            for (int i = 0; i < DGS.Instance.GetInt("NUM_PLAYERS"); i++)
+            {
+                IController controller = Tankontroller.Instance().GetController(i);
+                controller.UpdateController();
+            }
+
             bool tankMoved = false;
 
             foreach (Player p in m_Teams)

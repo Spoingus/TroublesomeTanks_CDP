@@ -35,7 +35,7 @@ void setup() {
   colorFill(20,0,0);  
 }
 
-const byte ports [] = { 0,1,2,3,4,5,6,7 };
+const byte ports [] = { 0,1,2,3,4,5,6 };
 
 // Sends the serial data for the ports
 // Sends an eight bit value for each port
@@ -80,10 +80,22 @@ void loop() {
   {
     int command = Serial.read();
     if ( command == 'R' )
+    {
       sendData();
+    }
    if ( command == 'P')
+   {
      receivePanel();
+   }
+    if( command == 'I')
+    {
+      identifyDevice();
+    }
   }
+}
+void identifyDevice()
+{  
+  Serial.write("Tankontroller");
 }
 
 byte IdentifyConnection(byte port) {
