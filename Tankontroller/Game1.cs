@@ -46,6 +46,14 @@ namespace Tankontroller
             }
             return mGameInterface;
         }
+        
+        public void TurnOffControllers()
+        {
+            foreach (IController controller in mControllers)
+            {
+                controller.TurnOffLights();
+            }
+        }
 
         public IController GetController(int pIndex) { return mControllers[pIndex]; }
 

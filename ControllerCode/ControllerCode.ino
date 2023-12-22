@@ -17,7 +17,7 @@
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(64, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(61, PIN, NEO_GRB + NEO_KHZ800);
 
 //#define TEST_MODE 0
 
@@ -32,7 +32,7 @@ void setup() {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  colorFill(20,0,0);  
+  initialiseAnimation();
 }
 
 const byte ports [] = { 0,1,2,3,4,5,6 };
@@ -221,6 +221,17 @@ void receivePanel()
     else {
     //  colorFill(20,0,0);
     }
+}
+
+// Fill the dots witn one colour
+void initialiseAnimation() {
+  colorFill(20, 0, 0);
+  delay(500);
+  colorFill(20, 0, 20);
+  delay(500);
+  colorFill(20, 20, 0);
+  delay(500);
+  colorFill(0, 0, 0);
 }
 
 // Fill the dots witn one colour

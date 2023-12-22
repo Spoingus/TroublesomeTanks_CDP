@@ -28,7 +28,7 @@ namespace Tankontroller.Scenes
             int x = (screenWidth - width) / 2;
             int y = (screenHeight - height) / 2;
             mRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
-            mSecondsLeft = DGS.Instance.GetInt("SECONDS_TO_DISPLAY_GAMEOVER_SCREEN");
+            mSecondsLeft = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_GAMEOVER_SCREEN");
             game.ReplaceCurrentMusicInstance("Music/Music_start", true);
             mPlayers = pPlayers;
             mWinner = pWinner;

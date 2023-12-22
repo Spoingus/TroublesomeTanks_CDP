@@ -41,6 +41,7 @@ namespace Tankontroller.Scenes
             {
                 // we should exit the game here...
                   Tankontroller game = (Tankontroller)Tankontroller.Instance();
+                game.TurnOffControllers();
                   game.Exit();
             }
         }

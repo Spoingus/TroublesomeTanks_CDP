@@ -73,7 +73,7 @@ namespace Tankontroller
             int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
             int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
             int xOffset = isOnLeft ? pRectangle.X + pRectangle.Width - (8 * xIncrement) - powerBarWidth : pRectangle.X;
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 7; j++)
             {
                 m_PowerBars[j] = new PowerBar(new Vector2(xOffset + xValue, powerBar_yValueOffset), powerBarWidth, powerBarHeight);
                 m_JackIcons[j] = new JackIcon(new Vector2(xOffset + xValue, jackIcons_yValueOffset), powerBarWidth, powerBarWidth);
@@ -101,7 +101,7 @@ namespace Tankontroller
         {
             DrawHealthBar(pSpriteBatch);
 
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 7; j++)
             {
                 if(m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
                 {

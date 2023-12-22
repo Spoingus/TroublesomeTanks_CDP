@@ -15,7 +15,10 @@ namespace Tankontroller
         static void Main()
         {
             using (var game = (Tankontroller)Tankontroller.Instance())
+            {
                 game.Run();
+                game.TurnOffControllers();
+            }
         }
     }
 #endif

@@ -12,21 +12,19 @@ namespace Tankontroller
         {
 
             if (pJackNum == 0) // As the ports dont line up in code/IRL, I've had to hard code these - JD
-                return 3;
+                return 5;
             else if (pJackNum == 1)
-                return 2;
+                return 4;
             else if (pJackNum == 2)
-                return 6;
+                return 3;
             else if (pJackNum == 3)
-                return 7;
+                return 2;
             else if (pJackNum == 4)
                 return 1;
             else if (pJackNum == 5)
                 return 0;
             else if (pJackNum == 6)
-                return 5;
-            else if (pJackNum == 7)
-                return 4;
+                return 6;
 
             return -1;
         }

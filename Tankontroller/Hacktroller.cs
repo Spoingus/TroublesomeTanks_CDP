@@ -91,11 +91,11 @@ namespace Tankontroller
 
         Random rand = new Random(1);
 
-        static int numPins = 8;
+        static int numPins = 7;
         static byte[] dCommand = new[] { (byte)'D' };
         static byte[] pCommand = new[] { (byte)'P' };
 
-        static byte[] frameBuffer = new byte[64 * 3];
+        static byte[] frameBuffer = new byte[61 * 3];
 
         static int tolerance= 0; // SJG I changed this from 1 to 3 because some pins seemed dodgy
 

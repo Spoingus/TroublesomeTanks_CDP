@@ -21,6 +21,8 @@ namespace Tankontroller
         Control GetJackControl(int pJackIndex);
         bool IsPressed(Control pControl);
         void ResetJacks();
+        void TurnOffLights();
+        void TurnOnLights();
 
         void SetColour(Color pColour);
 
@@ -29,6 +31,14 @@ namespace Tankontroller
 
     public abstract class Controller : IController
     {
+        protected class LEDArray
+        {
+            public int[] LED_IDS = new int[4];
+            public LEDArray()
+            {
+
+            }
+        }
         protected class Jack {
             public Control Control;
             public bool IsDown;
@@ -47,10 +57,14 @@ namespace Tankontroller
         };
         protected Color mColour;
         protected Jack[] mJacks;
+        protected LEDArray mLeds;
+        protected bool mLightsOn;
 
         protected Controller()
         {
-            mJacks = new Jack[8] { new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack() };
+            mJacks = new Jack[7] { new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack() };
+            mLeds = new LEDArray();
+            mLightsOn = true;
         }
 
         public void SetColour(Color pColour)
@@ -63,6 +77,16 @@ namespace Tankontroller
             {
                 j.ResetCharge();
             }
+        }
+
+        public void TurnOffLights()
+        {
+            mLightsOn = false;
+            UpdateController();
+        }
+        public void TurnOnLights()
+        {
+            mLightsOn = true;
         }
 
         public Control GetJackControl(int pJackIndex)
@@ -79,7 +103,7 @@ namespace Tankontroller
 
         public bool IsPressedWithCharge(Control pControl)
         {
-            for ( int i = 0; i < 8; ++i)
+            for ( int i = 0; i < 7; ++i)
             {
                 if (mJacks[i].Control == pControl)
                 {
@@ -90,7 +114,7 @@ namespace Tankontroller
         }
         public void DepleteCharge(Control pControl, float amount)
         {
-            for (int i = 0; i < 8; ++i)
+            for (int i = 0; i < 7; ++i)
             {
                 if (mJacks[i].Control == pControl)
                 {
@@ -107,7 +131,7 @@ namespace Tankontroller
 
         public void AddCharge(Control pControl, float amount)
         {
-            for (int i = 0; i < 8; ++i)
+            for (int i = 0; i < 7; ++i)
             {
                 if (mJacks[i].Control == pControl)
                 {
@@ -124,7 +148,7 @@ namespace Tankontroller
 
         public bool IsPressed(Control pControl)
         {
-            for (int i = 0; i < 8; ++i)
+            for (int i = 0; i < 7; ++i)
             {
                 if (mJacks[i].Control == pControl)
                 {
@@ -154,7 +178,6 @@ namespace Tankontroller
             mJacks[4].Control = Control.FIRE;
             mJacks[5].Control = Control.TURRET_LEFT;
             mJacks[6].Control = Control.TURRET_RIGHT;
-            mJacks[7].Control = Control.RECHARGE;
         }
 
         public override void UpdateController()
@@ -200,15 +223,14 @@ namespace Tankontroller
         public ModularController(string pPort):base()
         {
 
-            mJacks[4].LED_IDS = new int[8] { 0, 1, 2, 3, 4, 5, 6, 7 };
-            mJacks[5].LED_IDS = new int[8] { 8, 9, 10, 11, 12, 13, 14, 15 };
-            mJacks[0].LED_IDS = new int[8] { 16, 17, 18, 19, 20, 21, 22, 23 };
-            mJacks[1].LED_IDS = new int[8] { 24, 25, 26, 27, 28, 29, 30, 31 };
-            mJacks[7].LED_IDS = new int[8] { 32, 33, 34, 35, 36, 37, 38, 39 };
-            mJacks[6].LED_IDS = new int[8] { 40, 41, 42, 43, 44, 45, 46, 47 };
-            mJacks[2].LED_IDS = new int[8] { 48, 49, 50, 51, 52, 53, 54, 55 };
-            mJacks[3].LED_IDS = new int[8] { 56, 57, 58, 59, 60, 61, 62, 63 };
-
+            mJacks[5].LED_IDS = new int[8] { 0, 1, 2, 3, 4, 5, 6, 7 };
+            mJacks[4].LED_IDS = new int[8] { 8, 9, 10, 11, 12, 13, 14, 15 };
+            mJacks[3].LED_IDS = new int[8] { 16, 17, 18, 19, 20, 21, 22, 23 };
+            mJacks[2].LED_IDS = new int[8] { 24, 25, 26, 27, 28, 29, 30, 31 };
+            mJacks[1].LED_IDS = new int[8] { 32, 33, 34, 35, 36, 37, 38, 39 };
+            mJacks[0].LED_IDS = new int[8] { 40, 41, 42, 43, 44, 45, 46, 47 };
+            mJacks[6].LED_IDS = new int[8] { 48, 49, 50, 51, 52, 53, 54, 55 };
+            mLeds.LED_IDS = new int[5] { 56, 57, 58, 59, 60 };
             mHacktroller = new Hacktroller(pPort);
 
             PullDataThread();
@@ -309,7 +331,7 @@ namespace Tankontroller
         //}
         private void UpdateColors()
         {
-            ControllerColor[] result = new ControllerColor[64];
+            ControllerColor[] result = new ControllerColor[61];
 
             for (int i = 0; i < result.Length; i++)
             {
@@ -317,50 +339,58 @@ namespace Tankontroller
                 result[i].G = (byte)(0);
                 result[i].B = (byte)(0);
             }
-
-            foreach (Jack J in mJacks)
+            if(mLightsOn)
             {
-                // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
-                // J.charge should be between 0 and DGS.MAX_CHARGE
-                int FullByte = 50;
-                float brightness = 0.2f;
-                float decimalCharge = J.charge / DGS.Instance.GetFloat("MAX_CHARGE");
-                float remainingCharge = 8 * decimalCharge;
-                foreach (int i in J.LED_IDS)
+                foreach (Jack J in mJacks)
                 {
-                    if (remainingCharge >= 1)
+                    // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
+                    // J.charge should be between 0 and DGS.MAX_CHARGE
+                    int FullByte = 50;
+                    float brightness = 0.2f;
+                    float decimalCharge = J.charge / DGS.Instance.GetFloat("MAX_CHARGE");
+                    float remainingCharge = 8 * decimalCharge;
+                    foreach (int i in J.LED_IDS)
                     {
-                        result[i].R = (byte)((mColour.R) * brightness);
-                        result[i].G = (byte)((mColour.G) * brightness);
-                        result[i].B = (byte)((mColour.B) * brightness);
-                        /*
-                        if (decimalCharge < 0.5f)
+                        if (remainingCharge >= 1)
                         {
-                            result[i].R = (byte)(FullByte);
-                            result[i].G = (byte)(0);
-                            result[i].B = (byte)(0);
-                        }
-                        else if (decimalCharge < 0.9f)
-                        {
-                            result[i].R = (byte)(FullByte);
-                            result[i].G = (byte)(FullByte);
-                            result[i].B = (byte)(0);
+                            result[i].R = (byte)((mColour.R) * brightness);
+                            result[i].G = (byte)((mColour.G) * brightness);
+                            result[i].B = (byte)((mColour.B) * brightness);
+                            /*
+                            if (decimalCharge < 0.5f)
+                            {
+                                result[i].R = (byte)(FullByte);
+                                result[i].G = (byte)(0);
+                                result[i].B = (byte)(0);
+                            }
+                            else if (decimalCharge < 0.9f)
+                            {
+                                result[i].R = (byte)(FullByte);
+                                result[i].G = (byte)(FullByte);
+                                result[i].B = (byte)(0);
+                            }
+                            else
+                            {
+                                result[i].R = (byte)(0);
+                                result[i].G = (byte)(FullByte);
+                                result[i].B = (byte)(0);
+                            }
+                            */
                         }
                         else
                         {
                             result[i].R = (byte)(0);
-                            result[i].G = (byte)(FullByte);
+                            result[i].G = (byte)(0);
                             result[i].B = (byte)(0);
                         }
-                        */
+                        remainingCharge--;
                     }
-                    else
+                    foreach (int i in mLeds.LED_IDS)
                     {
-                        result[i].R = (byte)(0);
-                        result[i].G = (byte)(0);
-                        result[i].B = (byte)(0);
+                        result[i].R = (byte)(30);
+                        result[i].G = (byte)(30);
+                        result[i].B = (byte)(30);
                     }
-                    remainingCharge--;
                 }
             //    }
             //    else if (decimalCharge < 0.66f)
@@ -417,7 +447,8 @@ namespace Tankontroller
         {
             // Can we pull data in here instead?
             // PullDataThread();
-           // PullData();
+            // PullData();
+            UpdateColors();
         }
 
         private void PullData()
@@ -537,7 +568,10 @@ namespace Tankontroller
             {
                 //do nothing?
             }
-            PullDataThread();
+            if (mLightsOn)
+            {
+                PullDataThread();
+            }
         }
     }
 }
