@@ -95,7 +95,7 @@ void loop() {
 }
 void identifyDevice()
 {  
-  Serial.write("Tankontroller");
+  Serial.write("Tankontroller\n");
 }
 
 byte IdentifyConnection(byte port) {

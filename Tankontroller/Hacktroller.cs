@@ -156,14 +156,18 @@ namespace Tankontroller
             port.ReadTimeout = 10;
             port.WriteTimeout = 10;
 
+            
+        }
+        public Hacktroller(SerialPort pPort)
+        {
+            port = pPort;
             pinStates = new PinState[numPins];
             portStates = new PortState[numPins];
 
             for (int i = 0; i < frameBuffer.Length; i++)
             {
                 frameBuffer[i] = 20;
-            }           
-                
+            }
         }
 
         public PortState[] GetPorts()

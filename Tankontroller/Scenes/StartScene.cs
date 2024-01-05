@@ -25,19 +25,11 @@ namespace Tankontroller.Scenes
         Rectangle mTitleRectangle;
 
         SpriteBatch mSpriteBatch = null;
-        List<IController> mControllers;
+        
         float mSecondsLeft;
         public StartScene() {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            mControllers = new List<IController>();
-            for (int i = 0; i < DGS.Instance.GetInt("NUM_PLAYERS"); i++)
-            {
-                IController controller = Tankontroller.Instance().GetController(i);
-                if (controller != null)
-                {
-                    mControllers.Add(controller);
-                }
-            }
+            
             
             
             
@@ -92,7 +84,7 @@ namespace Tankontroller.Scenes
         }
 
 
-
+        
         private void ExitGame()
         {
             IGame game = Tankontroller.Instance();
@@ -108,7 +100,14 @@ namespace Tankontroller.Scenes
         public void Update(float pSeconds)
         {
             Escape();
-            foreach (IController controller in mControllers)
+
+            IGame game = Tankontroller.Instance();
+            if (DGS.Instance.GetBool("HAVE_CONTROLLER"))
+            {
+                game.DetectControllers();
+            }
+
+            foreach (IController controller in game.GetControllers())
             {
                 controller.UpdateController();
                 mSecondsLeft -= pSeconds;

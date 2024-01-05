@@ -3,8 +3,10 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using Tankontroller.Scenes;
 
 namespace Tankontroller
@@ -20,7 +22,8 @@ namespace Tankontroller
         GraphicsDeviceManager GDM();
 
         IController GetController(int pIndex);
-
+        List<IController> GetControllers();
+        void DetectControllers();
         void Exit();
     }
 
@@ -33,7 +36,7 @@ namespace Tankontroller
         private GraphicsDeviceManager mGraphics;
         private SpriteBatch mBatch;
         private SceneManager mSceneManager;
-        private List<IController> mControllers;
+        private Dictionary<string, IController> mControllers;
         private static IGame mGameInterface = null;
         private SoundEffectInstance mCurrentMusic;
         private string mCurrentMusicName;
@@ -46,17 +49,69 @@ namespace Tankontroller
             }
             return mGameInterface;
         }
-        
-        public void TurnOffControllers()
+        public void DetectControllers()
         {
-            foreach (IController controller in mControllers)
+            string[] portNames = SerialPort.GetPortNames();
+            foreach (string portName in portNames)
             {
-                controller.TurnOffLights();
+                if (!mControllers.ContainsKey(portName))
+                {
+                    SerialPort port = new SerialPort(portName, 19200);//, Parity.None, 8, StopBits.One);
+
+                    port.Open();
+
+                    port.DtrEnable = true;
+
+                    port.ReadTimeout = 10;
+                    port.WriteTimeout = 10;
+
+                    port.DiscardInBuffer();
+                    port.Write(new byte[] { (byte)'I' }, 0, 1);
+
+                    System.Threading.Thread.Sleep(10);
+
+                    if (port.BytesToRead > 0)
+                    {
+                        // The comms starts with 0xff 0xff
+                        try
+                        {
+                            string response = port.ReadLine();
+                            if (response == "Tankontroller")
+                            {
+                                Hacktroller hacktroller = new Hacktroller(port);
+                                IController controller = new ModularController(hacktroller);
+                                mControllers.Add(portName, controller);
+                            }
+                            else
+                            {
+                                bool stopHere = true;
+                                port.Close();
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            //possible timeout - ignore
+                        }
+                    }
+                    else
+                    {
+                        bool stopHere = true;
+                        port.Close();
+                    }
+                }
             }
         }
 
-        public IController GetController(int pIndex) { return mControllers[pIndex]; }
+        public void TurnOffControllers()
+        {
+            foreach (KeyValuePair<string, IController> controller in mControllers)
+            {
+                controller.Value.TurnOffLights();
+            }
+        }
 
+        public IController GetController(int pIndex) { return mControllers.Values.ElementAt(pIndex); }
+        public List<IController> GetControllers() { return mControllers.Values.ToList(); }
        
         public SoundManager GetSoundManager() { return mSoundManager; }
         public SceneManager SM() { return mSceneManager; }
@@ -67,84 +122,12 @@ namespace Tankontroller
             mGraphics               = new GraphicsDeviceManager(this);
             Content.RootDirectory   = "Content";
             mSceneManager           = new SceneManager();
-            if (DGS.Instance.GetBool("HAVE_CONTROLLER"))
-            {
-                mControllers = new List<IController>();
-                IController controller = new ModularController(DGS.Instance.GetString("CONTROLLER0_PORT"));
-                mControllers.Add(controller);
-                if (DGS.Instance.GetInt("NUM_PLAYERS") > 1)
-                {
-                    if (DGS.Instance.GetInt("NUM_CONTROLLERS") > 1)
-                    {
-                        controller = new ModularController(DGS.Instance.GetString("CONTROLLER1_PORT"));
-                    }
-                    else
-                    {
-                        Dictionary<Keys, Control> Player1KeyMap = new Dictionary<Keys, Control>();
-                        Player1KeyMap.Add(Keys.Q, Control.LEFT_TRACK_FORWARDS);
-                        Player1KeyMap.Add(Keys.A, Control.LEFT_TRACK_BACKWARDS);
-                        Player1KeyMap.Add(Keys.W, Control.RIGHT_TRACK_FORWARDS);
-                        Player1KeyMap.Add(Keys.S, Control.RIGHT_TRACK_BACKWARDS);
-                        Player1KeyMap.Add(Keys.Z, Control.TURRET_LEFT);
-                        Player1KeyMap.Add(Keys.X, Control.TURRET_RIGHT);
-                        Player1KeyMap.Add(Keys.Space, Control.FIRE);
-                        Player1KeyMap.Add(Keys.C, Control.RECHARGE);
-
-                        Dictionary<Keys, int> Player1PortMap = new Dictionary<Keys, int>();
-                        Player1PortMap.Add(Keys.D1, 3);
-                        Player1PortMap.Add(Keys.D2, 2);
-                        Player1PortMap.Add(Keys.D3, 6);
-                        Player1PortMap.Add(Keys.D4, 7);
-                        Player1PortMap.Add(Keys.D5, 1);
-                        Player1PortMap.Add(Keys.D6, 0);
-                        Player1PortMap.Add(Keys.D7, 5);
-                        Player1PortMap.Add(Keys.D8, 4);
-
-                        controller = new KeyboardController(Player1KeyMap, Player1PortMap);
-                    }
-                    mControllers.Add(controller);
-                    if (DGS.Instance.GetInt("NUM_PLAYERS") > 2)
-                    {
-                        if (DGS.Instance.GetInt("NUM_CONTROLLERS") > 2)
-                        {
-                            controller = new ModularController(DGS.Instance.GetString("CONTROLLER2_PORT"));
-                        }
-                        else
-                        {
-                            Dictionary<Keys, Control> Player2KeyMap = new Dictionary<Keys, Control>();
-                            Player2KeyMap.Add(Keys.Insert, Control.LEFT_TRACK_FORWARDS);
-                            Player2KeyMap.Add(Keys.Delete, Control.LEFT_TRACK_BACKWARDS);
-                            Player2KeyMap.Add(Keys.Home, Control.RIGHT_TRACK_FORWARDS);
-                            Player2KeyMap.Add(Keys.End, Control.RIGHT_TRACK_BACKWARDS);
-                            Player2KeyMap.Add(Keys.PageUp, Control.TURRET_LEFT);
-                            Player2KeyMap.Add(Keys.PageDown, Control.TURRET_RIGHT);
-                            Player2KeyMap.Add(Keys.Enter, Control.FIRE);
-                            Player2KeyMap.Add(Keys.P, Control.RECHARGE);
-
-                            Dictionary<Keys, int> Player2PortMap = new Dictionary<Keys, int>();
-                            Player2PortMap.Add(Keys.F1, 3);
-                            Player2PortMap.Add(Keys.F2, 2);
-                            Player2PortMap.Add(Keys.F3, 6);
-                            Player2PortMap.Add(Keys.F4, 7);
-                            Player2PortMap.Add(Keys.F5, 1);
-                            Player2PortMap.Add(Keys.F6, 0);
-                            Player2PortMap.Add(Keys.F7, 5);
-                            Player2PortMap.Add(Keys.F8, 4);
-
-                            controller = new KeyboardController(Player2KeyMap, Player2PortMap);
-                        }
-                        mControllers.Add(controller);
-                        if (DGS.Instance.GetInt("NUM_PLAYERS") > 3)
-                        {
-                            controller = new ModularController(DGS.Instance.GetString("CONTROLLER3_PORT"));
-                            mControllers.Add(controller);
-                        }
-                    }
-                }
+            mControllers = new Dictionary<string, IController>();
+            
                 
-            }
-            else
+            if (DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_1"))
             {
+                    
                 Dictionary<Keys, Control> Player1KeyMap = new Dictionary<Keys, Control>();
                 Player1KeyMap.Add(Keys.Q, Control.LEFT_TRACK_FORWARDS);
                 Player1KeyMap.Add(Keys.A, Control.LEFT_TRACK_BACKWARDS);
@@ -166,8 +149,11 @@ namespace Tankontroller
                 Player1PortMap.Add(Keys.D8, 4);
 
                 IController controller = new KeyboardController(Player1KeyMap, Player1PortMap);
-                mControllers.Add(controller);
+                mControllers.Add("Keyboard1", controller);
+            }
 
+            if(DGS.Instance.GetBool("ADD_KEYBOARD_CONROLLER_2"))
+            {
                 Dictionary<Keys, Control> Player2KeyMap = new Dictionary<Keys, Control>();
                 Player2KeyMap.Add(Keys.Insert, Control.LEFT_TRACK_FORWARDS);
                 Player2KeyMap.Add(Keys.Delete, Control.LEFT_TRACK_BACKWARDS);
@@ -188,10 +174,9 @@ namespace Tankontroller
                 Player2PortMap.Add(Keys.F7, 5);
                 Player2PortMap.Add(Keys.F8, 4);
 
-                controller = new KeyboardController(Player2KeyMap, Player2PortMap); ;
-                mControllers.Add(controller);
+                IController controller = new KeyboardController(Player2KeyMap, Player2PortMap);
+                mControllers.Add("Keyboard2", controller);
             }
-
 
             mSoundManager = new SoundManager();
 
@@ -257,7 +242,6 @@ namespace Tankontroller
         {
             float seconds = 0.001f * gameTime.ElapsedGameTime.Milliseconds;
             mSceneManager.Update(seconds);
-            
             base.Update(gameTime);
         }
         public SoundEffectInstance ReplaceCurrentMusicInstance(string pName, bool pLoopable)

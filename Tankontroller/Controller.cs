@@ -220,7 +220,7 @@ namespace Tankontroller
     {
         private Hacktroller mHacktroller;
 
-        public ModularController(string pPort):base()
+        public ModularController(Hacktroller pHackTroller):base()
         {
 
             mJacks[5].LED_IDS = new int[8] { 0, 1, 2, 3, 4, 5, 6, 7 };
@@ -231,7 +231,7 @@ namespace Tankontroller
             mJacks[0].LED_IDS = new int[8] { 40, 41, 42, 43, 44, 45, 46, 47 };
             mJacks[6].LED_IDS = new int[8] { 48, 49, 50, 51, 52, 53, 54, 55 };
             mLeds.LED_IDS = new int[5] { 56, 57, 58, 59, 60 };
-            mHacktroller = new Hacktroller(pPort);
+            mHacktroller = pHackTroller;
 
             PullDataThread();
         }
