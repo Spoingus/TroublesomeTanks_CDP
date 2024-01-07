@@ -110,7 +110,7 @@ namespace Tankontroller
             }
         }
 
-        public IController GetController(int pIndex) { return mControllers.Values.ElementAt(pIndex); }
+        public IController GetController(int pIndex) {  return mControllers.Values.ElementAt(pIndex); }
         public List<IController> GetControllers() { return mControllers.Values.ToList(); }
        
         public SoundManager GetSoundManager() { return mSoundManager; }
@@ -152,7 +152,7 @@ namespace Tankontroller
                 mControllers.Add("Keyboard1", controller);
             }
 
-            if(DGS.Instance.GetBool("ADD_KEYBOARD_CONROLLER_2"))
+            if(DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_2"))
             {
                 Dictionary<Keys, Control> Player2KeyMap = new Dictionary<Keys, Control>();
                 Player2KeyMap.Add(Keys.Insert, Control.LEFT_TRACK_FORWARDS);

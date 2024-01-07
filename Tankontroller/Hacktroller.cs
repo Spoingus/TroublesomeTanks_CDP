@@ -190,12 +190,12 @@ namespace Tankontroller
 
                 port.Read(buffer, 0, buffer.Length);
 
-                   for (int i = 0; i < numPins; i++)
+                for (int i = 0; i < numPins; i++)
                 //for (int i = 0; i < 1; i++)
                 {
                     int reading = buffer[i +1 ];
                     ControllerState readingState = DecodeState(reading);
-                        if (readingState == ControllerState.FIRE_PRESSED)
+                    if (readingState == ControllerState.FIRE_PRESSED)
                     {
                         portStates[i].Controller = ControllerState.FIRE_PRESSED;
                     }

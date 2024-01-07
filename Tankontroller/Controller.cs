@@ -452,125 +452,136 @@ namespace Tankontroller
         }
 
         private void PullData()
-        {            
-            PortState[] ports = mHacktroller.GetPorts();
+        {
+            
 
-            if (ports == null) return;
-
-            for (int i = 0; i < ports.Length; ++i)
+            while (mLightsOn)
             {
-                mJacks[i].IsDown = ports[i].FirePressed;
 
-                if (ports[i].Controller == ControllerState.NOT_CONNECTED)
+                PortState[] ports = mHacktroller.GetPorts();
+
+                if (ports == null)
                 {
-                    mJacks[i].Control = Control.NONE;
+                    return;
+                }
+                for (int i = 0; i < ports.Length; ++i)
+                {
+                    mJacks[i].IsDown = ports[i].FirePressed;
+
+                    if (ports[i].FirePressed)
+                    {
+                        bool stopHere = true;
+                    }
+
+                    if (ports[i].Controller == ControllerState.NOT_CONNECTED)
+                    {
+                        mJacks[i].Control = Control.NONE;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_FORWARDS)
+                    {
+                        mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
+                    }
+                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_FORWARDS_PRESSED)
+                    {
+                        mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
+                        mJacks[i].IsDown = true;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_BACKWARDS)
+                    {
+                        mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
+                    }
+                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_BACKWARDS_PRESSED)
+                    {
+                        mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
+                        mJacks[i].IsDown = true;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_FORWARDS)
+                    {
+                        mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
+                    }
+                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_FORWARDS_PRESSED)
+                    {
+                        mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
+                        mJacks[i].IsDown = true;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_BACKWARDS)
+                    {
+                        mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
+                    }
+                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED)
+                    {
+                        mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
+                        mJacks[i].IsDown = true;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.TURRET_LEFT)
+                    {
+                        mJacks[i].Control = Control.TURRET_LEFT;
+                    }
+                    else if (ports[i].Controller == ControllerState.TURRET_LEFT_PRESSED)
+                    {
+                        mJacks[i].Control = Control.TURRET_LEFT;
+                        mJacks[i].IsDown = true;
+                    }
+
+                    else if (ports[i].Controller == ControllerState.TURRET_RIGHT)
+                    {
+                        mJacks[i].Control = Control.TURRET_RIGHT;
+                    }
+                    else if (ports[i].Controller == ControllerState.TURRET_RIGHT_PRESSED)
+                    {
+                        mJacks[i].Control = Control.TURRET_RIGHT;
+                        mJacks[i].IsDown = true;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.CHARGE)
+                    {
+                        mJacks[i].Control = Control.RECHARGE;
+                    }
+                    else if (ports[i].Controller == ControllerState.CHARGE_PRESSED)
+                    {
+                        mJacks[i].Control = Control.RECHARGE;
+                        mJacks[i].IsDown = true;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.FIRE)
+                    {
+                        mJacks[i].Control = Control.FIRE;
+                    }
+                    else if (ports[i].Controller == ControllerState.FIRE_PRESSED)
+                    {
+                        mJacks[i].Control = Control.FIRE;
+                        mJacks[i].IsDown = true;
+                    }
+
+
+                    else if (ports[i].Controller == ControllerState.NO_MATCH)
+                    {
+                    }
                 }
 
-
-                else if (ports[i].Controller == ControllerState.LEFT_TRACK_FORWARDS)
+                //System.Threading.Thread.Sleep(10);
+                try
                 {
-                    mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
+                  //  UpdateColors();
                 }
-                else if (ports[i].Controller == ControllerState.LEFT_TRACK_FORWARDS_PRESSED)
+                catch(Exception e)
                 {
-                    mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
-                    mJacks[i].IsDown = true;
+                    //do nothing?
                 }
-
-
-                else if (ports[i].Controller == ControllerState.LEFT_TRACK_BACKWARDS)
-                {
-                    mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
-                }
-                else if (ports[i].Controller == ControllerState.LEFT_TRACK_BACKWARDS_PRESSED)
-                {
-                    mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
-                    mJacks[i].IsDown = true;
-                }
-
-
-                else if (ports[i].Controller == ControllerState.RIGHT_TRACK_FORWARDS)
-                {
-                    mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
-                }
-                else if (ports[i].Controller == ControllerState.RIGHT_TRACK_FORWARDS_PRESSED)
-                {
-                    mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
-                    mJacks[i].IsDown = true;
-                }
-
-
-                else if (ports[i].Controller == ControllerState.RIGHT_TRACK_BACKWARDS)
-                {
-                    mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
-                }
-                else if (ports[i].Controller == ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED)
-                {
-                    mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
-                    mJacks[i].IsDown = true;
-                }
-
-
-                else if (ports[i].Controller == ControllerState.TURRET_LEFT)
-                {
-                    mJacks[i].Control = Control.TURRET_LEFT;
-                }
-                else if (ports[i].Controller == ControllerState.TURRET_LEFT_PRESSED)
-                {
-                    mJacks[i].Control = Control.TURRET_LEFT;
-                    mJacks[i].IsDown = true;
-                }
-
-                else if (ports[i].Controller == ControllerState.TURRET_RIGHT)
-                {
-                    mJacks[i].Control = Control.TURRET_RIGHT;
-                }
-                else if (ports[i].Controller == ControllerState.TURRET_RIGHT_PRESSED)
-                {
-                    mJacks[i].Control = Control.TURRET_RIGHT;
-                    mJacks[i].IsDown = true;
-                }
-
-
-                else if (ports[i].Controller == ControllerState.CHARGE)
-                {
-                    mJacks[i].Control = Control.RECHARGE;
-                }
-                else if (ports[i].Controller == ControllerState.CHARGE_PRESSED)
-                {
-                    mJacks[i].Control = Control.RECHARGE;
-                    mJacks[i].IsDown = true;
-                }
-
-
-                else if (ports[i].Controller == ControllerState.FIRE)
-                {
-                    mJacks[i].Control = Control.FIRE;
-                }
-                else if (ports[i].Controller == ControllerState.FIRE_PRESSED)
-                {
-                    mJacks[i].Control = Control.FIRE;
-                    mJacks[i].IsDown = true;
-                }
-
-
-                else if (ports[i].Controller == ControllerState.NO_MATCH)
-                {
-                }
-            }
-
-            System.Threading.Thread.Sleep(10);
-            try
-            {
-                UpdateColors();
-            }
-            catch(Exception e)
-            {
-                //do nothing?
-            }
-            if (mLightsOn)
-            {
-                PullDataThread();
+            
+                //PullDataThread();
             }
         }
     }
