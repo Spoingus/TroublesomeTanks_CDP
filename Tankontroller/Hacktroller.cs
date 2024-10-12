@@ -97,7 +97,7 @@ namespace Tankontroller
 
         static byte[] frameBuffer = new byte[61 * 3];
 
-        static int tolerance= 0; // SJG I changed this from 1 to 3 because some pins seemed dodgy
+        static int tolerance= 0; 
 
         PortState[] portStates = new PortState[numPins];
 
@@ -210,7 +210,7 @@ namespace Tankontroller
         }
 
       
-        public bool SetColor(ControllerColor[] colourArray)
+        public async Task<bool> SetColor(ControllerColor[] colourArray)
         {
             byte[] colourWriteCommand = new byte[] { (byte)'P', 0 };
             byte[] writeColour = new byte[3];
@@ -223,7 +223,7 @@ namespace Tankontroller
             colourWriteCommand[1] = (byte)colourArray.Length;
 
             // Write the command
-            port.Write(colourWriteCommand, 0, 2);
+            await port.BaseStream.WriteAsync(colourWriteCommand, 0, 2);
 
             byte check = 0;
 
@@ -236,13 +236,13 @@ namespace Tankontroller
                 writeColour[2] = c.G;
                 check += c.B;
                 writeColour[1] = c.B;
-                port.Write(writeColour, 0, 3);
+                await port.BaseStream.WriteAsync(writeColour, 0, 3);
             }
 
             // Write out the checksum
 
             writeColour[0] = check;
-            port.Write(writeColour, 0, 1);
+            await port.BaseStream.WriteAsync(writeColour, 0, 1);
             return true;
         }
     }
