@@ -2,7 +2,6 @@
 
 namespace Tankontroller
 {
-#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -21,5 +20,4 @@ namespace Tankontroller
             }
         }
     }
-#endif
 }

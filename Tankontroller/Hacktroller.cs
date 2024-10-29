@@ -204,7 +204,6 @@ namespace Tankontroller
                         portStates[i].Controller = readingState;
                     }
                 }
-                Console.WriteLine();
             }
             return portStates;
         }

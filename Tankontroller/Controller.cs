@@ -114,6 +114,7 @@ namespace Tankontroller
         }
         public void DepleteCharge(Control pControl, float amount)
         {
+            return;
             for (int i = 0; i < 7; ++i)
             {
                 if (mJacks[i].Control == pControl)
