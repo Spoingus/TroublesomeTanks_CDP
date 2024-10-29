@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Threading;
 using Tankontroller.World;
 using Microsoft.Xna.Framework;
+using System.Threading.Tasks;
 
 namespace Tankontroller
 {
@@ -330,7 +331,7 @@ namespace Tankontroller
         //    //Thread UpdateColors = new Thread(new ThreadStart(this.UpdateColors));
         //    //UpdateColors.Start();
         //}
-        private void UpdateColors()
+        private async Task UpdateColors()
         {
             ControllerColor[] result = new ControllerColor[61];
 
@@ -437,19 +438,22 @@ namespace Tankontroller
             }
 
 
-            mHacktroller.SetColor(result);
+            await mHacktroller.SetColor(result);
 
             //System.Threading.Thread.Sleep(50);
             //Thread UpdateColors = new Thread(new ThreadStart(this.UpdateColors));
             //UpdateColors.Start();
         }
-
+        Task updateColourTask = null;
         public override void UpdateController()
         {
             // Can we pull data in here instead?
             // PullDataThread();
             // PullData();
-            UpdateColors();
+            if (updateColourTask == null || updateColourTask.IsCompleted)
+            {
+                updateColourTask = Task.Run(async () => await UpdateColors());
+            }
         }
 
         private void PullData()
