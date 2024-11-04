@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>D:/GitHub/TroublesomeTanks_3DP/Tankontroller/Content/healthbar_yeti_05.png</SourceFile>
-  <SourceTime>2024-09-24T16:10:06.9109497+01:00</SourceTime>
-  <DestFile>D:/GitHub/TroublesomeTanks_3DP/Tankontroller/Content/bin/DesktopGL/Content/healthbar_yeti_05.xnb</DestFile>
-  <DestTime>2024-09-24T16:53:54.817961+01:00</DestTime>
+  <SourceFile>C:/Users/667045/Source/Repos/TroublesomeTanks_CDP/Tankontroller/Content/healthbar_yeti_05.png</SourceFile>
+  <SourceTime>2024-11-04T13:56:07.8284617+00:00</SourceTime>
+  <DestFile>C:/Users/667045/Source/Repos/TroublesomeTanks_CDP/Tankontroller/Content/bin/DesktopGL/Content/healthbar_yeti_05.xnb</DestFile>
+  <DestTime>2024-11-04T13:57:13.8217296+00:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2022-07-26T12:44:56+01:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
