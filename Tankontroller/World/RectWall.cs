@@ -41,17 +41,17 @@ namespace Tankontroller.World
             {
                 float difference = Math.Abs(bulletPos.X - m_Rectangle.Left);
                 pCollisionNormal = new Vector2(-1, 0);
-                if(difference > Math.Abs(bulletPos.X - m_Rectangle.Right))
+                if (difference > Math.Abs(bulletPos.X - m_Rectangle.Right))
                 {
                     difference = Math.Abs(bulletPos.X - m_Rectangle.Right);
                     pCollisionNormal = new Vector2(1, 0);
                 }
-                if(difference > Math.Abs(bulletPos.Y - m_Rectangle.Top))
+                if (difference > Math.Abs(bulletPos.Y - m_Rectangle.Top))
                 {
                     difference = Math.Abs(bulletPos.Y - m_Rectangle.Top);
                     pCollisionNormal = new Vector2(0, -1);
                 }
-                if(difference > Math.Abs(bulletPos.Y - m_Rectangle.Bottom))
+                if (difference > Math.Abs(bulletPos.Y - m_Rectangle.Bottom))
                 {
                     pCollisionNormal = new Vector2(0, 1);
                 }
@@ -66,15 +66,20 @@ namespace Tankontroller.World
             Vector2[] tankCorners = new Vector2[4];
             pTank.GetCorners(tankCorners);
 
-            foreach(Vector2 corner in tankCorners)
+            foreach (Vector2 corner in tankCorners)
             {
-                if ((corner.X >= m_Rectangle.Left) &&
-                    (corner.X <= m_Rectangle.Right) &&
-                    (corner.Y <= m_Rectangle.Bottom) &&
-                    (corner.Y >= m_Rectangle.Top))
+                if (m_Rectangle.Contains(corner))
                 {
                     return true;
-                } 
+                }
+            }
+            // Check if any of the corners of the wall are within the tank
+            if (pTank.PointIsInTank(new Vector2(m_Rectangle.Left, m_Rectangle.Top)) ||
+               pTank.PointIsInTank(new Vector2(m_Rectangle.Right, m_Rectangle.Top)) ||
+               pTank.PointIsInTank(new Vector2(m_Rectangle.Left, m_Rectangle.Bottom)) ||
+               pTank.PointIsInTank(new Vector2(m_Rectangle.Right, m_Rectangle.Bottom)))
+            {
+                return true;
             }
             return false;
         }
