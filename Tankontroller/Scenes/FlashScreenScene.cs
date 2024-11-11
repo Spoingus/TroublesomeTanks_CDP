@@ -10,42 +10,42 @@ namespace Tankontroller.Scenes
 {
     public class FlashScreenScene : IScene
     {
-        Texture2D mLogoTexture = null;
-        SpriteBatch mSpriteBatch = null;
-        Rectangle mRectangle;
-        float mSecondsLeft;
-        public FlashScreenScene() {
-            IGame game = Tankontroller.Instance();
-            mLogoTexture = game.CM().Load<Texture2D>("selogo");
-            mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
-            int height = screenHeight / 2;
-            int width = (int)(mLogoTexture.Width * (float)height / mLogoTexture.Height);
-            int x = (screenWidth - width) / 2;
-            int y = (screenHeight - height) / 2;
-            mRectangle = new Rectangle(x, y, width, height);
-            mSecondsLeft = DGS.Instance.GetInt("SECONDS_TO_DISPLAY_FLASH_SCREEN");
+        Texture2D mLogoTexture = null; // The logo texture
+        SpriteBatch mSpriteBatch = null; // The sprite batch
+        Rectangle mRectangle; // The rectangle to draw the logo
+        float mSecondsLeft; // The seconds left to display the flash screen
+        public FlashScreenScene() // Constructor
+        {
+            IGame game = Tankontroller.Instance(); // Get the game instance
+            mLogoTexture = game.CM().Load<Texture2D>("selogo"); // Load the logo texture
+            mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice); // Create the sprite batch
+            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width; // Get the screen width
+            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height; // Get the screen height
+            int height = screenHeight / 2; // Set the height of the logo
+            int width = (int)(mLogoTexture.Width * (float)height / mLogoTexture.Height); // Set the width of the logo
+            int x = (screenWidth - width) / 2; // Set the x position of the logo
+            int y = (screenHeight - height) / 2; // Set the y position of the logo
+            mRectangle = new Rectangle(x, y, width, height); // Set the rectangle to draw the logo
+            mSecondsLeft = DGS.Instance.GetInt("SECONDS_TO_DISPLAY_FLASH_SCREEN"); // Set the seconds left to display the flash screen
         }
 
-        public void Update(float pSeconds)
+        public void Update(float pSeconds) // Update the flash screen
         {
-            mSecondsLeft -= pSeconds;
-            if(mSecondsLeft<= 0.0f)
+            mSecondsLeft -= pSeconds; // Decrease the seconds left
+            if (mSecondsLeft <= 0.0f) // If the seconds left is less than or equal to 0
             {
-                IGame game = Tankontroller.Instance();
-                game.SM().Transition(new StartScene());
-                
+                IGame game = Tankontroller.Instance(); // Get the game instance
+                game.SM().Transition(new StartScene()); // Transition to the start scene
             }
         }
-        public void Draw(float pSeconds)
+        public void Draw(float pSeconds) // Draw the flash screen
         {
-            Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
-            mSpriteBatch.Begin();
+            Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black); // Clear the screen
+            mSpriteBatch.Begin(); // Begin the sprite batch
 
-            mSpriteBatch.Draw(mLogoTexture, mRectangle, Color.White);
+            mSpriteBatch.Draw(mLogoTexture, mRectangle, Color.White); // Draw the logo
 
-            mSpriteBatch.End();
-        }
+            mSpriteBatch.End(); // End the sprite batch
+        } // End of Draw
     }
 }
