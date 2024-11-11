@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Tankontroller.Scenes
 {
+    //The scene that is displayed once only one player remains
     public class GameOverScene : IScene
     {
         private List<Player> mPlayers;
@@ -42,6 +43,8 @@ namespace Tankontroller.Scenes
             }
             RepositionAsLosers();
         }
+
+        //Repositions the winner GUI into the centre of the screen
         public void RepositionAsWinner()
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
@@ -54,6 +57,7 @@ namespace Tankontroller.Scenes
             mPlayers[mWinner].GUI.Reposition(newRectangle);
         }
 
+        //Repositions the loser GUIs into a row at the bottom of the screen
         public void RepositionAsLosers()
         {
             int offset = 0;
