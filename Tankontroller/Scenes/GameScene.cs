@@ -56,6 +56,7 @@ namespace Tankontroller.Scenes
 
         public GameScene()
         {
+            //Loads all the relevant textures for the game scene
             mControllers = new List<IController>();
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             m_TankBaseTexture = game.CM().Load<Texture2D>("Tank-B-05");
@@ -109,23 +110,26 @@ namespace Tankontroller.Scenes
             mPlayAreaOutlineRectangle = new Rectangle(mPlayAreaRectangle.X - 5, mPlayAreaRectangle.Y - 5, mPlayAreaRectangle.Width + 10, mPlayAreaRectangle.Height + 10);
             introMusicInstance = game.ReplaceCurrentMusicInstance("Music/Music_intro", false);
 
-            for(int i = 0; i < DGS.Instance.GetInt("NUM_PLAYERS"); i++)
+
+            int numberOfPlayers = DGS.Instance.GetInt("NUM_PLAYERS");
+
+            for (int i = 0; i < numberOfPlayers; i++)
             {
                 IController controller = Tankontroller.Instance().GetController(i);
                 controller.ResetJacks();
             }
-            
+
             //loopMusicInstance = game.GetSoundManager().GetLoopableSoundEffectInstance("Music/Music_loopable");  // Put the name of your song here instead of "song_title"
             // game.ReplaceCurrentMusicInstance("Music/Music_loopable", true);
             tankMoveSound = game.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks");  // Put the name of your song here instead of "song_title"
 
-            if (DGS.Instance.GetInt("NUM_PLAYERS") < 4)
+            if (numberOfPlayers < 4)
             {
-                setupNot4Player(mPlayAreaRectangle);
+                setupNot4Player(mPlayAreaRectangle, numberOfPlayers);
             }
             else
             {
-                setup4Player(mPlayAreaRectangle);
+                setup4Player(mPlayAreaRectangle, numberOfPlayers);
             }
             foreach (Player p in m_Teams)
             {
@@ -133,9 +137,10 @@ namespace Tankontroller.Scenes
             }
         }
 
-        private void setup4Player(Rectangle pPlayArea)
+        //The game set up for 4 players
+        private void setup4Player(Rectangle pPlayArea, int pNumOfPlayers)
         {
-           
+
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
 
             int middleBlockHeight = pPlayArea.Height / 3;
@@ -143,132 +148,52 @@ namespace Tankontroller.Scenes
             int blockThickness = pPlayArea.Width / 50;
             int outerBlockXOffset = pPlayArea.Width / 8;
 
+            //Creates a list of walls for a 4 player map
+            List<RectWall> Walls = new List<RectWall>();
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
 
-            Texture2D blockTexture = game.CM().Load<Texture2D>("block");
-            List<RectWall> Walls = new List<RectWall> // 4 player walls
-            {
-                new RectWall(blockTexture, new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
-                new RectWall(blockTexture, new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
-                new RectWall(blockTexture, new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)),
-                new RectWall(blockTexture, new Rectangle(pPlayArea.X, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)),
-                new RectWall(blockTexture, new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)),
-                new RectWall(blockTexture, new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight))
-            };
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)));
 
-            //       Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //         new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-            //    Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //       new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight)));
 
-            //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //        new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-            //   Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //      new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
-
-            //   Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //      new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-            // Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //    new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
-
-
-            //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //         new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-            //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-            //          new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
-
-
+            //Creates a list of tank positions and rotations for each of the 4 players
             List<Vector2> tankPositions = new List<Vector2>();
             List<float> tankRotations = new List<float>();
-            if (DGS.Instance.GetInt("NUM_PLAYERS") == 2)
-            {
-                float xPosition = pPlayArea.X + outerBlockXOffset;
-                float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add(0);
 
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI);
-            }
-            else if (DGS.Instance.GetInt("NUM_PLAYERS") == 3)
-            {
-                float xPosition = pPlayArea.X + outerBlockXOffset;
-                float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add(0);
+            float xPosition = pPlayArea.X + outerBlockXOffset / 2;
+            float yPosition = pPlayArea.Y + outerBlockXOffset / 2;
+            Vector2 tankPosition = new Vector2(xPosition, yPosition);
+            tankPositions.Add(tankPosition);
+            tankRotations.Add((float)(-Math.PI + Math.PI / 4));
 
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI);
+            xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
+            yPosition = pPlayArea.Y + outerBlockXOffset / 2;
+            tankPosition = new Vector2(xPosition, yPosition);
+            tankPositions.Add(tankPosition);
+            tankRotations.Add((float)-Math.PI / 4);
 
-                xPosition = pPlayArea.Width / 2 + 35;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI/2);
-            }
-            else if (DGS.Instance.GetInt("NUM_PLAYERS")==4)
-            {
-                float xPosition = pPlayArea.X + outerBlockXOffset / 2;
-                float yPosition = pPlayArea.Y + outerBlockXOffset / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(-Math.PI + Math.PI / 4));
+            xPosition = pPlayArea.X + outerBlockXOffset / 2;
+            yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
+            tankPosition = new Vector2(xPosition, yPosition);
+            tankPositions.Add(tankPosition);
+            tankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
 
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)-Math.PI/4);
+            xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
+            yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
+            tankPosition = new Vector2(xPosition, yPosition);
+            tankPositions.Add(tankPosition);
+            tankRotations.Add((float)Math.PI / 4);
 
-                xPosition = pPlayArea.X + outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(Math.PI / 2 + Math.PI/4));
-
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI / 4);
-            }
-            else if (DGS.Instance.GetInt("NUM_PLAYERS") == 5)
-            {
-                float xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 - outerBlockXOffset / 2;
-                float yPosition = pPlayArea.Y + pPlayArea.Height / 2 - outerBlockXOffset / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(-Math.PI + Math.PI / 4));
-
-                xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 + outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2 - outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)-Math.PI / 4);
-
-                xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 - outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2 + outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
-
-                xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 + outerBlockXOffset /2;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2 + outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI / 4);
-            }
-
-            float tankXPosition = pPlayArea.X + outerBlockXOffset;
-            float tankYPosition = pPlayArea.Y + pPlayArea.Height / 2;
-            float tankRotation = 0;
+            //Creates 4 health bars and an player image for each of the 4 players
             float tankScale = (float)pPlayArea.Width / (50 * 40);
             float textureHeightOverWidth = (float)254 / (float)540;
             int textureWidth = game.GDM().GraphicsDevice.Viewport.Width / 4;
@@ -284,9 +209,6 @@ namespace Tankontroller.Scenes
                 game.CM().Load<Texture2D>("healthbar_winterjack_02"),
                 game.CM().Load<Texture2D>("healthbar_winterjack_01"),
                 new Rectangle(0, 0, textureWidth, textureHeight), true));
-
-            tankXPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-            tankRotation = (float)Math.PI;
 
             m_Teams.Add(new Player(
                 DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().GetController(1),
@@ -298,17 +220,8 @@ namespace Tankontroller.Scenes
                 game.CM().Load<Texture2D>("healthbar_engineer_02"),
                 game.CM().Load<Texture2D>("healthbar_engineer_01"),
                 new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth, 0, textureWidth, textureHeight), false));
-            if (DGS.Instance.GetInt("NUM_PLAYERS") > 2)
-            {
-                tankRotation = (float)Math.PI;
-                if (DGS.Instance.GetInt("NUM_PLAYERS") <= 3)
-                {
-                    tankXPosition = pPlayArea.Width / 2 + 35;
-                    tankRotation = (float)Math.PI / 2;
-                }
-                
-                
-                m_Teams.Add(new Player(
+
+            m_Teams.Add(new Player(
                 DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().GetController(2),
                 tankPositions[2].X, tankPositions[2].Y, tankRotations[2], tankScale,
                 game.CM().Load<Texture2D>("healthbar_robo_06"),
@@ -319,30 +232,22 @@ namespace Tankontroller.Scenes
                 game.CM().Load<Texture2D>("healthbar_robo_01"),
                 new Rectangle(0 + textureWidth, 0, textureWidth, textureHeight), true));
 
-                tankXPosition = pPlayArea.X + outerBlockXOffset;
-                tankRotation = 0;
-                if (DGS.Instance.GetInt("NUM_PLAYERS") > 3)
-                {
-                    tankYPosition = pPlayArea.Y + pPlayArea.Height / 2 + 50;
-                    
-                    m_Teams.Add(new Player(
-        DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(3),
-        tankPositions[3].X, tankPositions[3].Y, tankRotations[3], tankScale,
-        game.CM().Load<Texture2D>("healthbar_yeti_06"),
-        game.CM().Load<Texture2D>("healthbar_yeti_05"),
-        game.CM().Load<Texture2D>("healthbar_yeti_04"),
-        game.CM().Load<Texture2D>("healthbar_yeti_03"),
-        game.CM().Load<Texture2D>("healthbar_yeti_02"),
-        game.CM().Load<Texture2D>("healthbar_yeti_01"),
-        new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth * 2, 0, textureWidth, textureHeight), false));
-                }
-            }
-            
+            m_Teams.Add(new Player(
+                DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(3),
+                tankPositions[3].X, tankPositions[3].Y, tankRotations[3], tankScale,
+                game.CM().Load<Texture2D>("healthbar_yeti_06"),
+                game.CM().Load<Texture2D>("healthbar_yeti_05"),
+                game.CM().Load<Texture2D>("healthbar_yeti_04"),
+                game.CM().Load<Texture2D>("healthbar_yeti_03"),
+                game.CM().Load<Texture2D>("healthbar_yeti_02"),
+                game.CM().Load<Texture2D>("healthbar_yeti_01"),
+                new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth * 2, 0, textureWidth, textureHeight), false));
 
             m_World = new TheWorld(pPlayArea, Walls);
         }
 
-        private void setupNot4Player(Rectangle pPlayArea)
+        //The game set up for 1 to 3 players
+        private void setupNot4Player(Rectangle pPlayArea, int pNumOfPlayers)
         {
 
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
@@ -352,146 +257,82 @@ namespace Tankontroller.Scenes
             int blockThickness = pPlayArea.Width / 50;
             int outerBlockXOffset = pPlayArea.Width / 8;
 
-            List<RectWall> Walls = new List<RectWall>
-            {
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - outerBlockHeight - 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight))
-            };
+            //Creates a list of walls for 1 to 3 player map
+            List<RectWall> Walls = new List<RectWall>();
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
 
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
+
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
+
+
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
+
+
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
+
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - outerBlockHeight - 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)));
+
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)));
+            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight)));
+
+            //Creates a list of tank positions and rotations for each of the players, ranging from 1 to 3 players
             List<Vector2> tankPositions = new List<Vector2>();
             List<float> tankRotations = new List<float>();
-            if (DGS.Instance.GetInt("NUM_PLAYERS") == 1)
+            if (pNumOfPlayers >= 1)
             {
                 float xPosition = pPlayArea.X + outerBlockXOffset;
                 float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
                 Vector2 tankPosition = new Vector2(xPosition, yPosition);
                 tankPositions.Add(tankPosition);
                 tankRotations.Add(0);
+                if (pNumOfPlayers >= 2)
+                {
+                    xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
+                    yPosition = pPlayArea.Y + pPlayArea.Height / 2;
+                    tankPosition = new Vector2(xPosition, yPosition);
+                    tankPositions.Add(tankPosition);
+                    tankRotations.Add((float)Math.PI);
+                    if (pNumOfPlayers >= 3)
+                    {
+                        xPosition = pPlayArea.Width / 2 + 35;
+                        yPosition = pPlayArea.Y + pPlayArea.Height / 2;
+                        tankPosition = new Vector2(xPosition, yPosition);
+                        tankPositions.Add(tankPosition);
+                        tankRotations.Add((float)Math.PI / 2);
+                    }
+                }
 
             }
-            else if (DGS.Instance.GetInt("NUM_PLAYERS") == 2)
-            {
-                float xPosition = pPlayArea.X + outerBlockXOffset;
-                float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add(0);
 
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI);
-            }
-            else if (DGS.Instance.GetInt("NUM_PLAYERS") == 3)
-            {
-                float xPosition = pPlayArea.X + outerBlockXOffset;
-                float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add(0);
-
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI);
-
-                xPosition = pPlayArea.Width / 2 + 35;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI / 2);
-            }
-            else if (DGS.Instance.GetInt("NUM_PLAYERS") == 4)
-            {
-                float xPosition = pPlayArea.X + outerBlockXOffset / 2;
-                float yPosition = pPlayArea.Y + outerBlockXOffset / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(-Math.PI + Math.PI / 4));
-
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)-Math.PI / 4);
-
-                xPosition = pPlayArea.X + outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
-
-                xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI / 4);
-            }
-            else if (DGS.Instance.GetInt("NUM_PLAYERS") == 5)
-            {
-                float xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 - outerBlockXOffset / 2;
-                float yPosition = pPlayArea.Y + pPlayArea.Height / 2 - outerBlockXOffset / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(-Math.PI + Math.PI / 4));
-
-                xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 + outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2 - outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)-Math.PI / 4);
-
-                xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 - outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2 + outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
-
-                xPosition = pPlayArea.X + pPlayArea.Width / 2 + 0 + outerBlockXOffset / 2;
-                yPosition = pPlayArea.Y + pPlayArea.Height / 2 + outerBlockXOffset / 2;
-                tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add((float)Math.PI / 4);
-            }
-
-            float tankXPosition = pPlayArea.X + outerBlockXOffset;
-            float tankYPosition = pPlayArea.Y + pPlayArea.Height / 2;
-            float tankRotation = 0;
+            //Creates health bars and an player image for each player, ranging from 1 to 3 players
             float tankScale = (float)pPlayArea.Width / (50 * 40);
             float textureHeightOverWidth = (float)254 / (float)540;
             int textureWidth = game.GDM().GraphicsDevice.Viewport.Width / 4;
             int textureHeight = (int)(textureWidth * textureHeightOverWidth);
 
             m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK1"), Tankontroller.Instance().GetController(0),
+                DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(0),
                 tankPositions[0].X, tankPositions[0].Y, tankRotations[0], tankScale,
                 game.CM().Load<Texture2D>("healthbar_winterjack_06"),
                 game.CM().Load<Texture2D>("healthbar_winterjack_05"),
@@ -500,11 +341,8 @@ namespace Tankontroller.Scenes
                 game.CM().Load<Texture2D>("healthbar_winterjack_02"),
                 game.CM().Load<Texture2D>("healthbar_winterjack_01"),
                 new Rectangle(0, 0, textureWidth, textureHeight), true));
-            if (DGS.Instance.GetInt("NUM_PLAYERS") > 1)
+            if (pNumOfPlayers > 1)
             {
-                tankXPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-                tankRotation = (float)Math.PI;
-
                 m_Teams.Add(new Player(
                     DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().GetController(1),
                     tankPositions[1].X, tankPositions[1].Y, tankRotations[1], tankScale,
@@ -515,16 +353,8 @@ namespace Tankontroller.Scenes
                     game.CM().Load<Texture2D>("healthbar_engineer_02"),
                     game.CM().Load<Texture2D>("healthbar_engineer_01"),
                     new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth, 0, textureWidth, textureHeight), false));
-                if (DGS.Instance.GetInt("NUM_PLAYERS") > 2)
+                if (pNumOfPlayers > 2)
                 {
-                    tankRotation = (float)Math.PI;
-                    if (DGS.Instance.GetInt("NUM_PLAYERS") <= 3)
-                    {
-                        tankXPosition = pPlayArea.Width / 2 + 35;
-                        tankRotation = (float)Math.PI / 2;
-                    }
-
-
                     m_Teams.Add(new Player(
                     DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().GetController(2),
                     tankPositions[2].X, tankPositions[2].Y, tankRotations[2], tankScale,
@@ -535,24 +365,6 @@ namespace Tankontroller.Scenes
                     game.CM().Load<Texture2D>("healthbar_robo_02"),
                     game.CM().Load<Texture2D>("healthbar_robo_01"),
                     new Rectangle(0 + textureWidth, 0, textureWidth, textureHeight), true));
-
-                    tankXPosition = pPlayArea.X + outerBlockXOffset;
-                    tankRotation = 0;
-                    if (DGS.Instance.GetInt("NUM_PLAYERS") > 3)
-                    {
-                        tankYPosition = pPlayArea.Y + pPlayArea.Height / 2 + 50;
-
-                        m_Teams.Add(new Player(
-                        DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(4),
-                        tankPositions[3].X, tankPositions[3].Y, tankRotations[3], tankScale,
-                        game.CM().Load<Texture2D>("healthbar_yeti_06"),
-                        game.CM().Load<Texture2D>("healthbar_yeti_05"),
-                        game.CM().Load<Texture2D>("healthbar_yeti_04"),
-                        game.CM().Load<Texture2D>("healthbar_yeti_03"),
-                        game.CM().Load<Texture2D>("healthbar_yeti_02"),
-                        game.CM().Load<Texture2D>("healthbar_yeti_01"),
-                        new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth * 2, 0, textureWidth, textureHeight), false));
-                    }
                 }
             }
 
@@ -561,6 +373,7 @@ namespace Tankontroller.Scenes
 
         private void IntroFinished()
         {
+            //Playes a loopable music track once the intro music has finished
             if (introMusicInstance.State == SoundState.Stopped)
             {
                 Tankontroller game = (Tankontroller)Tankontroller.Instance();
@@ -577,6 +390,7 @@ namespace Tankontroller.Scenes
 
             m_SpriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
 
+            //Draws the GUI for each player
             foreach (Player player in m_Teams)
             {
                 if (player.GUI != null)
@@ -590,7 +404,7 @@ namespace Tankontroller.Scenes
 
             TrackSystem.GetInstance().Draw(m_SpriteBatch);
 
-            // bullet background
+            //Draws the background of the bullets
             int bulletRadius = 10;
             int radius = bulletRadius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS");
             Rectangle bulletRect = new Rectangle(0, 0, radius, radius);
@@ -607,7 +421,7 @@ namespace Tankontroller.Scenes
 
             World.Particles.ParticleManager.Instance().Draw(m_SpriteBatch);
 
-            // bullet colour
+            //Draws the foreground of the bullets
             bulletRect.Width = bulletRadius;
             bulletRect.Height = bulletRadius;
             foreach (Player p in m_Teams)
@@ -621,6 +435,7 @@ namespace Tankontroller.Scenes
                 }
             }
 
+            //Draws the tanks
             Rectangle trackRect = new Rectangle(0, 0, m_TankLeftTrackTexture.Width, m_TankLeftTrackTexture.Height / 15);
 
             float tankScale = (float)mPlayAreaRectangle.Width / (50 * 40);
@@ -648,22 +463,14 @@ namespace Tankontroller.Scenes
                         m_SpriteBatch.Draw(m_CannonFireTexture, t.GetCannonWorldPosition(), null, t.Colour(), t.GetCannonWorldRotation(), new Vector2(m_CannonTexture.Width / 2, m_CannonTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
                     }
                 }
+                //If a tank has no health, its draw as a destroyed tank
                 else
                 {
                     m_SpriteBatch.Draw(m_TankBrokenTexture, t.GetWorldPosition(), null, t.Colour(), t.GetRotation(), new Vector2(m_TankBrokenTexture.Width / 2, m_TankBrokenTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
                 }
             }
 
-     /*       Vector2 bulletOffset = new Vector2(m_BulletTexture.Width / 2, m_BulletTexture.Height / 2);
-            foreach (Player p in m_Teams)
-            {
-                List<Bullet> bullets = p.Tank.GetBulletList();
-                foreach (Bullet b in bullets)
-                {
-                    m_SpriteBatch.Draw(m_BulletTexture, b.Position, null, p.Colour, 0, bulletOffset, 1f, SpriteEffects.None, 0.0f);
-                }
-            }
-            */
+            //Draws the walls
             foreach (RectWall w in m_World.Walls)
             {
                 w.DrawOutlines(m_SpriteBatch);
@@ -677,14 +484,15 @@ namespace Tankontroller.Scenes
             m_SpriteBatch.End();
         }
 
+        //If the escape key is pressed, the scene transitions to the main menu
         public void Escape()
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                //TogglePause();
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
+
         public void TogglePause()
         {
             isPaused = !isPaused;
@@ -700,6 +508,7 @@ namespace Tankontroller.Scenes
             }
 
             IntroFinished();
+            //Updates each controller to check for inputs
             for (int i = 0; i < DGS.Instance.GetInt("NUM_PLAYERS"); i++)
             {
                 IController controller = Tankontroller.Instance().GetController(i);
@@ -713,8 +522,8 @@ namespace Tankontroller.Scenes
                 tankMoved = tankMoved | p.DoTankControls(pSeconds);
             }
 
+            //Checks for tank collisons between the play area and the walls
             m_World.Update(pSeconds);
-
             m_World.CollideAllTheThingsWithPlayArea(mPlayAreaRectangle);
 
             if (tankMoved)
@@ -725,6 +534,8 @@ namespace Tankontroller.Scenes
             {
                 tankMoveSound.Pause();
             }
+
+            //If there is only on player remaining, the GameOverScene is transitioned to
             List<int> remainingTeamsList = remainingTeams();
             if (remainingTeamsList.Count <= 1)
             {
@@ -738,8 +549,9 @@ namespace Tankontroller.Scenes
 
             }
 
+            //Updates the track particles for each tank
             m_SecondsTillTracksAdded -= pSeconds;
-            if(m_SecondsTillTracksAdded <= 0)
+            if (m_SecondsTillTracksAdded <= 0)
             {
                 m_SecondsTillTracksAdded += SECONDS_BETWEEN_TRACKS_ADDED;
                 TrackSystem trackSystem = TrackSystem.GetInstance();
@@ -758,6 +570,7 @@ namespace Tankontroller.Scenes
             }
         }
 
+        //Checks the health of all players and returns a list of tanks with more that 0 health
         private List<int> remainingTeams()
         {
             List<int> remaining = new List<int>();
