@@ -41,7 +41,6 @@ namespace Tankontroller
             bool tankMoved = false;
             if (Tank.Health() > 0)
             {
-                
                 if (Controller.IsPressedWithCharge(Control.LEFT_TRACK_FORWARDS))
                 {
                     tankMoved = true;
@@ -53,8 +52,9 @@ namespace Tankontroller
                     }
                     else if (Controller.IsPressedWithCharge(Control.RIGHT_TRACK_BACKWARDS))
                     {
-                        Tank.LeftTrackForward();
-                        Tank.RightTrackBackward();
+                        //Tank.LeftTrackForward();
+                        //Tank.RightTrackBackward();
+                        Tank.BothTracksOpposite(true);
                         Controller.DepleteCharge(Control.RIGHT_TRACK_BACKWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                         Controller.DepleteCharge(Control.LEFT_TRACK_FORWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                     }
@@ -75,8 +75,9 @@ namespace Tankontroller
                     }
                     else if (Controller.IsPressedWithCharge(Control.RIGHT_TRACK_FORWARDS))
                     {
-                        Tank.LeftTrackBackward();
-                        Tank.RightTrackForward();
+                        //Tank.LeftTrackBackward();
+                        //Tank.RightTrackForward();
+                        Tank.BothTracksOpposite(false);
                         Controller.DepleteCharge(Control.RIGHT_TRACK_FORWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                         Controller.DepleteCharge(Control.LEFT_TRACK_BACKWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                     }
@@ -97,8 +98,9 @@ namespace Tankontroller
                     }
                     else if (Controller.IsPressedWithCharge(Control.LEFT_TRACK_BACKWARDS))
                     {
-                        Tank.LeftTrackBackward();
-                        Tank.RightTrackForward();
+                        //Tank.LeftTrackBackward();
+                        //Tank.RightTrackForward();
+                        Tank.BothTracksOpposite(false);
                         Controller.DepleteCharge(Control.RIGHT_TRACK_FORWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                         Controller.DepleteCharge(Control.LEFT_TRACK_BACKWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                     }
@@ -119,8 +121,9 @@ namespace Tankontroller
                     }
                     else if (Controller.IsPressedWithCharge(Control.LEFT_TRACK_FORWARDS))
                     {
-                        Tank.LeftTrackForward();
-                        Tank.RightTrackBackward();
+                        //Tank.LeftTrackForward();
+                        //Tank.RightTrackBackward();
+                        Tank.BothTracksOpposite(true);
                         Controller.DepleteCharge(Control.RIGHT_TRACK_BACKWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                         Controller.DepleteCharge(Control.LEFT_TRACK_FORWARDS, DGS.Instance.GetFloat("TRACK_DEPLETION_RATE") * pSeconds);
                     }
