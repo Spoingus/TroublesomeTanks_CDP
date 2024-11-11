@@ -97,14 +97,15 @@ namespace Tankontroller.Scenes
             game.SM().Transition(new GameScene(), false);
         }
 
+        Task? detectControllerTask = null;
         public void Update(float pSeconds)
         {
             Escape();
 
             IGame game = Tankontroller.Instance();
-            if (DGS.Instance.GetBool("HAVE_CONTROLLER"))
+            if (DGS.Instance.GetBool("HAVE_CONTROLLER") && (detectControllerTask == null || detectControllerTask.IsCompleted))
             {
-                game.DetectControllers();
+                detectControllerTask = Task.Run(async () => await game.DetectControllers());
             }
 
             foreach (IController controller in game.GetControllers())
@@ -112,22 +113,22 @@ namespace Tankontroller.Scenes
                 controller.UpdateController();
                 mSecondsLeft -= pSeconds;
 
-                if (controller.IsPressedWithCharge(Control.LEFT_TRACK_FORWARDS))
+                if (controller.IsPressedWithCharge(Control.LEFT_TRACK_FORWARDS) || controller.IsPressed(Control.TURRET_LEFT))
                 {
                     if (mSecondsLeft <= 0.0f)
                     {
                         //mSoundEffects["Button_Push"].Play();
                         mButtonList.SelectPreviousButton();
-                        mSecondsLeft = 0.2f;
+                        mSecondsLeft = 1.0f;
                     }
                 }
-                if (controller.IsPressed(Control.LEFT_TRACK_BACKWARDS))
+                if (controller.IsPressed(Control.LEFT_TRACK_BACKWARDS) || controller.IsPressed(Control.TURRET_RIGHT))
                 {
                     if (mSecondsLeft <= 0.0f)
                     {
                         //mSoundEffects["Button_Push"].Play();
                         mButtonList.SelectNextButton();
-                        mSecondsLeft = 0.2f;
+                        mSecondsLeft = 1.0f;
                     }
                 }
 

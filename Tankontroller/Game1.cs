@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading.Tasks;
 using Tankontroller.Scenes;
 
 namespace Tankontroller
@@ -23,7 +24,7 @@ namespace Tankontroller
 
         IController GetController(int pIndex);
         List<IController> GetControllers();
-        void DetectControllers();
+        Task DetectControllers();
         void Exit();
     }
 
@@ -49,7 +50,7 @@ namespace Tankontroller
             }
             return mGameInterface;
         }
-        public void DetectControllers()
+        public async Task DetectControllers()
         {
             string[] portNames = SerialPort.GetPortNames();
             foreach (string portName in portNames)
@@ -66,7 +67,8 @@ namespace Tankontroller
                     port.WriteTimeout = 10;
 
                     port.DiscardInBuffer();
-                    port.Write(new byte[] { (byte)'I' }, 0, 1);
+                    //port.Write(new byte[] { (byte)'I' }, 0, 1);
+                    await port.BaseStream.WriteAsync(new byte[] { (byte)'I' }, 0, 1);
 
                     System.Threading.Thread.Sleep(10);
 
