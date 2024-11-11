@@ -52,6 +52,8 @@ namespace Tankontroller.Scenes
         // private RenderTarget2D m_ShaderRenderTarget; // might not need this
         // private Texture2D m_ShaderTexture; // might not need this
 
+        private bool isPaused = false; // is the game paused
+
         public GameScene()
         {
             mControllers = new List<IController>();
@@ -141,44 +143,39 @@ namespace Tankontroller.Scenes
             int blockThickness = pPlayArea.Width / 50;
             int outerBlockXOffset = pPlayArea.Width / 8;
 
-            List<RectWall> Walls = new List<RectWall>();
 
-     //       Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-       //         new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-        //    Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-         //       new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
+            Texture2D blockTexture = game.CM().Load<Texture2D>("block");
+            List<RectWall> Walls = new List<RectWall> // 4 player walls
+            {
+                new RectWall(blockTexture, new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
+                new RectWall(blockTexture, new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
+                new RectWall(blockTexture, new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)),
+                new RectWall(blockTexture, new Rectangle(pPlayArea.X, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)),
+                new RectWall(blockTexture, new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)),
+                new RectWall(blockTexture, new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight))
+            };
 
-      //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-        //        new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-         //   Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-          //      new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
+            //       Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //         new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
+            //    Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //       new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
 
-         //   Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-          //      new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-           // Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //        new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
+            //   Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //      new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
+
+            //   Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //      new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
+            // Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
             //    new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
 
 
-      //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-       //         new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-      //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-      //          new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
+            //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //         new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
+            //      Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+            //          new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
 
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight)));
 
             List<Vector2> tankPositions = new List<Vector2>();
             List<float> tankRotations = new List<float>();
@@ -355,44 +352,37 @@ namespace Tankontroller.Scenes
             int blockThickness = pPlayArea.Width / 50;
             int outerBlockXOffset = pPlayArea.Width / 8;
 
-            List<RectWall> Walls = new List<RectWall>();
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
-
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
-
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - outerBlockHeight - 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight)));
+            List<RectWall> Walls = new List<RectWall>
+            {
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - outerBlockHeight - 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight))
+            };
 
             List<Vector2> tankPositions = new List<Vector2>();
             List<float> tankRotations = new List<float>();
@@ -691,13 +681,23 @@ namespace Tankontroller.Scenes
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
+                //TogglePause();
                 Tankontroller.Instance().SM().Transition(null);
             }
+        }
+        public void TogglePause()
+        {
+            isPaused = !isPaused;
         }
 
         public void Update(float pSeconds)
         {
             Escape();
+
+            if (isPaused)
+            {
+                return; // If the game is paused, exit the method early
+            }
 
             IntroFinished();
             for (int i = 0; i < DGS.Instance.GetInt("NUM_PLAYERS"); i++)

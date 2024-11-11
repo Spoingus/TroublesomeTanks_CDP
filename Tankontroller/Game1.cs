@@ -130,25 +130,29 @@ namespace Tankontroller
             if (DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_1"))
             {
                     
-                Dictionary<Keys, Control> Player1KeyMap = new Dictionary<Keys, Control>();
-                Player1KeyMap.Add(Keys.Q, Control.LEFT_TRACK_FORWARDS);
-                Player1KeyMap.Add(Keys.A, Control.LEFT_TRACK_BACKWARDS);
-                Player1KeyMap.Add(Keys.W, Control.RIGHT_TRACK_FORWARDS);
-                Player1KeyMap.Add(Keys.S, Control.RIGHT_TRACK_BACKWARDS);
-                Player1KeyMap.Add(Keys.Z, Control.TURRET_LEFT);
-                Player1KeyMap.Add(Keys.X, Control.TURRET_RIGHT);
-                Player1KeyMap.Add(Keys.Space, Control.FIRE);
-                Player1KeyMap.Add(Keys.C, Control.RECHARGE);
+                Dictionary<Keys, Control> Player1KeyMap = new Dictionary<Keys, Control>
+                {
+                    { Keys.Q, Control.LEFT_TRACK_FORWARDS },
+                    { Keys.A, Control.LEFT_TRACK_BACKWARDS },
+                    { Keys.W, Control.RIGHT_TRACK_FORWARDS },
+                    { Keys.S, Control.RIGHT_TRACK_BACKWARDS },
+                    { Keys.Z, Control.TURRET_LEFT },
+                    { Keys.X, Control.TURRET_RIGHT },
+                    { Keys.Space, Control.FIRE },
+                    { Keys.C, Control.RECHARGE }
+                };
 
-                Dictionary<Keys, int> Player1PortMap = new Dictionary<Keys, int>();
-                Player1PortMap.Add(Keys.D1, 3);
-                Player1PortMap.Add(Keys.D2, 2);
-                Player1PortMap.Add(Keys.D3, 6);
-                Player1PortMap.Add(Keys.D4, 7);
-                Player1PortMap.Add(Keys.D5, 1);
-                Player1PortMap.Add(Keys.D6, 0);
-                Player1PortMap.Add(Keys.D7, 5);
-                Player1PortMap.Add(Keys.D8, 4);
+                Dictionary<Keys, int> Player1PortMap = new Dictionary<Keys, int>
+                {
+                    { Keys.D1, 3 },
+                    { Keys.D2, 2 },
+                    { Keys.D3, 6 },
+                    { Keys.D4, 7 },
+                    { Keys.D5, 1 },
+                    { Keys.D6, 0 },
+                    { Keys.D7, 5 },
+                    { Keys.D8, 4 }
+                };
 
                 IController controller = new KeyboardController(Player1KeyMap, Player1PortMap);
                 mControllers.Add("Keyboard1", controller);
@@ -156,25 +160,29 @@ namespace Tankontroller
 
             if(DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_2"))
             {
-                Dictionary<Keys, Control> Player2KeyMap = new Dictionary<Keys, Control>();
-                Player2KeyMap.Add(Keys.Insert, Control.LEFT_TRACK_FORWARDS);
-                Player2KeyMap.Add(Keys.Delete, Control.LEFT_TRACK_BACKWARDS);
-                Player2KeyMap.Add(Keys.Home, Control.RIGHT_TRACK_FORWARDS);
-                Player2KeyMap.Add(Keys.End, Control.RIGHT_TRACK_BACKWARDS);
-                Player2KeyMap.Add(Keys.PageUp, Control.TURRET_LEFT);
-                Player2KeyMap.Add(Keys.PageDown, Control.TURRET_RIGHT);
-                Player2KeyMap.Add(Keys.Enter, Control.FIRE);
-                Player2KeyMap.Add(Keys.P, Control.RECHARGE);
+                Dictionary<Keys, Control> Player2KeyMap = new Dictionary<Keys, Control>
+                {
+                    { Keys.Insert, Control.LEFT_TRACK_FORWARDS },
+                    { Keys.Delete, Control.LEFT_TRACK_BACKWARDS },
+                    { Keys.Home, Control.RIGHT_TRACK_FORWARDS },
+                    { Keys.End, Control.RIGHT_TRACK_BACKWARDS },
+                    { Keys.PageUp, Control.TURRET_LEFT },
+                    { Keys.PageDown, Control.TURRET_RIGHT },
+                    { Keys.Enter, Control.FIRE },
+                    { Keys.P, Control.RECHARGE }
+                };
 
-                Dictionary<Keys, int> Player2PortMap = new Dictionary<Keys, int>();
-                Player2PortMap.Add(Keys.F1, 3);
-                Player2PortMap.Add(Keys.F2, 2);
-                Player2PortMap.Add(Keys.F3, 6);
-                Player2PortMap.Add(Keys.F4, 7);
-                Player2PortMap.Add(Keys.F5, 1);
-                Player2PortMap.Add(Keys.F6, 0);
-                Player2PortMap.Add(Keys.F7, 5);
-                Player2PortMap.Add(Keys.F8, 4);
+                Dictionary<Keys, int> Player2PortMap = new Dictionary<Keys, int>
+                {
+                    { Keys.F1, 3 },
+                    { Keys.F2, 2 },
+                    { Keys.F3, 6 },
+                    { Keys.F4, 7 },
+                    { Keys.F5, 1 },
+                    { Keys.F6, 0 },
+                    { Keys.F7, 5 },
+                    { Keys.F8, 4 }
+                };
 
                 IController controller = new KeyboardController(Player2KeyMap, Player2PortMap);
                 mControllers.Add("Keyboard2", controller);
@@ -185,7 +193,7 @@ namespace Tankontroller
             mGraphics.PreferredBackBufferHeight = DGS.Instance.GetInt("SCREENHEIGHT");
             mGraphics.PreferredBackBufferWidth = DGS.Instance.GetInt("SCREENWIDTH");
             mGraphics.IsFullScreen = DGS.Instance.GetBool("IS_FULL_SCREEN");
-            this.Window.Title = "TroubleSome Tanks";
+            this.Window.Title = "TroubleSome Tanks - CDP Edition!";
         }
 
         
