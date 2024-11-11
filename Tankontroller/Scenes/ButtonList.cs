@@ -13,16 +13,16 @@ namespace Tankontroller.Scenes
         List<Button> mButtons = null; //List of buttons
         int currentSelectedButtonIndex = 0; //Index of the currently selected button
 
-        public ButtonList() //Constructor
+        public ButtonList()
         {
-            mButtons = new List<Button>(); //Initialise the list
+            mButtons = new List<Button>();
         }
-        public void Add(Button pButton) //Add a button to the list
+        public void Add(Button pButton)
         {
             mButtons.Add(pButton);
         }
 
-        public void SelectNextButton() //Select the next button
+        public void SelectNextButton()
         {
             Console.WriteLine("NextButton start: " + currentSelectedButtonIndex); //Debug
             int nextSelectedButtonIndex = currentSelectedButtonIndex + 1; //Get the index of the next button
@@ -35,8 +35,9 @@ namespace Tankontroller.Scenes
             currentSelectedButtonIndex = nextSelectedButtonIndex; //Set the current button index to the next button
             Console.WriteLine("NextButton finish: " + currentSelectedButtonIndex); //Debug
 
-        } // End of SelectNextButton
-        public void SelectPreviousButton() //Select previous button
+        }
+
+        public void SelectPreviousButton()
         {
             Console.WriteLine("PreviousButton start: " + currentSelectedButtonIndex); //Debug
             int previousSelectedButtonIndex = currentSelectedButtonIndex - 1; //Get the index of the previous button
@@ -50,21 +51,20 @@ namespace Tankontroller.Scenes
             Console.WriteLine("PreviousButton finish: " + currentSelectedButtonIndex); //Debug
         }
 
-        public void PressSelectedButton() //Press the selected button
+        public void PressSelectedButton()
         {
             mButtons[currentSelectedButtonIndex].PressButton();
         }
 
-        public void Draw(SpriteBatch pSpriteBatch) //Draw the buttons
+        public void Draw(SpriteBatch pSpriteBatch)
         {
-            foreach (Button button in mButtons) //For each button
+            foreach (Button button in mButtons)
             {
-                Color buttonColour = Color.White; //Set the button colour
-                if (button.Selected) //If the button is selected
-                {
-                    buttonColour = button.SelectedColour; //Set the button colour to the selected colour
-                }
-                pSpriteBatch.Draw(button.Texture, button.Rect, buttonColour); //Draw the button
+                Color buttonColour = Color.White;
+                if (button.Selected)
+                    pSpriteBatch.Draw(button.TexturePressed, button.Rect, buttonColour);
+                else
+                    pSpriteBatch.Draw(button.Texture, button.Rect, buttonColour);
             }
         }
     }
