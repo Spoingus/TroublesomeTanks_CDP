@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Tankontroller.Scenes
 {
-    
+    //The main menu scene that is displayed once the app has launched
     public class StartScene : IScene
     {
         ButtonList mButtonList = null;
@@ -29,10 +29,6 @@ namespace Tankontroller.Scenes
         float mSecondsLeft;
         public StartScene() {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            
-            
-            
-            
             
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
             int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
@@ -51,7 +47,8 @@ namespace Tankontroller.Scenes
                         
             Texture2D startGameButtonTexture = game.CM().Load<Texture2D>("menu_play_white");
             Texture2D startGameButtonTexturePressed = game.CM().Load<Texture2D>("menu_play_dark");
-            
+
+            //Makes the start game button
             Rectangle startGameButtonRectangle = 
                 new Rectangle(
                     ((int)((screenWidth - startGameButtonTexture.Width) / 2) - (int)(startGameButtonTexture.Width * 0.75f)), 
@@ -62,7 +59,8 @@ namespace Tankontroller.Scenes
             Button startGameButton = new Button(startGameButtonTexture,startGameButtonTexturePressed, startGameButtonRectangle, Color.Red, StartGame);
             startGameButton.Selected = true;
             mButtonList.Add(startGameButton);
-            
+
+            //Makes the exit game button
             Texture2D exitGameButtonTexture = game.CM().Load<Texture2D>("menu_quit_white");
             Texture2D exitGameButtonTexturePressed = game.CM().Load<Texture2D>("menu_quit_dark");
             
@@ -76,21 +74,16 @@ namespace Tankontroller.Scenes
             mButtonList.Add(exitGameButton);
             mSecondsLeft = 0.1f;
             game.ReplaceCurrentMusicInstance("Music/Music_start", true);
-            
-            
-         
-
-         
         }
 
-
-        
+        //Exits the game
         private void ExitGame()
         {
             IGame game = Tankontroller.Instance();
             game.SM().Transition(null);
         }
 
+        //Starts the game
         private void StartGame()
         {
             IGame game = Tankontroller.Instance();
@@ -159,6 +152,8 @@ namespace Tankontroller.Scenes
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
+
+        //Draws the start screen and buttons
         public void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);

@@ -463,7 +463,7 @@ namespace Tankontroller.Scenes
                         m_SpriteBatch.Draw(m_CannonFireTexture, t.GetCannonWorldPosition(), null, t.Colour(), t.GetCannonWorldRotation(), new Vector2(m_CannonTexture.Width / 2, m_CannonTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
                     }
                 }
-                //If a tank has no health, its draw as a destroyed tank
+                //If a tank has no health, its drawn as a destroyed tank
                 else
                 {
                     m_SpriteBatch.Draw(m_TankBrokenTexture, t.GetWorldPosition(), null, t.Colour(), t.GetRotation(), new Vector2(m_TankBrokenTexture.Width / 2, m_TankBrokenTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
