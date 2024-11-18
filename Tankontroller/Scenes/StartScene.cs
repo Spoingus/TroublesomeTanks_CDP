@@ -1,11 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
 using Tankontroller.Controller;
@@ -34,6 +28,9 @@ namespace Tankontroller.Scenes
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
             int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
+
+            //game.GDM().IsFullScreen = true;
+            //game.GDM().ApplyChanges();
 
             mBackgroundTexture = game.CM().Load<Texture2D>("background_01");         
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);

@@ -499,7 +499,7 @@ namespace Tankontroller.Scenes
         {
             isPaused = !isPaused;
         }
-
+        Task? detectControllerTask = null;
         public void Update(float pSeconds)
         {
             Escape();

@@ -24,6 +24,7 @@ namespace Tankontroller.Controller
         void ResetJacks();
         void TurnOffLights();
         void TurnOnLights();
+        bool lights_on();
 
         void SetColour(Color pColour);
 
@@ -161,7 +162,10 @@ namespace Tankontroller.Controller
             return false;
         }
 
-
+        public bool lights_on()
+        {
+            return mLightsOn;
+        }
     }
 
     public class KeyboardController : Controller
