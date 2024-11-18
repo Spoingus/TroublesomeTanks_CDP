@@ -315,7 +315,7 @@ namespace Tankontroller.GUI
 
         }
 
-        bool WasFirePressed = false;
+        bool WasFirePressed = true;
         bool WasBackPressed = false;
         public void Update(float pSeconds)
         {
@@ -327,9 +327,9 @@ namespace Tankontroller.GUI
                 IController controller = mPlayer.Controller;
                 controller.UpdateController();
 
-                if (!controller.IsPressed(Control.FIRE))
+                if (controller.IsPressed(Control.FIRE))
                 {
-                    if (WasFirePressed) // this is pressing the A
+                    if (!WasFirePressed) // this is pressing the A
                     {
                         // if this controller is not already a player
                         // need to make a player here as this controller wants to play
@@ -354,9 +354,9 @@ namespace Tankontroller.GUI
                         }
                     }
                 }
-                if (!controller.IsPressed(Control.RECHARGE))
+                if (controller.IsPressed(Control.RECHARGE))
                 {
-                    if (WasBackPressed) // this is pressing the B
+                    if (!WasBackPressed) // this is pressing the B
                     {
                         // if this controller is already a player
                         // need to remove this player
