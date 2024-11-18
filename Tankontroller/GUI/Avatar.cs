@@ -11,49 +11,49 @@ namespace Tankontroller.GUI
 {
     public class Avatar
     {
-        private Texture2D[] mBlackAndWhiteLayer = new Texture2D[5];
-        private Texture2D[] mColourLayer = new Texture2D[5];
-        private Texture2D mWhitePixel;
-        private Rectangle mBoundsRectangle;
-        private Rectangle[] mDrawRectangles = new Rectangle[5];
-        private Color mColour;
-        private string mName;
+        private Texture2D[] m_BlackAndWhiteLayer = new Texture2D[5];
+        private Texture2D[] m_ColourLayer = new Texture2D[5];
+        private Texture2D m_WhitePixel;
+        private Rectangle m_Rectangle;
+        private Rectangle[] m_DrawRectangles = new Rectangle[5];
+        private Color m_Colour;
+        private string m_Name;
 
         public Avatar(Texture2D pWhitePixel, Texture2D pBlackAndWhiteLayer, Texture2D pColourLayer, Rectangle pRectangle, Color pColour)
         {
-            mBlackAndWhiteLayer[0] = pBlackAndWhiteLayer;
-            mColourLayer[0] = pColourLayer;
-            mBoundsRectangle = pRectangle;
-            mColour = pColour;
-            mWhitePixel = pWhitePixel;
+            m_BlackAndWhiteLayer[0] = pBlackAndWhiteLayer;
+            m_ColourLayer[0] = pColourLayer;
+            m_Rectangle = pRectangle;
+            m_Colour = pColour;
+            m_WhitePixel = pWhitePixel;
             PrepareDrawRectangles();
         }
 
         public Avatar(Texture2D pWhitePixel, string pName, Rectangle pRectangle, Color pColour)
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            for (int i = 0; i < mBlackAndWhiteLayer.Length; i++)
+            for (int i = 0; i < m_BlackAndWhiteLayer.Length; i++)
             {
                 string blackAndWhiteFileName = "avatars/avatar_" + pName + "_bw_0" + (i + 1);
                 string colourFileName = "avatars/avatar_" + pName + "_colour_0" + (i + 1);
-                mBlackAndWhiteLayer[i] = game.CM().Load<Texture2D>(blackAndWhiteFileName);
-                mColourLayer[i] = game.CM().Load<Texture2D>(colourFileName);
+                m_BlackAndWhiteLayer[i] = game.CM().Load<Texture2D>(blackAndWhiteFileName);
+                m_ColourLayer[i] = game.CM().Load<Texture2D>(colourFileName);
             }
-            mBoundsRectangle = pRectangle;
-            mColour = pColour;
-            mWhitePixel = pWhitePixel;
-            mName = pName;
+            m_Rectangle = pRectangle;
+            m_Colour = pColour;
+            m_WhitePixel = pWhitePixel;
+            m_Name = pName;
             PrepareDrawRectangles();
         }
 
         private void PrepareDrawRectangles()
         {
             int padding = 5;
-            int maxAvatarWidth = mBoundsRectangle.Width - 2 * padding;
-            int maxAvatarHeight = mBoundsRectangle.Height - 2 * padding;
-            for (int i = 0; i < mDrawRectangles.Length; i++)
+            int maxAvatarWidth = m_Rectangle.Width - 2 * padding;
+            int maxAvatarHeight = m_Rectangle.Height - 2 * padding;
+            for (int i = 0; i < m_DrawRectangles.Length; i++)
             {
-                float avatarRatio = (float)mBlackAndWhiteLayer[i].Width / mBlackAndWhiteLayer[i].Height;
+                float avatarRatio = (float)m_BlackAndWhiteLayer[i].Width / m_BlackAndWhiteLayer[i].Height;
                 int avatarHeight = maxAvatarHeight;
                 int avatarWidth = (int)(avatarHeight * avatarRatio);
                 if (avatarWidth > maxAvatarWidth)
@@ -61,29 +61,29 @@ namespace Tankontroller.GUI
                     avatarWidth = maxAvatarWidth;
                     avatarHeight = (int)(avatarWidth / avatarRatio);
                 }
-                int avatarLeft = mBoundsRectangle.Left + (mBoundsRectangle.Width - avatarWidth) / 2;
-                int avatarTop = mBoundsRectangle.Top + (mBoundsRectangle.Height - avatarHeight) / 2;
-                mDrawRectangles[i] = new Rectangle(avatarLeft, avatarTop, avatarWidth, avatarHeight);
+                int avatarLeft = m_Rectangle.Left + (m_Rectangle.Width - avatarWidth) / 2;
+                int avatarTop = m_Rectangle.Top + (m_Rectangle.Height - avatarHeight) / 2;
+                m_DrawRectangles[i] = new Rectangle(avatarLeft, avatarTop, avatarWidth, avatarHeight);
             }
         }
         public string GetName()
         {
-            return mName;
+            return m_Name;
         }
-        public Color GetColour() { return mColour; }
-        public void SetColour(Color pColour) { mColour = pColour; }
+        public Color GetColour() { return m_Colour; }
+        public void SetColour(Color pColour) { m_Colour = pColour; }
 
         public void Reposition(Rectangle pRectangle)
         {
-            mBoundsRectangle = pRectangle;
+            m_Rectangle = pRectangle;
             PrepareDrawRectangles();
         }
 
         public void DrawBounds(SpriteBatch pSpriteBatch)
         {
-            Color boundColour = mColour;
+            Color boundColour = m_Colour;
             boundColour.A = (byte)0.5f;
-            pSpriteBatch.Draw(mWhitePixel, mBoundsRectangle, boundColour);
+            pSpriteBatch.Draw(m_WhitePixel, m_Rectangle, boundColour);
         }
 
         public void Draw(SpriteBatch pSpriteBatch, bool pAlive, int pIndex)
@@ -91,13 +91,13 @@ namespace Tankontroller.GUI
             //DrawBounds(pSpriteBatch);
             if (pAlive)
             {
-                pSpriteBatch.Draw(mBlackAndWhiteLayer[pIndex], mDrawRectangles[pIndex], Color.White);
-                pSpriteBatch.Draw(mColourLayer[pIndex], mDrawRectangles[pIndex], mColour);
+                pSpriteBatch.Draw(m_BlackAndWhiteLayer[pIndex], m_DrawRectangles[pIndex], Color.White);
+                pSpriteBatch.Draw(m_ColourLayer[pIndex], m_DrawRectangles[pIndex], m_Colour);
             }
             else
             {
-                pSpriteBatch.Draw(mBlackAndWhiteLayer[pIndex], mDrawRectangles[pIndex], Color.Red);
-                pSpriteBatch.Draw(mColourLayer[pIndex], mDrawRectangles[pIndex], Color.Red);
+                pSpriteBatch.Draw(m_BlackAndWhiteLayer[pIndex], m_DrawRectangles[pIndex], Color.Red);
+                pSpriteBatch.Draw(m_ColourLayer[pIndex], m_DrawRectangles[pIndex], Color.Red);
             }
         }
     }

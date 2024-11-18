@@ -65,7 +65,7 @@ namespace Tankontroller
             Texture2D pHealthBarBlackAndWhiteLayer,
             Texture2D pHealthBarColourLayer, Texture2D pAvatarBlackAndWhiteLayer,
             Texture2D pAvatarColourLayer,
-            Rectangle pRectangle, bool pIsOnLeft)
+            Rectangle pRectangle)
         {
             Colour = pColour;
             Controller = pController;
@@ -73,7 +73,7 @@ namespace Tankontroller
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
             GUI = new TeamGUI(pWhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, pAvatarBlackAndWhiteLayer,
-            pAvatarColourLayer, pRectangle, Tank, Controller, Colour);
+                pAvatarColourLayer, pRectangle, Tank, Controller, Colour);
         }
         public void GamePreparation(
             float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,

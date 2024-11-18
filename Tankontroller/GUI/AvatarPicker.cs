@@ -317,7 +317,7 @@ namespace Tankontroller.GUI
         }
         public void Update(float pSeconds)
         {
-            IGame game = TroublesomeTanks.Instance();
+            IGame game = Tankontroller.Instance();
             mCountDown -= pSeconds;
             if (HasPlayer())
             {

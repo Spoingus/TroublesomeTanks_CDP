@@ -38,6 +38,9 @@ namespace Tankontroller.Scenes
         private SoundEffectInstance loopMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
 
+        private List<Vector2> m_TankPositions = new List<Vector2>();
+        private List<float> m_TankRotations = new List<float>();
+
         private const float SECONDS_BETWEEN_TRACKS_ADDED = 0.2f;
         private float m_SecondsTillTracksAdded = SECONDS_BETWEEN_TRACKS_ADDED;
 
@@ -169,83 +172,34 @@ namespace Tankontroller.Scenes
 
             //Creates a list of tank positions and rotations for each of the 4 players
             List<Vector2> tankPositions = new List<Vector2>();
-            List<float> tankRotations = new List<float>();
 
             float xPosition = pPlayArea.X + outerBlockXOffset / 2;
             float yPosition = pPlayArea.Y + outerBlockXOffset / 2;
             Vector2 tankPosition = new Vector2(xPosition, yPosition);
-            tankPositions.Add(tankPosition);
-            tankRotations.Add((float)(-Math.PI + Math.PI / 4));
+            m_TankPositions.Add(tankPosition);
+            m_TankRotations.Add((float)(-Math.PI + Math.PI / 4));
 
             xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
             yPosition = pPlayArea.Y + outerBlockXOffset / 2;
             tankPosition = new Vector2(xPosition, yPosition);
-            tankPositions.Add(tankPosition);
-            tankRotations.Add((float)-Math.PI / 4);
+            m_TankPositions.Add(tankPosition);
+            m_TankRotations.Add((float)-Math.PI / 4);
 
             xPosition = pPlayArea.X + outerBlockXOffset / 2;
             yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
             tankPosition = new Vector2(xPosition, yPosition);
-            tankPositions.Add(tankPosition);
-            tankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
+            m_TankPositions.Add(tankPosition);
+            m_TankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
 
             xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
             yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
             tankPosition = new Vector2(xPosition, yPosition);
-            tankPositions.Add(tankPosition);
-            tankRotations.Add((float)Math.PI / 4);
-
-            //Creates 4 health bars and an player image for each of the 4 players
-            float tankScale = (float)pPlayArea.Width / (50 * 40);
-            float textureHeightOverWidth = (float)254 / (float)540;
-            int textureWidth = game.GDM().GraphicsDevice.Viewport.Width / 4;
-            int textureHeight = (int)(textureWidth * textureHeightOverWidth);
-
-            m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK1"), Tankontroller.Instance().GetController(0),
-                tankPositions[0].X, tankPositions[0].Y, tankRotations[0], tankScale,
-                game.CM().Load<Texture2D>("healthbar_winterjack_06"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_05"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_04"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_03"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_02"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_01"),
-                new Rectangle(0, 0, textureWidth, textureHeight), true));
-
-            m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().GetController(1),
-                tankPositions[1].X, tankPositions[1].Y, tankRotations[1], tankScale,
-                game.CM().Load<Texture2D>("healthbar_engineer_06"),
-                game.CM().Load<Texture2D>("healthbar_engineer_05"),
-                game.CM().Load<Texture2D>("healthbar_engineer_04"),
-                game.CM().Load<Texture2D>("healthbar_engineer_03"),
-                game.CM().Load<Texture2D>("healthbar_engineer_02"),
-                game.CM().Load<Texture2D>("healthbar_engineer_01"),
-                new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth, 0, textureWidth, textureHeight), false));
-
-            m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().GetController(2),
-                tankPositions[2].X, tankPositions[2].Y, tankRotations[2], tankScale,
-                game.CM().Load<Texture2D>("healthbar_robo_06"),
-                game.CM().Load<Texture2D>("healthbar_robo_05"),
-                game.CM().Load<Texture2D>("healthbar_robo_04"),
-                game.CM().Load<Texture2D>("healthbar_robo_03"),
-                game.CM().Load<Texture2D>("healthbar_robo_02"),
-                game.CM().Load<Texture2D>("healthbar_robo_01"),
-                new Rectangle(0 + textureWidth, 0, textureWidth, textureHeight), true));
-
-            m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(3),
-                tankPositions[3].X, tankPositions[3].Y, tankRotations[3], tankScale,
-                game.CM().Load<Texture2D>("healthbar_yeti_06"),
-                game.CM().Load<Texture2D>("healthbar_yeti_05"),
-                game.CM().Load<Texture2D>("healthbar_yeti_04"),
-                game.CM().Load<Texture2D>("healthbar_yeti_03"),
-                game.CM().Load<Texture2D>("healthbar_yeti_02"),
-                game.CM().Load<Texture2D>("healthbar_yeti_01"),
-                new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth * 2, 0, textureWidth, textureHeight), false));
+            m_TankPositions.Add(tankPosition);
+            m_TankRotations.Add((float)Math.PI / 4);
 
             m_World = new TheWorld(pPlayArea, Walls);
+
+            setupPlayers(pPlayArea);
         }
 
         //The game set up for 1 to 3 players
@@ -299,78 +253,55 @@ namespace Tankontroller.Scenes
                 new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight)));
 
             //Creates a list of tank positions and rotations for each of the players, ranging from 1 to 3 players
-            List<Vector2> tankPositions = new List<Vector2>();
-            List<float> tankRotations = new List<float>();
             if (pNumOfPlayers >= 1)
             {
                 float xPosition = pPlayArea.X + outerBlockXOffset;
                 float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
                 Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                tankPositions.Add(tankPosition);
-                tankRotations.Add(0);
+                m_TankPositions.Add(tankPosition);
+                m_TankRotations.Add(0);
                 if (pNumOfPlayers >= 2)
                 {
                     xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
                     yPosition = pPlayArea.Y + pPlayArea.Height / 2;
                     tankPosition = new Vector2(xPosition, yPosition);
-                    tankPositions.Add(tankPosition);
-                    tankRotations.Add((float)Math.PI);
+                    m_TankPositions.Add(tankPosition);
+                    m_TankRotations.Add((float)Math.PI);
                     if (pNumOfPlayers >= 3)
                     {
                         xPosition = pPlayArea.Width / 2 + 35;
                         yPosition = pPlayArea.Y + pPlayArea.Height / 2;
                         tankPosition = new Vector2(xPosition, yPosition);
-                        tankPositions.Add(tankPosition);
-                        tankRotations.Add((float)Math.PI / 2);
+                        m_TankPositions.Add(tankPosition);
+                        m_TankRotations.Add((float)Math.PI / 2);
                     }
                 }
 
             }
 
-            //Creates health bars and an player image for each player, ranging from 1 to 3 players
-            float tankScale = (float)pPlayArea.Width / (50 * 40);
-            float textureHeightOverWidth = (float)254 / (float)540;
-            int textureWidth = game.GDM().GraphicsDevice.Viewport.Width / 4;
-            int textureHeight = (int)(textureWidth * textureHeightOverWidth);
+            m_World = new TheWorld(pPlayArea, Walls);
 
-            m_Teams.Add(new Player(
-                DGS.Instance.GetColour("COLOUR_TANK4"), Tankontroller.Instance().GetController(0),
-                tankPositions[0].X, tankPositions[0].Y, tankRotations[0], tankScale,
-                game.CM().Load<Texture2D>("healthbar_winterjack_06"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_05"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_04"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_03"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_02"),
-                game.CM().Load<Texture2D>("healthbar_winterjack_01"),
-                new Rectangle(0, 0, textureWidth, textureHeight), true));
-            if (pNumOfPlayers > 1)
+            setupPlayers(pPlayArea);
+        }
+
+
+        private void setupPlayers(Rectangle pPlayArea)
+        {
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
+
+            float tankScale = (float)pPlayArea.Width / (50 * 40);
+            int textureWidth = game.GDM().GraphicsDevice.Viewport.Width / 4;
+            int spacePerPlayer = game.GDM().GraphicsDevice.Viewport.Width / m_Teams.Count;
+            int textureHeight = game.GDM().GraphicsDevice.Viewport.Height * 24 / 100;
+            for (int i = 0; i < m_Teams.Count; i++)
             {
-                m_Teams.Add(new Player(
-                    DGS.Instance.GetColour("COLOUR_TANK2"), Tankontroller.Instance().GetController(1),
-                    tankPositions[1].X, tankPositions[1].Y, tankRotations[1], tankScale,
-                    game.CM().Load<Texture2D>("healthbar_engineer_06"),
-                    game.CM().Load<Texture2D>("healthbar_engineer_05"),
-                    game.CM().Load<Texture2D>("healthbar_engineer_04"),
-                    game.CM().Load<Texture2D>("healthbar_engineer_03"),
-                    game.CM().Load<Texture2D>("healthbar_engineer_02"),
-                    game.CM().Load<Texture2D>("healthbar_engineer_01"),
-                    new Rectangle(game.GDM().GraphicsDevice.Viewport.Width - textureWidth, 0, textureWidth, textureHeight), false));
-                if (pNumOfPlayers > 2)
-                {
-                    m_Teams.Add(new Player(
-                    DGS.Instance.GetColour("COLOUR_TANK3"), Tankontroller.Instance().GetController(2),
-                    tankPositions[2].X, tankPositions[2].Y, tankRotations[2], tankScale,
-                    game.CM().Load<Texture2D>("healthbar_robo_06"),
-                    game.CM().Load<Texture2D>("healthbar_robo_05"),
-                    game.CM().Load<Texture2D>("healthbar_robo_04"),
-                    game.CM().Load<Texture2D>("healthbar_robo_03"),
-                    game.CM().Load<Texture2D>("healthbar_robo_02"),
-                    game.CM().Load<Texture2D>("healthbar_robo_01"),
-                    new Rectangle(0 + textureWidth, 0, textureWidth, textureHeight), true));
-                }
+                m_Teams[i].GamePreparation(
+                m_TankPositions[i].X, m_TankPositions[i].Y, m_TankRotations[i], tankScale,
+                game.CM().Load<Texture2D>("healthbars/heart_bw"),
+                game.CM().Load<Texture2D>("healthbars/heart_colour"),
+                new Rectangle((int)(i * spacePerPlayer + (spacePerPlayer - textureWidth) * 0.5f), 0, textureWidth, textureHeight));
             }
 
-            m_World = new TheWorld(pPlayArea, Walls);
         }
 
         private void IntroFinished()
