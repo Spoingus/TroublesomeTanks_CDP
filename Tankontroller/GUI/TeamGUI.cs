@@ -12,7 +12,10 @@ namespace Tankontroller.GUI
 {
     public class TeamGUI
     {
+        private Texture2D m_WhitePixel;
+        private Rectangle m_Rectangle;
         private HealthBar m_HealthBar;
+        private Avatar m_Avatar;
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
@@ -46,12 +49,11 @@ namespace Tankontroller.GUI
         }
 
         public TeamGUI(
-            Texture2D pHealthBar1,
-            Texture2D pHealthBar2,
-            Texture2D pHealthBar3,
-            Texture2D pHealthBar4,
-            Texture2D pHealthBar5,
-            Texture2D pHealthBar6,
+            Texture2D pWhitePixel,
+            Texture2D pHealthBarBlackAndWhiteLayer,
+            Texture2D pHealthBarColourLayer,
+            Texture2D pAvatarBlackAndWhiteLayer,
+            Texture2D pAvatarColourLayer,
             Rectangle pRectangle,
             Tank pTank,
             bool isOnLeft,
@@ -60,6 +62,7 @@ namespace Tankontroller.GUI
         {
             m_Color = pColor;
             m_Controller = pController;
+            PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
             m_HealthBar = new HealthBar(pHealthBar1, pHealthBar2, pHealthBar3, pHealthBar4, pHealthBar5, pHealthBar6, pRectangle, pTank);
 
             int powerBarWidth = DGS.Instance.GetInt("SCREENWIDTH") / 4 /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
@@ -81,6 +84,19 @@ namespace Tankontroller.GUI
                 m_PortNumLabels[j] = new PortNumLabel(m_PortNumbers, new Vector2(xOffset + xValue, labels_yValueOffset), powerBarWidth, powerBarWidth);
                 xValue += xIncrement;
             }
+        }
+
+      
+
+
+        private void PrepareHealthBar(Texture2D pHealthBarBlackAndWhiteLayer, Texture2D pHealthBarColourLayer)
+        {
+            int healthBarWidth = (int)(m_Rectangle.Width * 0.6);
+            int healthBarHeight = (int)(m_Rectangle.Height * 0.25);
+            int healthBarLeft = m_Rectangle.Left + m_Rectangle.Width - healthBarWidth;
+            int healthBarTop = m_Rectangle.Top + m_Rectangle.Height - healthBarHeight;
+            Rectangle healthBarRectangle = new Rectangle(healthBarLeft, healthBarTop, healthBarWidth, healthBarHeight);
+            m_HealthBar = new HealthBar(m_WhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, healthBarRectangle, mTank);
         }
 
         public Tank GetTank()

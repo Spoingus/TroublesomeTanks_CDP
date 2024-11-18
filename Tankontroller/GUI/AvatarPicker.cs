@@ -115,13 +115,13 @@ namespace Tankontroller.GUI
         }
         private Avatar prepareAvatar(string pAvatarName, Rectangle pRectangle, Color pColour)
         {
-            TroublesomeTanks game = (TroublesomeTanks)TroublesomeTanks.Instance();
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
             Avatar avatar = new Avatar(mWhitePixel, pAvatarName, pRectangle, pColour);
             return avatar;
         }
         private void prepareAvatars()
         {
-            TroublesomeTanks game = (TroublesomeTanks)TroublesomeTanks.Instance();
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mAvatars = new List<Avatar>();
@@ -164,7 +164,7 @@ namespace Tankontroller.GUI
         }
         private void prepareSelectionRectangles()
         {
-            TroublesomeTanks game = (TroublesomeTanks)TroublesomeTanks.Instance();
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mSelectionRectangles = new List<Rectangle>();
