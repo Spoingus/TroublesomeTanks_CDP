@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.Controller
 {
-    public class PortMapping 
+    public class PortMapping
     {
         public static int getPortForPlayer(int pJackNum) // Eww. Sorry
         {

@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 using Microsoft.Xna.Framework.Input;
 using Tankontroller.World.Particles;
+using Tankontroller.GUI;
+using Tankontroller.Controller;
 
 namespace Tankontroller.Scenes
 {

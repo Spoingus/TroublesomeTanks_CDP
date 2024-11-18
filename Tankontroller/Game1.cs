@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading.Tasks;
+using Tankontroller.Controller;
 using Tankontroller.Scenes;
 
 namespace Tankontroller

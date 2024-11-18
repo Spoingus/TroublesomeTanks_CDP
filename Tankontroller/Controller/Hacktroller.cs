@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.Controller
 {
     /*      R1     R2    R3     Off   On
             100k   47k   0      323   0
@@ -189,7 +189,7 @@ namespace Tankontroller
                     b = port.ReadByte();
                     if (b != 'D') return null;
 
-                    byte[] buffer = new byte[(numPins) + 1];
+                    byte[] buffer = new byte[numPins + 1];
 
                     port.Read(buffer, 0, buffer.Length);
 

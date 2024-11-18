@@ -8,7 +8,7 @@ using Tankontroller.World;
 using Microsoft.Xna.Framework;
 using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.Controller
 {
     public enum Control { LEFT_TRACK_FORWARDS = 0, LEFT_TRACK_BACKWARDS = 1, RIGHT_TRACK_FORWARDS = 2, RIGHT_TRACK_BACKWARDS = 3, FIRE = 4, RECHARGE = 5, NONE = 6, TURRET_LEFT = 7, TURRET_RIGHT = 8 };
 
@@ -109,7 +109,7 @@ namespace Tankontroller
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION")) || (pControl != Control.FIRE && mJacks[i].charge > 0));
+                    return mJacks[i].IsDown && (pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || pControl != Control.FIRE && mJacks[i].charge > 0);
                 }
             }
             return false;
@@ -241,8 +241,8 @@ namespace Tankontroller
 
         public void PullDataThread()
         {
-            System.Threading.Thread.Sleep(10);
-            Thread UpdateController = new Thread(new ThreadStart(this.PullData));
+            Thread.Sleep(10);
+            Thread UpdateController = new Thread(new ThreadStart(PullData));
             UpdateController.Start();
         }
 
@@ -252,9 +252,9 @@ namespace Tankontroller
 
             for (int i = 0; i < result.Length; i++)
             {
-                result[i].R = (byte)(0);
-                result[i].G = (byte)(0);
-                result[i].B = (byte)(0);
+                result[i].R = 0;
+                result[i].G = 0;
+                result[i].B = 0;
             }
             if (mLightsOn)
             {
@@ -270,23 +270,23 @@ namespace Tankontroller
                     {
                         if (remainingCharge >= 1)
                         {
-                            result[i].R = (byte)((mColour.R) * brightness);
-                            result[i].G = (byte)((mColour.G) * brightness);
-                            result[i].B = (byte)((mColour.B) * brightness);
+                            result[i].R = (byte)(mColour.R * brightness);
+                            result[i].G = (byte)(mColour.G * brightness);
+                            result[i].B = (byte)(mColour.B * brightness);
                         }
                         else
                         {
-                            result[i].R = (byte)(0);
-                            result[i].G = (byte)(0);
-                            result[i].B = (byte)(0);
+                            result[i].R = 0;
+                            result[i].G = 0;
+                            result[i].B = 0;
                         }
                         remainingCharge--;
                     }
                     foreach (int i in mLeds.LED_IDS)
                     {
-                        result[i].R = (byte)(30);
-                        result[i].G = (byte)(30);
-                        result[i].B = (byte)(30);
+                        result[i].R = 30;
+                        result[i].G = 30;
+                        result[i].B = 30;
                     }
                 }
             }

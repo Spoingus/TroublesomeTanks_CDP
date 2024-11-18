@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tankontroller.Controller;
+using Tankontroller.GUI;
 using Tankontroller.World;
 
 namespace Tankontroller
