@@ -44,7 +44,7 @@ namespace Tankontroller.Scenes
         private const float SECONDS_BETWEEN_TRACKS_ADDED = 0.2f;
         private float m_SecondsTillTracksAdded = SECONDS_BETWEEN_TRACKS_ADDED;
 
-        private List<Player> m_Teams = new List<Player>();
+        private List<Player> m_Teams;
 
         Texture2D mBackgroundTexture = null;
         Texture2D mPixelTexture = null;
@@ -59,10 +59,9 @@ namespace Tankontroller.Scenes
 
         private bool isPaused = false; // is the game paused
 
-        public GameScene()
+        public GameScene(List<Player> pPlayers)
         {
             //Loads all the relevant textures for the game scene
-            mControllers = new List<IController>();
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             m_TankBaseTexture = game.CM().Load<Texture2D>("Tank-B-05");
             m_TankBrokenTexture = game.CM().Load<Texture2D>("BrokenTank");
@@ -116,7 +115,9 @@ namespace Tankontroller.Scenes
             introMusicInstance = game.ReplaceCurrentMusicInstance("Music/Music_intro", false);
 
 
-            int numberOfPlayers = DGS.Instance.GetInt("NUM_PLAYERS");
+            m_Teams = pPlayers;
+
+            int numberOfPlayers = m_Teams.Count;
 
             for (int i = 0; i < numberOfPlayers; i++)
             {
@@ -134,7 +135,7 @@ namespace Tankontroller.Scenes
             }
             else
             {
-                setup4Player(mPlayAreaRectangle, numberOfPlayers);
+                setup4Player(mPlayAreaRectangle);
             }
             foreach (Player p in m_Teams)
             {
@@ -143,11 +144,8 @@ namespace Tankontroller.Scenes
         }
 
         //The game set up for 4 players
-        private void setup4Player(Rectangle pPlayArea, int pNumOfPlayers)
+        private void setup4Player(Rectangle pPlayArea)
         {
-
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
-
             int middleBlockHeight = pPlayArea.Height / 3;
             int outerBlockHeight = pPlayArea.Height / 5;
             int blockThickness = pPlayArea.Width / 50;
@@ -205,9 +203,6 @@ namespace Tankontroller.Scenes
         //The game set up for 1 to 3 players
         private void setupNot4Player(Rectangle pPlayArea, int pNumOfPlayers)
         {
-
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
-
             int middleBlockHeight = pPlayArea.Height / 3;
             int outerBlockHeight = pPlayArea.Height / 5;
             int blockThickness = pPlayArea.Width / 50;
@@ -442,11 +437,11 @@ namespace Tankontroller.Scenes
 
             IntroFinished();
             //Updates each controller to check for inputs
-            for (int i = 0; i < DGS.Instance.GetInt("NUM_PLAYERS"); i++)
+            foreach (Player p in m_Teams)
             {
-                IController controller = Tankontroller.Instance().GetController(i);
-                controller.UpdateController();
+                p.Controller.UpdateController();
             }
+
 
             bool tankMoved = false;
 

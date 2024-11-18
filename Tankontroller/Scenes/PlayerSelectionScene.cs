@@ -197,29 +197,25 @@ namespace Tankontroller.Scenes
             }
         }
 
+
         public void Update(float pSeconds)
         {
             Escape();
             IGame game = Tankontroller.Instance();
             updateAvatarPickers(pSeconds);
-            for (int i = 0; i < game.NumControllers(); i++)
+            for (int i = 0; i < game.GetControllerCount(); i++)
             {
                 IController controller = game.GetController(i);
                 AvatarPicker avatarPicker = getControllerAvatarPicker(controller);
                 if (avatarPicker == null)
                 {
-                    controller.UpdateController(pSeconds);
+                    controller.UpdateController();
                 }
-                if (!controller.IsPressed(Control.POWER3))
+                if (controller.IsPressed(Control.FIRE))
                 {
-                    if (controller.WasPressed(Control.POWER3)) // this is pressing the A
+                    if (avatarPicker == null)
                     {
-                        // if this controller is not already a player
-                        // need to make a player here as this controller wants to play
-                        if (avatarPicker == null)
-                        {
-                            makeNewPlayer(controller);
-                        }
+                        makeNewPlayer(controller);
                     }
                 }
             }

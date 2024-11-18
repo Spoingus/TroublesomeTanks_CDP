@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,6 +64,7 @@ namespace Tankontroller.GUI
             m_Rectangle = pRectangle;
             m_Color = pColor;
             m_Controller = pController;
+            m_Tank = pTank;
             PrepareAvatar(pAvatarBlackAndWhiteLayer, pAvatarColourLayer);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
 
@@ -73,7 +75,6 @@ namespace Tankontroller.GUI
             int jackIcons_yValueOffset = powerBar_yValueOffset + (int)(powerBarHeight * 1.01f) - powerBarWidth;
             int labels_yValueOffset = powerBar_yValueOffset + (int)(powerBarWidth * 1.01f);
 
-            m_Tank = pTank;
             bool isOnLeft = true;
             int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
             int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
@@ -100,6 +101,7 @@ namespace Tankontroller.GUI
             m_Rectangle = pRectangle;
             m_Color = pColor;
             m_Controller = pController;
+            m_Tank = pTank;
             PrepareAvatar(pAvatar);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
 
@@ -110,7 +112,6 @@ namespace Tankontroller.GUI
             int jackIcons_yValueOffset = powerBar_yValueOffset + (int)(powerBarHeight * 1.01f) - powerBarWidth;
             int labels_yValueOffset = powerBar_yValueOffset + (int)(powerBarWidth * 1.01f);
 
-            m_Tank = pTank;
             bool isOnLeft = true;
             int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
             int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
@@ -161,11 +162,41 @@ namespace Tankontroller.GUI
 
         public void Reposition(Rectangle pRectangle)
         {
-            m_HealthBar.Reposition(pRectangle);
+            Rectangle healthRect = new Rectangle(new Point(pRectangle.X, pRectangle.Y + (pRectangle.Height * 3 / 4)), new Point(pRectangle.Width, pRectangle.Height / 4));
+            m_HealthBar.Reposition(healthRect);
+            m_Avatar.Reposition(pRectangle);
+        }
+
+        public void DrawAvatar(SpriteBatch pSpriteBatch)
+        {
+            int avatarIndex = 4;
+            int health = m_Tank.Health();
+            if (health == 5)
+            {
+                avatarIndex = 0;
+            }
+            else if (health == 4)
+            {
+                avatarIndex = 1;
+            }
+            else if (health == 3)
+            {
+                avatarIndex = 2;
+            }
+            else if (health == 2)
+            {
+                avatarIndex = 3;
+            }
+            else if (health == 1)
+            {
+                avatarIndex = 4;
+            }
+            m_Avatar.Draw(pSpriteBatch, m_Tank.Health() > 0, avatarIndex);
         }
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
+            DrawAvatar(pSpriteBatch);
             DrawHealthBar(pSpriteBatch);
 
             for (int j = 0; j < 7; j++)
