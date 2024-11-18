@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.GUI
 {
     public class PowerBar
     {
@@ -34,15 +34,15 @@ namespace Tankontroller
 
             if (pCharge > 0)
             {
-                int height = (int)((powerBarHeight / 100f) * ((100 / DGS.Instance.GetFloat("MAX_CHARGE")) * pCharge));
+                int height = (int)(powerBarHeight / 100f * (100 / DGS.Instance.GetFloat("MAX_CHARGE") * pCharge));
                 if (enoughCharge)
                 {
-                    pSpriteBatch.Draw(powerBarPower, new Rectangle((int)powerBarPosition.X, (int)(powerBarPosition.Y) + powerBarHeight - height, powerBarWidth, height), null, Color.LightBlue, 0f, new Vector2(0, 0), SpriteEffects.None, 0f);
+                    pSpriteBatch.Draw(powerBarPower, new Rectangle((int)powerBarPosition.X, (int)powerBarPosition.Y + powerBarHeight - height, powerBarWidth, height), null, Color.LightBlue, 0f, new Vector2(0, 0), SpriteEffects.None, 0f);
                 }
                 else
                 {
                     pSpriteBatch.Draw(powerBarPower, new Rectangle((int)powerBarPosition.X, (int)powerBarPosition.Y, powerBarWidth, powerBarHeight), null, Color.Red, 0f, new Vector2(0, 0), SpriteEffects.None, 0f);
-                    pSpriteBatch.Draw(powerBarPower, new Rectangle((int)powerBarPosition.X, (int)(powerBarPosition.Y) + powerBarHeight - height, powerBarWidth, height), null, Color.LightBlue, 0f, new Vector2(0, 0), SpriteEffects.None, 0f);
+                    pSpriteBatch.Draw(powerBarPower, new Rectangle((int)powerBarPosition.X, (int)powerBarPosition.Y + powerBarHeight - height, powerBarWidth, height), null, Color.LightBlue, 0f, new Vector2(0, 0), SpriteEffects.None, 0f);
                 }
                 //pSpriteBatch.DrawString(gameFont, pCharge, new Vector2(665, 40), Color.Wheat, 0f, new Vector2(0, 0), 0.6f, SpriteEffects.None, 0f);
             }
@@ -54,6 +54,6 @@ namespace Tankontroller
 
             }
         }
-        
+
     }
 }

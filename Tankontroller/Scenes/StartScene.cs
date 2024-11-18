@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
+using Tankontroller.Controller;
 
 
 namespace Tankontroller.Scenes

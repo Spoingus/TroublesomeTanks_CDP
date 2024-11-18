@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tankontroller.World;
 
-namespace Tankontroller
+namespace Tankontroller.GUI
 {
     public class HealthBar
     {
@@ -32,7 +32,7 @@ namespace Tankontroller
             m_Rectangle = pRectangle;
         }
 
-       
+
 
         public void Draw(SpriteBatch pSpriteBatch)
         {

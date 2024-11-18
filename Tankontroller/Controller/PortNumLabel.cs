@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.Controller
 {
     public class PortNumLabel
     {
@@ -27,6 +27,6 @@ namespace Tankontroller
             pSpriteBatch.Draw(numTextures[pNumToDisplay], new Rectangle((int)numPosition.X, (int)numPosition.Y, numWidth, numHeight), pColor);
 
         }
-        
+
     }
 }

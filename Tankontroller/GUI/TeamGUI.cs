@@ -5,9 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tankontroller.Controller;
 using Tankontroller.World;
 
-namespace Tankontroller
+namespace Tankontroller.GUI
 {
     public class TeamGUI
     {
@@ -61,10 +62,10 @@ namespace Tankontroller
             m_Controller = pController;
             m_HealthBar = new HealthBar(pHealthBar1, pHealthBar2, pHealthBar3, pHealthBar4, pHealthBar5, pHealthBar6, pRectangle, pTank);
 
-            int powerBarWidth = (DGS.Instance.GetInt("SCREENWIDTH") / 4) /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
+            int powerBarWidth = DGS.Instance.GetInt("SCREENWIDTH") / 4 /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
             int powerBarHeight = DGS.Instance.GetInt("SCREENHEIGHT") / 100 * 12;
 
-            int powerBar_yValueOffset = -10+ DGS.Instance.GetInt("SCREENWIDTH") / 100 * 2;
+            int powerBar_yValueOffset = -10 + DGS.Instance.GetInt("SCREENWIDTH") / 100 * 2;
             int jackIcons_yValueOffset = powerBar_yValueOffset + (int)(powerBarHeight * 1.01f) - powerBarWidth;
             int labels_yValueOffset = powerBar_yValueOffset + (int)(powerBarWidth * 1.01f);
 
@@ -72,7 +73,7 @@ namespace Tankontroller
 
             int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
             int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
-            int xOffset = isOnLeft ? pRectangle.X + pRectangle.Width - (8 * xIncrement) - powerBarWidth : pRectangle.X;
+            int xOffset = isOnLeft ? pRectangle.X + pRectangle.Width - 8 * xIncrement - powerBarWidth : pRectangle.X;
             for (int j = 0; j < 7; j++)
             {
                 m_PowerBars[j] = new PowerBar(new Vector2(xOffset + xValue, powerBar_yValueOffset), powerBarWidth, powerBarHeight);
@@ -103,9 +104,9 @@ namespace Tankontroller
 
             for (int j = 0; j < 7; j++)
             {
-                if(m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
+                if (m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
                 {
-                    if(m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
+                    if (m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
                         m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), true);
                     }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.Controller
 {
     /*      R1     R2    R3     Off   On
             100k   47k   0      323   0
@@ -68,9 +68,9 @@ namespace Tankontroller
     {
         public ControllerState Result;
         public int Reading;
-        public stateMap( ControllerState decodedState, int readingValue)
+        public stateMap(ControllerState decodedState, int readingValue)
         {
-            Result=decodedState;
+            Result = decodedState;
             Reading = readingValue;
         }
     }
@@ -97,18 +97,18 @@ namespace Tankontroller
 
         static byte[] frameBuffer = new byte[61 * 3];
 
-        static int tolerance= 0; 
+        static int tolerance = 0;
 
         PortState[] portStates = new PortState[numPins];
 
-        static stateMap[] stateMapping = new stateMap[] 
+        static stateMap[] stateMapping = new stateMap[]
         {
-            
+
 
             new stateMap(ControllerState.RIGHT_TRACK_FORWARDS, 3),
             new stateMap(ControllerState.RIGHT_TRACK_FORWARDS_PRESSED, 4),
-            
-            new stateMap(ControllerState.RIGHT_TRACK_BACKWARDS, 5), 
+
+            new stateMap(ControllerState.RIGHT_TRACK_BACKWARDS, 5),
             new stateMap(ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED, 6),
 
             new stateMap(ControllerState.LEFT_TRACK_FORWARDS, 7),
@@ -156,8 +156,9 @@ namespace Tankontroller
             port.ReadTimeout = 10;
             port.WriteTimeout = 10;
 
-            
+
         }
+
         public Hacktroller(SerialPort pPort)
         {
             port = pPort;
@@ -172,43 +173,50 @@ namespace Tankontroller
 
         public PortState[] GetPorts()
         {
-            port.DiscardInBuffer();
-            port.Write(new byte[] { (byte)'R' }, 0, 1);
-
-            System.Threading.Thread.Sleep(10);
-
-            if (port.BytesToRead > 0)
+            try
             {
-                // The comms starts with 0xff 0xff
-                var b = port.ReadByte();
-                if (b != 0xff) return null;
+                port.DiscardInBuffer();
+                port.Write(new byte[] { (byte)'R' }, 0, 1);
 
-                b = port.ReadByte();
-                if (b != 'D') return null;
+                System.Threading.Thread.Sleep(10);
 
-                byte[] buffer = new byte[(numPins) + 1];
-
-                port.Read(buffer, 0, buffer.Length);
-
-                for (int i = 0; i < numPins; i++)
-                //for (int i = 0; i < 1; i++)
+                if (port.BytesToRead > 0)
                 {
-                    int reading = buffer[i +1 ];
-                    ControllerState readingState = DecodeState(reading);
-                    if (readingState == ControllerState.FIRE_PRESSED)
+                    // The comms starts with 0xff 0xff
+                    var b = port.ReadByte();
+                    if (b != 0xff) return null;
+
+                    b = port.ReadByte();
+                    if (b != 'D') return null;
+
+                    byte[] buffer = new byte[numPins + 1];
+
+                    port.Read(buffer, 0, buffer.Length);
+
+                    for (int i = 0; i < numPins; i++)
+                    //for (int i = 0; i < 1; i++)
                     {
-                        portStates[i].Controller = ControllerState.FIRE_PRESSED;
-                    }
-                    else
-                    {
-                        portStates[i].Controller = readingState;
+                        int reading = buffer[i + 1];
+                        ControllerState readingState = DecodeState(reading);
+                        if (readingState == ControllerState.FIRE_PRESSED)
+                        {
+                            portStates[i].Controller = ControllerState.FIRE_PRESSED;
+                        }
+                        else
+                        {
+                            portStates[i].Controller = readingState;
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                return null;
             }
             return portStates;
         }
 
-      
+
         public async Task<bool> SetColor(ControllerColor[] colourArray)
         {
             byte[] colourWriteCommand = new byte[] { (byte)'P', 0 };

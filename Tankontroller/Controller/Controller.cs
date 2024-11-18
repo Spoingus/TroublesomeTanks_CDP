@@ -8,7 +8,7 @@ using Tankontroller.World;
 using Microsoft.Xna.Framework;
 using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.Controller
 {
     public enum Control { LEFT_TRACK_FORWARDS = 0, LEFT_TRACK_BACKWARDS = 1, RIGHT_TRACK_FORWARDS = 2, RIGHT_TRACK_BACKWARDS = 3, FIRE = 4, RECHARGE = 5, NONE = 6, TURRET_LEFT = 7, TURRET_RIGHT = 8 };
 
@@ -40,13 +40,14 @@ namespace Tankontroller
 
             }
         }
-        protected class Jack {
+        protected class Jack
+        {
             public Control Control;
             public bool IsDown;
             public int[] LED_IDS = new int[4];
-            public float charge;   
-               
-     
+            public float charge;
+
+
             public Jack()
             {
                 ResetCharge();
@@ -74,7 +75,7 @@ namespace Tankontroller
         }
         public void ResetJacks()
         {
-            foreach(Jack j in mJacks)
+            foreach (Jack j in mJacks)
             {
                 j.ResetCharge();
             }
@@ -104,11 +105,11 @@ namespace Tankontroller
 
         public bool IsPressedWithCharge(Control pControl)
         {
-            for ( int i = 0; i < 7; ++i)
+            for (int i = 0; i < 7; ++i)
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") ) || (pControl != Control.FIRE && mJacks[i].charge > 0));
+                    return mJacks[i].IsDown && (pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || pControl != Control.FIRE && mJacks[i].charge > 0);
                 }
             }
             return false;
@@ -160,7 +161,7 @@ namespace Tankontroller
             return false;
         }
 
-        
+
     }
 
     public class KeyboardController : Controller
@@ -187,17 +188,17 @@ namespace Tankontroller
             KeyboardState keyboardState = Keyboard.GetState();
             int rechargeJack = 0;
 
-            for(int i = 0; i < mJacks.Length; i++)
+            for (int i = 0; i < mJacks.Length; i++)
             {
-                if(mJacks[i].Control == Control.RECHARGE)
+                if (mJacks[i].Control == Control.RECHARGE)
                 {
                     rechargeJack = i;
                 }
             }
 
-            foreach(KeyValuePair<Keys, int> kvp in m_PortMap)
+            foreach (KeyValuePair<Keys, int> kvp in m_PortMap)
             {
-                if(keyboardState.IsKeyDown(kvp.Key))
+                if (keyboardState.IsKeyDown(kvp.Key))
                 {
                     mJacks[rechargeJack].Control = mJacks[kvp.Value].Control;
                     mJacks[kvp.Value].Control = Control.RECHARGE;
@@ -205,7 +206,7 @@ namespace Tankontroller
                 }
             }
 
-            foreach(KeyValuePair<Keys, Control> kvp in m_KeyMap)
+            foreach (KeyValuePair<Keys, Control> kvp in m_KeyMap)
             {
                 for (int i = 0; i < mJacks.Length; i++)
                 {
@@ -222,7 +223,7 @@ namespace Tankontroller
     {
         private Hacktroller mHacktroller;
 
-        public ModularController(Hacktroller pHackTroller):base()
+        public ModularController(Hacktroller pHackTroller) : base()
         {
 
             mJacks[5].LED_IDS = new int[8] { 0, 1, 2, 3, 4, 5, 6, 7 };
@@ -240,108 +241,22 @@ namespace Tankontroller
 
         public void PullDataThread()
         {
-            System.Threading.Thread.Sleep(10);
-            Thread UpdateController = new Thread(new ThreadStart(this.PullData));
+            Thread.Sleep(10);
+            Thread UpdateController = new Thread(new ThreadStart(PullData));
             UpdateController.Start();
         }
 
-        //private void UpdateColors()
-        //{
-        //    ControllerColor[] result = new ControllerColor[64];
-
-        //    for (int i = 0; i < result.Length; i++)
-        //    {
-        //        result[i].R = (byte)(0);
-        //        result[i].G = (byte)(0);
-        //        result[i].B = (byte)(0);
-        //    }
-
-        //    foreach (Jack J in mJacks)
-        //    {
-        //        // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
-        //        // J.charge should be between 0 and DGS.MAX_CHARGE
-        //        int FullByte = 50;
-        //        float decimalCharge = J.charge / DGS.MAX_CHARGE;
-        //        if (decimalCharge < 0.33f)
-        //        {
-        //            float remainingCharge = 4 * decimalCharge / 0.33f;
-        //            foreach (int i in J.LED_IDS)
-        //            {
-        //                if (remainingCharge > 1)
-        //                {
-        //                    result[i].R = (byte)(FullByte);
-        //                    result[i].G = (byte)(0);
-        //                    result[i].B = (byte)(0);
-        //                }
-        //                else
-        //                {
-        //                    result[i].R = (byte)(0);
-        //                    result[i].G = (byte)(0);
-        //                    result[i].B = (byte)(0);
-        //                }
-        //                remainingCharge--;
-        //            }
-        //        }
-        //        else if (decimalCharge < 0.66f)
-        //        {
-        //            float remainingCharge = 4 * (decimalCharge - 0.33f) / 0.33f;
-        //            foreach (int i in J.LED_IDS)
-        //            {
-        //                if (remainingCharge > 1)
-        //                {
-        //                    result[i].R = (byte)(FullByte);
-        //                    result[i].G = (byte)(FullByte / 2);
-        //                    result[i].B = (byte)(0);
-        //                }
-        //                else
-        //                {
-        //                    result[i].R = (byte)(FullByte);
-        //                    result[i].G = (byte)(0);
-        //                    result[i].B = (byte)(0);
-        //                }
-        //                remainingCharge--;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            float remainingCharge = 4 * (decimalCharge - 0.66f) / 0.33f;
-        //            foreach (int i in J.LED_IDS)
-        //            {
-        //                if (remainingCharge >= 1)
-        //                {
-        //                    result[i].R = (byte)(0);
-        //                    result[i].G = (byte)(FullByte);
-        //                    result[i].B = (byte)(0);
-        //                }
-        //                else
-        //                {
-        //                    result[i].R = (byte)(FullByte);
-        //                    result[i].G = (byte)(FullByte / 2);
-        //                    result[i].B = (byte)(0);
-        //                }
-        //                remainingCharge--;
-        //            }
-        //        }
-        //    }
-
-
-        //    mHacktroller.SetColor(result);
-
-        //    //System.Threading.Thread.Sleep(50);
-        //    //Thread UpdateColors = new Thread(new ThreadStart(this.UpdateColors));
-        //    //UpdateColors.Start();
-        //}
         private async Task UpdateColors()
         {
             ControllerColor[] result = new ControllerColor[61];
 
             for (int i = 0; i < result.Length; i++)
             {
-                result[i].R = (byte)(0);
-                result[i].G = (byte)(0);
-                result[i].B = (byte)(0);
+                result[i].R = 0;
+                result[i].G = 0;
+                result[i].B = 0;
             }
-            if(mLightsOn)
+            if (mLightsOn)
             {
                 foreach (Jack J in mJacks)
                 {
@@ -355,102 +270,34 @@ namespace Tankontroller
                     {
                         if (remainingCharge >= 1)
                         {
-                            result[i].R = (byte)((mColour.R) * brightness);
-                            result[i].G = (byte)((mColour.G) * brightness);
-                            result[i].B = (byte)((mColour.B) * brightness);
-                            /*
-                            if (decimalCharge < 0.5f)
-                            {
-                                result[i].R = (byte)(FullByte);
-                                result[i].G = (byte)(0);
-                                result[i].B = (byte)(0);
-                            }
-                            else if (decimalCharge < 0.9f)
-                            {
-                                result[i].R = (byte)(FullByte);
-                                result[i].G = (byte)(FullByte);
-                                result[i].B = (byte)(0);
-                            }
-                            else
-                            {
-                                result[i].R = (byte)(0);
-                                result[i].G = (byte)(FullByte);
-                                result[i].B = (byte)(0);
-                            }
-                            */
+                            result[i].R = (byte)(mColour.R * brightness);
+                            result[i].G = (byte)(mColour.G * brightness);
+                            result[i].B = (byte)(mColour.B * brightness);
                         }
                         else
                         {
-                            result[i].R = (byte)(0);
-                            result[i].G = (byte)(0);
-                            result[i].B = (byte)(0);
+                            result[i].R = 0;
+                            result[i].G = 0;
+                            result[i].B = 0;
                         }
                         remainingCharge--;
                     }
                     foreach (int i in mLeds.LED_IDS)
                     {
-                        result[i].R = (byte)(30);
-                        result[i].G = (byte)(30);
-                        result[i].B = (byte)(30);
+                        result[i].R = 30;
+                        result[i].G = 30;
+                        result[i].B = 30;
                     }
                 }
-            //    }
-            //    else if (decimalCharge < 0.66f)
-            //    {
-            //        float remainingCharge = 8 * (decimalCharge - 0.33f) / 0.33f;
-            //        foreach (int i in J.LED_IDS)
-            //        {
-            //            if (remainingCharge > 1)
-            //            {
-            //                result[i].R = (byte)(FullByte);
-            //                result[i].G = (byte)(FullByte / 2);
-            //                result[i].B = (byte)(0);
-            //            }
-            //            else
-            //            {
-            //                result[i].R = (byte)(FullByte);
-            //                result[i].G = (byte)(0);
-            //                result[i].B = (byte)(0);
-            //            }
-            //            remainingCharge--;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        float remainingCharge = 8 * (decimalCharge - 0.66f) / 0.33f;
-            //        foreach (int i in J.LED_IDS)
-            //        {
-            //            if (remainingCharge >= 1)
-            //            {
-            //                result[i].R = (byte)(0);
-            //                result[i].G = (byte)(FullByte);
-            //                result[i].B = (byte)(0);
-            //            }
-            //            else
-            //            {
-            //                result[i].R = (byte)(FullByte);
-            //                result[i].G = (byte)(FullByte / 2);
-            //                result[i].B = (byte)(0);
-            //            }
-            //            remainingCharge--;
-            //        }
-            //    }
             }
 
 
             await mHacktroller.SetColor(result);
-
-            //System.Threading.Thread.Sleep(50);
-            //Thread UpdateColors = new Thread(new ThreadStart(this.UpdateColors));
-            //UpdateColors.Start();
         }
         Task updateColourTask = null;
         public override void UpdateController()
         {
-            // Can we pull data in here instead?
-            // PullDataThread();
-            // PullData();
-            if (updateColourTask == null || updateColourTask.IsCompleted)
+            if (mLightsOn && (updateColourTask == null || updateColourTask.IsCompleted))
             {
                 updateColourTask = Task.Run(async () => await UpdateColors());
             }
@@ -458,25 +305,18 @@ namespace Tankontroller
 
         private void PullData()
         {
-            
-
             while (mLightsOn)
             {
-
                 PortState[] ports = mHacktroller.GetPorts();
 
                 if (ports == null)
                 {
+                    mLightsOn = false;
                     return;
                 }
                 for (int i = 0; i < ports.Length; ++i)
                 {
                     mJacks[i].IsDown = ports[i].FirePressed;
-
-                    if (ports[i].FirePressed)
-                    {
-                        bool stopHere = true;
-                    }
 
                     if (ports[i].Controller == ControllerState.NOT_CONNECTED)
                     {
@@ -575,18 +415,6 @@ namespace Tankontroller
                     {
                     }
                 }
-
-                //System.Threading.Thread.Sleep(10);
-                try
-                {
-                  //  UpdateColors();
-                }
-                catch(Exception e)
-                {
-                    //do nothing?
-                }
-            
-                //PullDataThread();
             }
         }
     }
