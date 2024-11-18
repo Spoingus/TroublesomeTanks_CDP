@@ -11,35 +11,76 @@ namespace Tankontroller.GUI
 {
     public class HealthBar
     {
-        private Texture2D[] m_Textures = new Texture2D[6];
-        private Rectangle m_Rectangle;
-        private Tank m_Tank;
+        private Texture2D mHeartBlackAndWhite;
+        private Texture2D mHeartColour;
+        private Texture2D mWhitePixel;
+        private Rectangle mBoundsRectangle;
+        private Rectangle[] mRectangles = new Rectangle[DGS.Instance.GetInt("MAX_TANK_HEALTH")];
+        private Tank mTank;
 
-        public HealthBar(Texture2D pT0, Texture2D pT1, Texture2D pT2, Texture2D pT3, Texture2D pT4, Texture2D pT5, Rectangle pRectangle, Tank pTank)
+        public HealthBar(Texture2D pWhitePixel, Texture2D pHeartBlackAndWhite, Texture2D pHeartColour, Rectangle pRectangle, Tank pTank)
         {
-            m_Textures[0] = pT0;
-            m_Textures[1] = pT1;
-            m_Textures[2] = pT2;
-            m_Textures[3] = pT3;
-            m_Textures[4] = pT4;
-            m_Textures[5] = pT5;
-            m_Rectangle = pRectangle;
-            m_Tank = pTank;
+            mHeartBlackAndWhite = pHeartBlackAndWhite;
+            mHeartColour = pHeartColour;
+            mWhitePixel = pWhitePixel;
+            mBoundsRectangle = pRectangle;
+            PrepareRectangles();
+            mTank = pTank;
+
+        }
+
+        private void PrepareRectangles()
+        {
+            int paddingWidth = 5;
+            int width = (mBoundsRectangle.Width - paddingWidth * (DGS.Instance.GetInt("MAX_TANK_HEALTH") + 1)) / DGS.Instance.GetInt("MAX_TANK_HEALTH");
+            float heightRatio = (float)mHeartBlackAndWhite.Height / mHeartBlackAndWhite.Width;
+            int height = (int)(width * heightRatio);
+            if (height > mBoundsRectangle.Height)
+            {
+                height = mBoundsRectangle.Height;
+                width = (int)(height / heightRatio);
+            }
+            int left = mBoundsRectangle.Left + paddingWidth;
+            int top = mBoundsRectangle.Top;
+            if (height < mBoundsRectangle.Height)
+            {
+                top += (mBoundsRectangle.Height - height) / 2;
+            }
+            for (int i = 0; i < DGS.Instance.GetInt("MAX_TANK_HEALTH"); i++)
+            {
+                Rectangle rectangle = new Rectangle(left, top, width, height);
+                mRectangles[i] = rectangle;
+                left += paddingWidth + width;
+            }
+
+
         }
 
         public void Reposition(Rectangle pRectangle)
         {
-            m_Rectangle = pRectangle;
+            mBoundsRectangle = pRectangle;
+            PrepareRectangles();
         }
 
-
+        public void DrawBounds(SpriteBatch pSpriteBatch)
+        {
+            Color boundColour = Color.White;
+            boundColour.A = (byte)0.5f;
+            pSpriteBatch.Draw(mWhitePixel, mBoundsRectangle, boundColour);
+        }
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
-            if (m_Tank.Health() >= 0)
+            //DrawBounds(pSpriteBatch);
+            for (int i = 0; i < DGS.Instance.GetInt("MAX_TANK_HEALTH"); i++)
             {
-                pSpriteBatch.Draw(m_Textures[m_Tank.Health()], m_Rectangle, Color.White);
+                pSpriteBatch.Draw(mHeartBlackAndWhite, mRectangles[i], Color.White);
+                if (i < mTank.Health())
+                {
+                    pSpriteBatch.Draw(mHeartColour, mRectangles[i], Color.Red);
+                }
             }
+
         }
     }
 }

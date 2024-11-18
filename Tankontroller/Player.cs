@@ -18,20 +18,75 @@ namespace Tankontroller
         public Tank Tank { get; private set; }
         public IController Controller { get; private set; }
         public Color Colour { get; private set; }
+        public Avatar Avatar { get; private set; }
 
         public List<Bullet> Bullets { get; private set; }
 
-        public Player(Color pColour, IController pController, 
+        public bool ColourSet { get; private set; }
+        public bool AvatarSet { get; private set; }
+        public int SelectionIndex { get; set; }
+        public Player(IController pController)
+        {
+            Controller = pController;
+            ColourSet = false;
+            AvatarSet = false;
+            SelectionIndex = 0;
+        }
+
+        public void AddColour(Color pColour)
+        {
+            Colour = pColour;
+        }
+        public void SetColour()
+        {
+            ColourSet = true;
+        }
+        public void RemoveColour()
+        {
+            ColourSet = false;
+            Colour = Color.White;
+        }
+        public void AddAvatar(Avatar pAvatar)
+        {
+            Avatar = pAvatar;
+        }
+        public void SetAvatar()
+        {
+            AvatarSet = true;
+        }
+        public void RemoveAvatar()
+        {
+            AvatarSet = false;
+            Avatar = null;
+        }
+        public Player(Color pColour, IController pController,
             float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
-            Texture2D pHealthBar1, Texture2D pHealthBar2, Texture2D pHealthBar3, Texture2D pHealthBar4, Texture2D pHealthBar5, Texture2D pHealthBar6, 
-            Rectangle pRectangle, bool pIsOnLeft)
+            Texture2D pWhitePixel,
+            Texture2D pHealthBarBlackAndWhiteLayer,
+            Texture2D pHealthBarColourLayer, Texture2D pAvatarBlackAndWhiteLayer,
+            Texture2D pAvatarColourLayer,
+            Rectangle pRectangle)
         {
             Colour = pColour;
             Controller = pController;
             Controller.SetColour(pColour);
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
-            GUI = new TeamGUI(pHealthBar1, pHealthBar2, pHealthBar3, pHealthBar4, pHealthBar5, pHealthBar6, pRectangle, Tank, pIsOnLeft, Controller, Colour);
+            GUI = new TeamGUI(pWhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, pAvatarBlackAndWhiteLayer,
+                pAvatarColourLayer, pRectangle, Tank, Controller, Colour);
+        }
+        public void GamePreparation(
+            float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
+            Texture2D pHealthBarBlackAndWhiteLayer,
+            Texture2D pHealthBarColourLayer,
+            Rectangle pRectangle)
+        {
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
+            Controller.SetColour(Colour);
+            Bullets = new List<Bullet>();
+            Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
+            Texture2D whitePixel = game.CM().Load<Texture2D>("white_pixel");
+            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Tank, Controller, Colour);
         }
         public void Reset()
         {
