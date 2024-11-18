@@ -192,7 +192,7 @@ namespace Tankontroller.GUI
         }
         private void prepareColours(string pName)
         {
-            TroublesomeTanks game = (TroublesomeTanks)TroublesomeTanks.Instance();
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mColours = new List<Avatar>();
