@@ -103,6 +103,7 @@ namespace Tankontroller.Scenes
             mSpriteBatch.Draw(mBackgroundTexture, mRectangle, Color.White);
             for (int i = 0; i < mPlayers.Count; i++)
             {
+                mPlayers[i].GUI.DrawAvatar(mSpriteBatch);
                 mPlayers[i].GUI.DrawHealthBar(mSpriteBatch);
             }
             mSpriteBatch.End();

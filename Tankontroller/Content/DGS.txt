@@ -18,7 +18,7 @@ float BULLET_SPEED = 100;
 bool HAVE_CONTROLLER = true;
 bool ADD_KEYBOARD_CONTROLLER_1 = false;
 bool ADD_KEYBOARD_CONTROLLER_2 = false;
-int NUM_PLAYERS = 4;
+
 int NUM_CONTROLLERS = 1;
 string CONTROLLER0_PORT = COM9;
 string CONTROLLER1_PORT = COM8;
@@ -59,3 +59,5 @@ Color COLOUR_DUST = dcdcdc;
 //Color COLOUR_DUST = Gainsboro;
 //  static Color COLOUR_FIRE = DarkOrange;
 //  static Color COLOUR_TRACK_PRINT = DarkKhaki;
+
+int NUMBER_OF_AVATARS = 12;

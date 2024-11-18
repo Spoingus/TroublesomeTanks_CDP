@@ -88,7 +88,7 @@ namespace Tankontroller.Scenes
         private void StartGame()
         {
             IGame game = Tankontroller.Instance();
-            game.SM().Transition(new GameScene(), false);
+            game.SM().Transition(new PlayerSelectionScene(), false);
         }
 
         Task? detectControllerTask = null;

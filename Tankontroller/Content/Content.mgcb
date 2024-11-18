@@ -565,6 +565,18 @@
 /processorParam:TextureFormat=Color
 /build:background_01.png
 
+#begin background_06.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:background_06.png
+
 #begin block.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1674,4 +1686,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:turretRight.png
+
+#begin white_pixel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:white_pixel.png
 

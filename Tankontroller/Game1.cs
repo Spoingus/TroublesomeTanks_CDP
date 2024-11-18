@@ -24,6 +24,7 @@ namespace Tankontroller
         GraphicsDeviceManager GDM();
 
         IController GetController(int pIndex);
+        int GetControllerCount();
         List<IController> GetControllers();
         Task DetectControllers();
         void Exit();
@@ -114,6 +115,7 @@ namespace Tankontroller
         }
 
         public IController GetController(int pIndex) {  return mControllers.Values.ElementAt(pIndex); }
+        public int GetControllerCount() { return mControllers.Count; }
         public List<IController> GetControllers() { return mControllers.Values.ToList(); }
        
         public SoundManager GetSoundManager() { return mSoundManager; }

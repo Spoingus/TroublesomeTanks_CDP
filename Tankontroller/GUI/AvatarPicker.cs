@@ -169,13 +169,13 @@ namespace Tankontroller.GUI
             int screenHeight = mBoundsRectangle.Height;
             mSelectionRectangles = new List<Rectangle>();
             // need to add a bunch of different avatars here
-            float anglePerAvatar = (float)(Math.PI * 2 / DGS.NUMBER_OF_AVATARS);
+            float anglePerAvatar = (float)(Math.PI * 2 / DGS.Instance.GetInt("NUMBER_OF_AVATARS"));
 
             float centreX = mCentre.X;
             float centreY = mCentre.Y;
             float topLeftAngle = (float)Math.PI * 5 / 4;
             float bottomRightAngle = (float)Math.PI / 4;
-            for (int i = 0; i < DGS.NUMBER_OF_AVATARS; i++)
+            for (int i = 0; i < DGS.Instance.GetInt("NUMBER_OF_AVATARS"); i++)
             {
                 float angle = i * anglePerAvatar;
                 float x = centreX + (float)Math.Cos(angle) * mRadius;
@@ -192,7 +192,6 @@ namespace Tankontroller.GUI
         }
         private void prepareColours(string pName)
         {
-            TroublesomeTanks game = (TroublesomeTanks)TroublesomeTanks.Instance();
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mColours = new List<Avatar>();
@@ -315,6 +314,9 @@ namespace Tankontroller.GUI
             }
 
         }
+
+        bool WasFirePressed = false;
+        bool WasBackPressed = false;
         public void Update(float pSeconds)
         {
             IGame game = Tankontroller.Instance();
@@ -323,11 +325,11 @@ namespace Tankontroller.GUI
             {
                 mShowAButton = false;
                 IController controller = mPlayer.Controller;
-                controller.UpdateController(pSeconds);
+                controller.UpdateController();
 
-                if (!controller.IsPressed(Control.POWER3))
+                if (!controller.IsPressed(Control.FIRE))
                 {
-                    if (controller.WasPressed(Control.POWER3)) // this is pressing the A
+                    if (WasFirePressed) // this is pressing the A
                     {
                         // if this controller is not already a player
                         // need to make a player here as this controller wants to play
@@ -352,9 +354,9 @@ namespace Tankontroller.GUI
                         }
                     }
                 }
-                if (!controller.IsPressed(Control.POWER2))
+                if (!controller.IsPressed(Control.RECHARGE))
                 {
-                    if (controller.WasPressed(Control.POWER2)) // this is pressing the B
+                    if (WasBackPressed) // this is pressing the B
                     {
                         // if this controller is already a player
                         // need to remove this player
@@ -386,7 +388,7 @@ namespace Tankontroller.GUI
                         }
                     }
                 }
-                if (controller.IsPressed(Control.TRACKS_LEFT))
+                if (controller.IsPressed(Control.TURRET_LEFT))
                 {
                     // if controller is already a player
                     // cycle through the options
@@ -424,7 +426,7 @@ namespace Tankontroller.GUI
                         }
                     }
                 }
-                else if (controller.IsPressed(Control.TRACKS_RIGHT))
+                else if (controller.IsPressed(Control.TURRET_RIGHT))
                 {
                     // if controller is already a player
                     // cycle through the options
@@ -466,7 +468,8 @@ namespace Tankontroller.GUI
                         }
                     }
                 }
-
+                WasFirePressed = controller.IsPressed(Control.FIRE);
+                WasBackPressed = controller.IsPressed(Control.RECHARGE);
             }
             else
             {
