@@ -20,7 +20,15 @@ namespace Tankontroller.GUI
         Texture2D mWhitePixel;
         Texture2D mCircle;
         Texture2D mAButtonTexture;
+        Texture2D mBackButtonTexture;
+        Texture2D mRotateLeftTexture;
+        Texture2D mRotateRightTexture;
+        Texture2D mBackTextTexture;
         Rectangle mAButtonRectangle;
+        Rectangle mBackButtonRectangle;
+        Rectangle mRotateLeftButton;
+        Rectangle mRotateRightButton;
+        Rectangle mBackTextRectangle;
         Vector2 mCentre;
         float mRadius;
         float mAvatarRadius;
@@ -44,18 +52,34 @@ namespace Tankontroller.GUI
             prepareAvatars();
             prepareColours("engineer");
             prepareSelectionRectangles();
-            prepareAButton();
+            prepareButtons();
             mShowAButton = true;
         }
 
-        private void prepareAButton()
+        private void prepareButtons()
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            mAButtonTexture = game.CM().Load<Texture2D>("countdown/a_button");
+            mAButtonTexture = game.CM().Load<Texture2D>("fire");
             float widthRatio = (float)mAButtonTexture.Width / mAButtonTexture.Height;
             int height = 200;
             int width = (int)(height * widthRatio);
             mAButtonRectangle = new Rectangle(mBoundsRectangle.X + (mBoundsRectangle.Width - width) / 2, mBoundsRectangle.Y + (mBoundsRectangle.Height - height) / 2, width, height);
+
+            height = 60;
+            width = (int)(height * widthRatio);
+            mBackButtonTexture = game.CM().Load<Texture2D>("charge");
+            mBackButtonRectangle = new Rectangle(mBoundsRectangle.X + (mBoundsRectangle.Width / 16) - width, mBoundsRectangle.Y + (mBoundsRectangle.Height/ 8) - height, width, height);
+
+            height = 40;
+            width = (int)(height * widthRatio);
+            mBackTextTexture = game.CM().Load<Texture2D>("back");
+            mBackTextRectangle = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 16) + 30) - width, mBoundsRectangle.Y + (mBoundsRectangle.Height / 8) - height, width, height / 2);
+            
+            mRotateLeftTexture = game.CM().Load<Texture2D>("turretLeft");
+            mRotateLeftButton = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 10) * 3) - width + 20, mBoundsRectangle.Y + (mBoundsRectangle.Height / 8) - height, width, height);
+
+            mRotateRightTexture = game.CM().Load<Texture2D>("turretRight");
+            mRotateRightButton = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 10) * 7) - width + 20, mBoundsRectangle.Y + (mBoundsRectangle.Height/ 8) - height, width, height);
         }
         public void AddPlayer(Player pPlayer)
         {
@@ -79,7 +103,6 @@ namespace Tankontroller.GUI
         {
             return mPlayer;
         }
-
         public bool Ready()
         {
             if (HasPlayer())
@@ -247,7 +270,8 @@ namespace Tankontroller.GUI
             {
                 avatar.Draw(pSpriteBatch, true, 0);
             }
-
+            pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
+            pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
         }
 
         public void DrawColours(SpriteBatch pSpriteBatch)
@@ -256,7 +280,8 @@ namespace Tankontroller.GUI
             {
                 avatar.Draw(pSpriteBatch, true, 0);
             }
-
+            pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
+            pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
         }
         public void DrawSelection(SpriteBatch pSpriteBatch)
         {
@@ -275,6 +300,7 @@ namespace Tankontroller.GUI
             }
 
         }
+
 
         public void Reposition(Rectangle pRectangle)
         {
@@ -308,12 +334,15 @@ namespace Tankontroller.GUI
                         DrawColours(pSpriteBatch);
                     }
                 }
+                pSpriteBatch.Draw(mBackButtonTexture, mBackButtonRectangle, Color.White);
+                pSpriteBatch.Draw(mBackTextTexture, mBackTextRectangle, Color.White);
             }
             else
             {
                 //draw a button
                 DrawAButton(pSpriteBatch);
             }
+
 
         }
 
@@ -331,7 +360,7 @@ namespace Tankontroller.GUI
 
                 if (controller.IsPressed(Control.FIRE))
                 {
-                    if (!WasFirePressed) // this is pressing the A
+                    if (!WasFirePressed)
                     {
                         // if this controller is not already a player
                         // need to make a player here as this controller wants to play
@@ -358,7 +387,7 @@ namespace Tankontroller.GUI
                 }
                 if (controller.IsPressed(Control.RECHARGE))
                 {
-                    if (!WasBackPressed) // this is pressing the B
+                    if (!WasBackPressed)
                     {
                         // if this controller is already a player
                         // need to remove this player
