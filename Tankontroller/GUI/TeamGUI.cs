@@ -162,7 +162,7 @@ namespace Tankontroller.GUI
 
         public void Reposition(Rectangle pRectangle)
         {
-            Rectangle healthRect = new Rectangle(new Point(pRectangle.X, pRectangle.Y + (pRectangle.Height * 3 / 4)), new Point(pRectangle.Width, pRectangle.Height / 4));
+            Rectangle healthRect = new Rectangle(new Point(pRectangle.X + (pRectangle.Height / 3), pRectangle.Y + (pRectangle.Height - 15)), new Point(pRectangle.Width, pRectangle.Height / 4));
             m_HealthBar.Reposition(healthRect);
             m_Avatar.Reposition(pRectangle);
         }
