@@ -1,14 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tankontroller.World;
 using Microsoft.Xna.Framework.Graphics;
-
 using Microsoft.Xna.Framework.Input;
 using Tankontroller.World.Particles;
 using Tankontroller.GUI;
@@ -33,10 +29,12 @@ namespace Tankontroller.Scenes
         private Texture2D m_CannonTexture;
         private Texture2D m_CannonFireTexture;
         private Texture2D m_BulletTexture;
+        private Texture2D m_ErrorBGTexture;
         private SpriteBatch m_SpriteBatch;
         private SoundEffectInstance introMusicInstance = null;
         private SoundEffectInstance loopMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
+        private SpriteFont m_SpriteFont;
 
         private List<Vector2> m_TankPositions = new List<Vector2>();
         private List<float> m_TankRotations = new List<float>();
@@ -72,6 +70,7 @@ namespace Tankontroller.Scenes
             m_BulletTexture = game.CM().Load<Texture2D>("circle");
             mPlayAreaTexture = game.CM().Load<Texture2D>("playArea");
             mPixelTexture = game.CM().Load<Texture2D>("block");
+            m_ErrorBGTexture = game.CM().Load<Texture2D>("background_err");
             TrackSystem.SetupStaticMembers(game.CM().Load<Texture2D>("track"));
             TeamGUI.SetupStaticTextures(
                 game.CM().Load<Texture2D>("port1"),
@@ -97,6 +96,7 @@ namespace Tankontroller.Scenes
                 game.CM().Load<Texture2D>("powerBar_power"));
 
             m_CircleTexture = game.CM().Load<Texture2D>("circle");
+            m_SpriteFont = game.CM().Load<SpriteFont>("handwritingfont");
 
             m_SpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
 
@@ -407,6 +407,15 @@ namespace Tankontroller.Scenes
             foreach (RectWall w in m_World.Walls)
             {
                 w.Draw(m_SpriteBatch);
+            }
+
+            if(!mControllersConnected)
+            {
+                string message = "A controller has been disconnected.\r\nPlease reconnect it to continue.\r\nSearching for controller...";
+                Vector2 centre = new Vector2(mPlayAreaRectangle.X + mPlayAreaRectangle.Width / 2, mPlayAreaRectangle.Y + mPlayAreaRectangle.Height / 2);
+                Vector2 fontSize = m_SpriteFont.MeasureString(message);
+                m_SpriteBatch.Draw(m_ErrorBGTexture, PlayArea, Color.White);
+                m_SpriteBatch.DrawString(m_SpriteFont, message, new Vector2(centre.X - (fontSize.X / 2), centre.Y - (fontSize.Y / 2)), Color.Black);
             }
 
             m_SpriteBatch.End();
