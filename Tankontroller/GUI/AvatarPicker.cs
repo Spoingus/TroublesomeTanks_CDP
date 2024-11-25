@@ -377,6 +377,7 @@ namespace Tankontroller.GUI
                         {
                             // add a colour to the player
                             mPlayer.SetColour();
+                            mPlayer.Controller.SetColour(mPlayer.Colour);
                             mPlayer.SelectionIndex = 0;
                             prepareCentreAvatar();
                             mPlayer.Avatar.Reposition(mAvatarRectangle);
