@@ -72,7 +72,7 @@ namespace Tankontroller
                     //port.Write(new byte[] { (byte)'I' }, 0, 1);
                     await port.BaseStream.WriteAsync(new byte[] { (byte)'I' }, 0, 1);
 
-                    System.Threading.Thread.Sleep(10);
+                    System.Threading.Thread.Sleep(10); 
 
                     if (port.BytesToRead > 0)
                     {
@@ -88,7 +88,6 @@ namespace Tankontroller
                             }
                             else
                             {
-                                bool stopHere = true;
                                 port.Close();
                             }
                         }
@@ -97,12 +96,21 @@ namespace Tankontroller
                             //possible timeout - ignore
                         }
                     }
-                    else
-                    {
-                        bool stopHere = true;
-                        port.Close();
-                    }
+                    else { port.Close(); }
                 }
+            }
+
+            List<string> toRemove = new List<string>();
+            foreach (KeyValuePair<string, IController> controller in mControllers)
+            {
+                if (!controller.Value.lights_on())
+                {
+                    toRemove.Add(controller.Key);
+                }
+            }
+            foreach (string key in toRemove)
+            {
+                mControllers.Remove(key);
             }
         }
 
