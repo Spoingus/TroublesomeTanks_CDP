@@ -20,7 +20,7 @@ namespace Tankontroller.GUI
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
-        private IController m_Controller;
+        private Player m_player;
         private static Texture2D[] m_PortNumbers = new Texture2D[8];
         private static Texture2D m_PowerBarBorderTexture;
         private static Texture2D m_PowerBarPowerTexture;
@@ -57,13 +57,13 @@ namespace Tankontroller.GUI
             Texture2D pAvatarColourLayer,
             Rectangle pRectangle,
             Tank pTank,
-            IController pController,
+            Player pPlayer,
             Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
-            m_Controller = pController;
+            m_player = pPlayer;
             m_Tank = pTank;
             PrepareAvatar(pAvatarBlackAndWhiteLayer, pAvatarColourLayer);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
@@ -94,13 +94,13 @@ namespace Tankontroller.GUI
            Avatar pAvatar,
            Rectangle pRectangle,
            Tank pTank,
-           IController pController,
+           Player pPlayer,
            Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
-            m_Controller = pController;
+            m_player = pPlayer;
             m_Tank = pTank;
             PrepareAvatar(pAvatar);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
@@ -198,25 +198,25 @@ namespace Tankontroller.GUI
         {
             DrawAvatar(pSpriteBatch);
             DrawHealthBar(pSpriteBatch);
-
+            IController controller = m_player.Controller;
             for (int j = 0; j < 7; j++)
             {
-                if (m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
+                if (controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
                 {
-                    if (m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
+                    if (controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), true);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), true);
                     }
                     else
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), false);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), false);
                     }
                 }
                 else
                 {
-                    m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) > 0);
+                    m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), controller.GetJackCharge(PortMapping.getPortForPlayer(j)) > 0);
                 }
-                m_JackIcons[j].Draw(pSpriteBatch, m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)));
+                m_JackIcons[j].Draw(pSpriteBatch, controller.GetJackControl(PortMapping.getPortForPlayer(j)));
                 m_PortNumLabels[j].Draw(pSpriteBatch, j, m_Color);
             }
         }

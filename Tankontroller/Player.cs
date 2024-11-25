@@ -77,7 +77,7 @@ namespace Tankontroller
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
             GUI = new TeamGUI(pWhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, pAvatarBlackAndWhiteLayer,
-                pAvatarColourLayer, pRectangle, Tank, Controller, Colour);
+                pAvatarColourLayer, pRectangle, Tank, this, Colour);
         }
         public void GamePreparation(
             float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
@@ -90,12 +90,12 @@ namespace Tankontroller
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
             Texture2D whitePixel = game.CM().Load<Texture2D>("white_pixel");
-            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Tank, Controller, Colour);
+            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Tank, this, Colour);
         }
         public void Reset()
         {
             Controller.ResetJacks();
-            
+
         }
         public bool DoTankControls(float pSeconds)
         {
@@ -235,9 +235,9 @@ namespace Tankontroller
                     Tank.ChargeReleased();
                 }
 
-                
 
-               
+
+
             }
             if (Tank.Fired() > 0)
             {
