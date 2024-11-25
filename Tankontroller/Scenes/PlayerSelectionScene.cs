@@ -197,16 +197,11 @@ namespace Tankontroller.Scenes
             }
         }
 
-        Task? detectControllerTask = null;
-
         public void Update(float pSeconds)
         {
             Escape();
             IGame game = Tankontroller.Instance();
-            if (DGS.Instance.GetBool("HAVE_CONTROLLER") && (detectControllerTask == null || detectControllerTask.IsCompleted))
-            {
-                detectControllerTask = Task.Run(async () => await game.DetectControllers());
-            }
+            game.DetectControllers();
 
             updateAvatarPickers(pSeconds);
             for (int i = 0; i < game.GetControllerCount(); i++)
@@ -218,7 +213,7 @@ namespace Tankontroller.Scenes
                 {
                     int index = mAvatarPickers.IndexOf(avatarPicker);
                     mAvatarPickers[index] = new AvatarPicker(avatarPicker.Rect);
-                   return;
+                    return;
                 }
                 if (avatarPicker == null)
                 {

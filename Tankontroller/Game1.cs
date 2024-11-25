@@ -26,7 +26,7 @@ namespace Tankontroller
         IController GetController(int pIndex);
         int GetControllerCount();
         List<IController> GetControllers();
-        Task DetectControllers();
+        void DetectControllers();
         void Exit();
     }
 
@@ -52,7 +52,17 @@ namespace Tankontroller
             }
             return mGameInterface;
         }
-        public async Task DetectControllers()
+
+        Task mDetectControllerTask = null;
+        public void DetectControllers()
+        {
+            if (mDetectControllerTask == null || mDetectControllerTask.IsCompleted)
+            {
+                mDetectControllerTask = Task.Run(async () => await DetectControllersAsync());
+            }
+        }
+
+        private async Task DetectControllersAsync()
         {
             string[] portNames = SerialPort.GetPortNames();
             foreach (string portName in portNames)

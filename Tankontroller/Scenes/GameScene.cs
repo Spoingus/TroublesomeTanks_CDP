@@ -421,7 +421,6 @@ namespace Tankontroller.Scenes
             }
         }
 
-        Task mDetectControllerTask = null;
         public void Update(float pSeconds)
         {
             Escape();
@@ -485,10 +484,7 @@ namespace Tankontroller.Scenes
             else // At least one controller is disconnected
             {
                 IGame game = Tankontroller.Instance();
-                if (mDetectControllerTask == null || mDetectControllerTask.IsCompleted)
-                {
-                    mDetectControllerTask = Task.Run(async () => await game.DetectControllers());
-                }
+                game.DetectControllers();
 
                 mControllersConnected = true;
                 foreach (Player p in m_Teams)
@@ -500,7 +496,7 @@ namespace Tankontroller.Scenes
                         {
                             if (!m_Teams.Any(player => player.Controller == controller))
                             {
-                                if(controller != null) // I don't think this is neccessary but the game crashed when controller was null
+                                if (controller != null) // I don't think this is neccessary but the game crashed when controller was null
                                 {
                                     controller.TransferJackCharge(p.Controller);
                                     p.SetController(controller);

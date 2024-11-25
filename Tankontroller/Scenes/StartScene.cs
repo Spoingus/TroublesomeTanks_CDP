@@ -20,11 +20,12 @@ namespace Tankontroller.Scenes
         Rectangle mTitleRectangle;
 
         SpriteBatch mSpriteBatch = null;
-        
+
         float mSecondsLeft;
-        public StartScene() {
+        public StartScene()
+        {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            
+
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
             int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
@@ -32,7 +33,7 @@ namespace Tankontroller.Scenes
             //game.GDM().IsFullScreen = true;
             //game.GDM().ApplyChanges();
 
-            mBackgroundTexture = game.CM().Load<Texture2D>("background_01");         
+            mBackgroundTexture = game.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
 
@@ -42,30 +43,30 @@ namespace Tankontroller.Scenes
             mTitleRectangle = new Rectangle((screenWidth / 2) - (644 / 2), (screenHeight / 2) - (128 / 2), 644, 128);
 
             mButtonList = new ButtonList();
-                        
+
             Texture2D startGameButtonTexture = game.CM().Load<Texture2D>("menu_play_white");
             Texture2D startGameButtonTexturePressed = game.CM().Load<Texture2D>("menu_play_dark");
 
             //Makes the start game button
-            Rectangle startGameButtonRectangle = 
+            Rectangle startGameButtonRectangle =
                 new Rectangle(
-                    ((int)((screenWidth - startGameButtonTexture.Width) / 2) - (int)(startGameButtonTexture.Width * 0.75f)), 
-                    (screenHeight) / 2 + startGameButtonTexture.Height, 
-                    startGameButtonTexture.Width, 
+                    ((int)((screenWidth - startGameButtonTexture.Width) / 2) - (int)(startGameButtonTexture.Width * 0.75f)),
+                    (screenHeight) / 2 + startGameButtonTexture.Height,
+                    startGameButtonTexture.Width,
                     startGameButtonTexture.Height);
-            
-            Button startGameButton = new Button(startGameButtonTexture,startGameButtonTexturePressed, startGameButtonRectangle, Color.Red, StartGame);
+
+            Button startGameButton = new Button(startGameButtonTexture, startGameButtonTexturePressed, startGameButtonRectangle, Color.Red, StartGame);
             startGameButton.Selected = true;
             mButtonList.Add(startGameButton);
 
             //Makes the exit game button
             Texture2D exitGameButtonTexture = game.CM().Load<Texture2D>("menu_quit_white");
             Texture2D exitGameButtonTexturePressed = game.CM().Load<Texture2D>("menu_quit_dark");
-            
+
             Rectangle exitGameButtonRectangle =
                 new Rectangle((screenWidth - exitGameButtonTexture.Width) / 2 + (int)(startGameButtonTexture.Width * 0.75f),
                     (screenHeight) / 2 + exitGameButtonTexture.Width,
-                    exitGameButtonTexture.Width, 
+                    exitGameButtonTexture.Width,
                     exitGameButtonTexture.Height);
             Button exitGameButton = new Button(exitGameButtonTexture, exitGameButtonTexturePressed, exitGameButtonRectangle, Color.Red, ExitGame);
             exitGameButton.Selected = false;
@@ -88,16 +89,12 @@ namespace Tankontroller.Scenes
             game.SM().Transition(new PlayerSelectionScene(), false);
         }
 
-        Task? detectControllerTask = null;
         public void Update(float pSeconds)
         {
             Escape();
 
             IGame game = Tankontroller.Instance();
-            if (DGS.Instance.GetBool("HAVE_CONTROLLER") && (detectControllerTask == null || detectControllerTask.IsCompleted))
-            {
-                detectControllerTask = Task.Run(async () => await game.DetectControllers());
-            }
+            game.DetectControllers();
 
             foreach (IController controller in game.GetControllers())
             {
@@ -157,7 +154,7 @@ namespace Tankontroller.Scenes
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
             mSpriteBatch.Begin();
             Color backColour = Color.White;
-            
+
             mSpriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
             mSpriteBatch.Draw(mForgroundTexture, mBackgroundRectangle, backColour);
 
