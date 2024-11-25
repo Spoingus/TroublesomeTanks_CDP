@@ -384,6 +384,8 @@ namespace Tankontroller.GUI
                             else
                             {
                                 mPlayer = null;
+                                WasFirePressed = true;
+                                return;
                             }
                         }
                     }
