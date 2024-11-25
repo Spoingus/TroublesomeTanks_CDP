@@ -103,7 +103,7 @@ namespace Tankontroller
             List<string> toRemove = new List<string>();
             foreach (KeyValuePair<string, IController> controller in mControllers)
             {
-                if (!controller.Value.lights_on())
+                if (!controller.Value.IsConnected())
                 {
                     toRemove.Add(controller.Key);
                 }

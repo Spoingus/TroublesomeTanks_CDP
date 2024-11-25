@@ -57,7 +57,7 @@ namespace Tankontroller.Scenes
         // private RenderTarget2D m_ShaderRenderTarget; // might not need this
         // private Texture2D m_ShaderTexture; // might not need this
 
-        private bool isPaused = false; // is the game paused
+        private bool mControllersConnected = true;
 
         public GameScene(List<Player> pPlayers)
         {
@@ -421,71 +421,94 @@ namespace Tankontroller.Scenes
             }
         }
 
-        public void TogglePause()
-        {
-            isPaused = !isPaused;
-        }
-        Task? detectControllerTask = null;
+        Task mDetectControllerTask = null;
         public void Update(float pSeconds)
         {
             Escape();
 
-            if (isPaused)
+            if (mControllersConnected) // Game should pause in the event of controller disconnect
             {
-                return; // If the game is paused, exit the method early
-            }
-
-            IntroFinished();
-            //Updates each controller to check for inputs
-            foreach (Player p in m_Teams)
-            {
-                p.Controller.UpdateController();
-            }
-
-
-            bool tankMoved = false;
-
-            foreach (Player p in m_Teams)
-            {
-                tankMoved = tankMoved | p.DoTankControls(pSeconds);
-            }
-
-            //Checks for tank collisons between the play area and the walls
-            m_World.Update(pSeconds);
-            m_World.CollideAllTheThingsWithPlayArea(mPlayAreaRectangle);
-
-            if (tankMoved)
-            {
-                tankMoveSound.Play();
-            }
-            else
-            {
-                tankMoveSound.Pause();
-            }
-
-            //If there is only on player remaining, the GameOverScene is transitioned to
-            List<int> remainingTeamsList = remainingTeams();
-            if (remainingTeamsList.Count <= 1)
-            {
-                int winner = -1;
-                if (remainingTeamsList.Count == 1)
-                {
-                    winner = remainingTeamsList[0];
-                }
-                Reset();
-                Tankontroller.Instance().SM().Transition(new GameOverScene(mBackgroundTexture, m_Teams, winner));
-
-            }
-
-            //Updates the track particles for each tank
-            m_SecondsTillTracksAdded -= pSeconds;
-            if (m_SecondsTillTracksAdded <= 0)
-            {
-                m_SecondsTillTracksAdded += SECONDS_BETWEEN_TRACKS_ADDED;
-                TrackSystem trackSystem = TrackSystem.GetInstance();
+                IntroFinished();
+                //Updates each controller to check for inputs
                 foreach (Player p in m_Teams)
                 {
-                    trackSystem.AddTrack(p.Tank.GetWorldPosition(), p.Tank.GetRotation(), p.Tank.Colour());
+                    p.Controller.UpdateController();
+                    // Check if controller is disconnected
+                    mControllersConnected = mControllersConnected && p.Controller.IsConnected();
+                }
+
+                bool tankMoved = false;
+                foreach (Player p in m_Teams)
+                {
+                    tankMoved = tankMoved | p.DoTankControls(pSeconds);
+                }
+
+                //Checks for tank collisons between the play area and the walls
+                m_World.Update(pSeconds);
+                m_World.CollideAllTheThingsWithPlayArea(mPlayAreaRectangle);
+
+                if (tankMoved)
+                {
+                    tankMoveSound.Play();
+                }
+                else
+                {
+                    tankMoveSound.Pause();
+                }
+
+                //If there is only on player remaining, the GameOverScene is transitioned to
+                List<int> remainingTeamsList = remainingTeams();
+                if (remainingTeamsList.Count <= 1)
+                {
+                    int winner = -1;
+                    if (remainingTeamsList.Count == 1)
+                    {
+                        winner = remainingTeamsList[0];
+                    }
+                    Reset();
+                    Tankontroller.Instance().SM().Transition(new GameOverScene(mBackgroundTexture, m_Teams, winner));
+
+                }
+
+                //Updates the track particles for each tank
+                m_SecondsTillTracksAdded -= pSeconds;
+                if (m_SecondsTillTracksAdded <= 0)
+                {
+                    m_SecondsTillTracksAdded += SECONDS_BETWEEN_TRACKS_ADDED;
+                    TrackSystem trackSystem = TrackSystem.GetInstance();
+                    foreach (Player p in m_Teams)
+                    {
+                        trackSystem.AddTrack(p.Tank.GetWorldPosition(), p.Tank.GetRotation(), p.Tank.Colour());
+                    }
+                }
+            }
+            else // At least one controller is disconnected
+            {
+                IGame game = Tankontroller.Instance();
+                if (mDetectControllerTask == null || mDetectControllerTask.IsCompleted)
+                {
+                    mDetectControllerTask = Task.Run(async () => await game.DetectControllers());
+                }
+
+                mControllersConnected = true;
+                foreach (Player p in m_Teams)
+                {
+                    if (!p.Controller.IsConnected())
+                    {
+                        // Check to see if there is a connected controller not yet associated to a player
+                        foreach (IController controller in game.GetControllers())
+                        {
+                            if (!m_Teams.Any(player => player.Controller == controller))
+                            {
+                                if(controller != null) // I don't think this is neccessary but the game crashed when controller was null
+                                {
+                                    p.SetController(controller);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    mControllersConnected = mControllersConnected && p.Controller.IsConnected();
                 }
             }
         }
@@ -515,4 +538,3 @@ namespace Tankontroller.Scenes
         }
     }
 }
-

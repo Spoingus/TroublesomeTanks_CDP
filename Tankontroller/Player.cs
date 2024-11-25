@@ -59,6 +59,10 @@ namespace Tankontroller
             AvatarSet = false;
             Avatar = null;
         }
+        public void SetController(IController pController)
+        {
+            Controller = pController;
+        }
         public Player(Color pColour, IController pController,
             float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
             Texture2D pWhitePixel,
