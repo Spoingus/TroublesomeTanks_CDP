@@ -24,7 +24,7 @@ namespace Tankontroller.Controller
         void ResetJacks();
         void TurnOffLights();
         void TurnOnLights();
-        bool lights_on();
+        bool IsConnected();
 
         void SetColour(Color pColour);
 
@@ -62,12 +62,14 @@ namespace Tankontroller.Controller
         protected Jack[] mJacks;
         protected LEDArray mLeds;
         protected bool mLightsOn;
+        protected bool mConnected;
 
         protected Controller()
         {
             mJacks = new Jack[7] { new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack() };
             mLeds = new LEDArray();
             mLightsOn = true;
+            mConnected = true;
         }
 
         public void SetColour(Color pColour)
@@ -162,9 +164,9 @@ namespace Tankontroller.Controller
             return false;
         }
 
-        public bool lights_on()
+        public bool IsConnected()
         {
-            return mLightsOn;
+            return mConnected;
         }
     }
 
@@ -260,7 +262,7 @@ namespace Tankontroller.Controller
                 result[i].G = 0;
                 result[i].B = 0;
             }
-            if (mLightsOn)
+            if (mLightsOn && mConnected)
             {
                 foreach (Jack J in mJacks)
                 {
@@ -301,7 +303,7 @@ namespace Tankontroller.Controller
         Task updateColourTask = null;
         public override void UpdateController()
         {
-            if (mLightsOn && (updateColourTask == null || updateColourTask.IsCompleted))
+            if (mConnected && mLightsOn && (updateColourTask == null || updateColourTask.IsCompleted))
             {
                 updateColourTask = Task.Run(async () => await UpdateColors());
             }
@@ -309,13 +311,14 @@ namespace Tankontroller.Controller
 
         private void PullData()
         {
-            while (mLightsOn)
+            while (mLightsOn && mConnected)
             {
                 PortState[] ports = mHacktroller.GetPorts();
 
                 if (ports == null)
                 {
-                    mLightsOn = false;
+                    mConnected = false;
+                    Tankontroller.Instance().GetControllers().Remove(this);
                     return;
                 }
                 for (int i = 0; i < ports.Length; ++i)
