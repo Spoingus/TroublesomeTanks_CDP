@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace Tankontroller.GUI
         float mAButtonCountDown;
         bool mShowAButton;
 
+        public Rectangle Rect { get { return mBoundsRectangle; } }
 
         public AvatarPicker(Rectangle pRectangle)
         {
