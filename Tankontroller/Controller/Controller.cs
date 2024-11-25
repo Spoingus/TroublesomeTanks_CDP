@@ -20,6 +20,7 @@ namespace Tankontroller.Controller
         void AddCharge(Control pControl, float amount);
         float GetJackCharge(int pJackIndex);
         Control GetJackControl(int pJackIndex);
+        void TransferJackCharge(IController pController);
         bool IsPressed(Control pControl);
         void ResetJacks();
         void TurnOffLights();
@@ -149,6 +150,14 @@ namespace Tankontroller.Controller
                     else
                         mJacks[i].charge = DGS.Instance.GetFloat("MAX_CHARGE");
                 }
+            }
+        }
+
+        public void TransferJackCharge(IController pController)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                mJacks[i].charge = pController.GetJackCharge(i);
             }
         }
 

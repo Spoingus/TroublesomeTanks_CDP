@@ -502,6 +502,7 @@ namespace Tankontroller.Scenes
                             {
                                 if(controller != null) // I don't think this is neccessary but the game crashed when controller was null
                                 {
+                                    controller.TransferJackCharge(p.Controller);
                                     p.SetController(controller);
                                     break;
                                 }
