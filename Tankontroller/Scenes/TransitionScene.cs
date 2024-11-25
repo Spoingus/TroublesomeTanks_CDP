@@ -23,7 +23,7 @@ namespace Tankontroller.Scenes
             mNextScene = pNextScene;
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
             
-            mRectangle = new Rectangle(0, 0, DGS.Instance.GetInt("SCREENWIDTH"), DGS.Instance.GetInt("SCREENHEIGHT"));
+            mRectangle = new Rectangle(0, 0, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             mSecondsLeft = DGS.Instance.GetInt("SECONDS_TO_DISPLAY_FLASH_SCREEN");
             GeneratePreviousTexture();
             GenerateNextTexture();

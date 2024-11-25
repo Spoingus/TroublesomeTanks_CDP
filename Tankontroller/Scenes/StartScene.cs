@@ -27,11 +27,12 @@ namespace Tankontroller.Scenes
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
 
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
+            
 
-            //game.GDM().IsFullScreen = true;
-            //game.GDM().ApplyChanges();
+            game.GDM().IsFullScreen = true;
+            game.GDM().ApplyChanges();
+            int screenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            int screenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
             mBackgroundTexture = game.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
