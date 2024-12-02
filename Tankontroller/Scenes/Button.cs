@@ -1,13 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tankontroller.Scenes
 {
+    //-------------------------------------------------------------------------------------------------
+    // Button Class
+    //
+    // Purpose: This class is used to create buttons for the game
+    // It contains the texture, rectangle, colour, selected colour, selected state and action for the button
+    // It also contains methods to select and press the button
+    // The button can be pressed with or without a touch
+    //-------------------------------------------------------------------------------------------------
     public class Button
     {
         public Texture2D Texture { get; private set; } //Texture for the button

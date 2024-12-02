@@ -1,21 +1,36 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
-
-using Tankontroller.GUI;
+using System.Collections.Generic;
 using Tankontroller.Controller;
+using Tankontroller.GUI;
 
 
 namespace Tankontroller.Scenes
 {
-
+    //-------------------------------------------------------------------------------------------------
+    // PlayerSelectionScene
+    //
+    // This class is used to display the player selection screen.
+    // The player selection screen displays the avatars of the players, and allows the players to
+    // select their avatars and colours.
+    //
+    // The class contains a background texture, a sprite batch, a rectangle to draw the background, the list of
+    // avatar pickers, the countdown textures, the countdown rectangles, the countdown, and a boolean to
+    // check if the players were ready.
+    //
+    // The class provides methods to:
+    //  - exit the game
+    //  - get the ready players
+    //  - start the game
+    //  - make a new player
+    //  - get an empty avatar picker
+    //  - get the controller avatar picker
+    //  - get the player avatar picker
+    //  - check if the players are ready
+    //  - update the avatar pickers
+    //  - draw the avatar pickers and countdown.
+    //-------------------------------------------------------------------------------------------------
     public class PlayerSelectionScene : IScene
     {
         Texture2D mBackgroundTexture = null;
