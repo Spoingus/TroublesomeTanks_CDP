@@ -69,9 +69,16 @@ namespace Tankontroller
             {
                 if (!mControllers.ContainsKey(portName))
                 {
-                    SerialPort port = new SerialPort(portName, 19200);//, Parity.None, 8, StopBits.One);
-
-                    port.Open();
+                    SerialPort port;
+                    try
+                    {
+                        port = new SerialPort(portName, 19200); //, Parity.None, 8, StopBits.One);
+                        port.Open();
+                    }
+                    catch (Exception e)
+                    {
+                        continue;
+                    }
 
                     port.DtrEnable = true;
 
