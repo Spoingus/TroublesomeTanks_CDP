@@ -1,10 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
+//-----------------------------------------------------------------------------------------------
+// Hacktroller.cs
+// This is a class that interfaces with the Hacktroller device. The Hacktroller is a custom
+// device that is used to control a tank. It has a number of pins that can be connected to
+// switches and buttons. The class reads the state of the pins and decodes them into a
+// ControllerState. The class also has a method to set the colour of the LEDs on the device.
+//-----------------------------------------------------------------------------------------------
 namespace Tankontroller.Controller
 {
     /*      R1     R2    R3     Off   On
@@ -15,6 +19,11 @@ namespace Tankontroller.Controller
             18k    400   154
             33k    450   252*/
 
+    //-----------------------------------------------------------------------------------------------
+    // ControllerColor
+    //
+    // This struct is used to store the colour of the LEDs on the Hacktroller device.
+    //-----------------------------------------------------------------------------------------------
     public struct ControllerColor
     {
         public byte R;
@@ -28,12 +37,21 @@ namespace Tankontroller.Controller
             B = inB;
         }
     }
-
+    //-----------------------------------------------------------------------------------------------
+    // PinState
+    //
+    // This struct is used to store the state of a pin on the Hacktroller device.
+    //-----------------------------------------------------------------------------------------------
     public struct PinState
     {
         public int RawValue;
     }
 
+    //-----------------------------------------------------------------------------------------------
+    // ControllerState
+    //
+    // This enum is used to store the state of the Hacktroller device.
+    //-----------------------------------------------------------------------------------------------
     public enum ControllerState
     {
         LEFT_TRACK_FORWARDS,
@@ -64,6 +82,14 @@ namespace Tankontroller.Controller
         NOT_CONNECTED
     }
 
+    //-----------------------------------------------------------------------------------------------
+    // stateMap
+    //
+    // This struct is used to map the reading of a pin to a ControllerState.
+    // It contains the following:
+    // - A ControllerState to store the state of the pin
+    // - An int to store the reading of the pin
+    //-----------------------------------------------------------------------------------------------
     public struct stateMap
     {
         public ControllerState Result;
@@ -75,6 +101,14 @@ namespace Tankontroller.Controller
         }
     }
 
+    //-----------------------------------------------------------------------------------------------
+    // PortState
+    //
+    // This struct is used to store the state of a pin on the Hacktroller device.
+    // It contains the following:
+    // - A ControllerState to store the state of the pin
+    // - A bool to store whether the fire button is pressed
+    //-----------------------------------------------------------------------------------------------
     public struct PortState
     {
         public ControllerState Controller;
@@ -84,7 +118,21 @@ namespace Tankontroller.Controller
             return Controller.ToString() + FirePressed.ToString();
         }
     }
-
+    //-----------------------------------------------------------------------------------------------
+    // Hacktroller
+    //
+    // This class is used to interface with the Hacktroller device.
+    // It contains the following:
+    // - A SerialPort object to communicate with the device
+    // - A Random object to generate random numbers
+    // - A byte array to store the command to read the state of the pins
+    // - A byte array to store the command to set the colour of the LEDs
+    // - A byte array to store the frame buffer
+    // - An array of PortState objects to store the state of the pins
+    // - A static array of stateMap objects to map the pin readings to ControllerStates
+    // - A static array of PinState objects to store the state of the pins
+    // - A static int to store the tolerance for the pin readings
+    //-----------------------------------------------------------------------------------------------
     public class Hacktroller
     {
         SerialPort port;

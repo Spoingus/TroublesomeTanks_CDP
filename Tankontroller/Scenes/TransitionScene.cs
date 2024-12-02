@@ -3,6 +3,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Tankontroller.Scenes
 {
+    //-------------------------------------------------------------------------------------------------
+    // TransitionScene
+    //
+    // This class is used to display a transition screen. The transition screen displays the previous
+    // scene and the next scene. The class contains the previous texture, the next texture, a sprite
+    // batch, a rectangle to draw the textures, the number of seconds left to display the transition
+    // screen, the previous scene, the next scene, the previous position, the next position, the velocity,
+    // and the acceleration.
+    //
+    // The class provides methods to generate the previous texture, generate the next texture,
+    // update the transition screen, and draw the transition screen.
+    //-------------------------------------------------------------------------------------------------
     public class TransitionScene : IScene
     {
         RenderTarget2D mPreviousTexture = null;

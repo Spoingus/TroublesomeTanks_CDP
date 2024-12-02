@@ -1,16 +1,36 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tankontroller.Controller;
 using Tankontroller.World;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // TeamGUI
+    //
+    // This class is used to represent the GUI of a team.
+    //
+    // It contains the following member variables:
+    // - A white pixel texture
+    // - A rectangle representing the position of the GUI
+    // - A health bar
+    // - An avatar
+    // - An array of power bars, jack icons and port number labels
+    // - A player
+    // - A tank
+    // - A frame
+    // - A colour
+    //
+    // It contains the following methods:
+    // - A method to set up the static textures
+    // - A constructor to initialise the GUI
+    // - A method to get the tank
+    // - A method to draw the health bar
+    // - A method to reposition the GUI
+    // - A method to draw the avatar
+    // - A method to draw the GUI
+    //-------------------------------------------------------------------------------------------------
     public class TeamGUI
     {
         private Texture2D m_WhitePixel;
@@ -201,22 +221,22 @@ namespace Tankontroller.GUI
             IController controller = m_player.Controller;
             for (int j = 0; j < 7; j++)
             {
-                if (controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
+                if (controller.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
                 {
-                    if (controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
+                    if (controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), true);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), true);
                     }
                     else
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), false);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), false);
                     }
                 }
                 else
                 {
-                    m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), controller.GetJackCharge(PortMapping.getPortForPlayer(j)) > 0);
+                    m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) > 0);
                 }
-                m_JackIcons[j].Draw(pSpriteBatch, controller.GetJackControl(PortMapping.getPortForPlayer(j)));
+                m_JackIcons[j].Draw(pSpriteBatch, controller.GetJackControl(PortMapping.GetPortForPlayer(j)));
                 m_PortNumLabels[j].Draw(pSpriteBatch, j, m_Color);
             }
         }

@@ -1,13 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tankontroller.Scenes
 {
+    //-------------------------------------------------------------------------------------------------
+    // FlashScreenScene
+    //
+    // This class is used to display a flash screen. The flash screen displays a logo for a certain
+    // number of seconds, and then transitions to the start scene.
+    //
+    // The class contains a logo texture, a sprite batch, a rectangle to draw the logo, and the number
+    // of seconds left to display the flash screen. The class provides methods to update and draw the
+    // flash screen.
+    //-------------------------------------------------------------------------------------------------
     public class FlashScreenScene : IScene
     {
         Texture2D mLogoTexture = null; // The logo texture

@@ -1,13 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
 using Tankontroller.Controller;
 
 
 namespace Tankontroller.Scenes
 {
-    //The main menu scene that is displayed once the app has launched
+    //--------------------------------------------------------------------------------------------------
+    // StartScene
+    //
+    // This class is used to display the start screen. The start screen displays the game title and two
+    // buttons: one to start the game and one to exit the game. The class contains a background texture,
+    // a sprite batch, a rectangle to draw the background, a list of buttons, and the number of seconds
+    // left to display the start screen.
+    // The class provides methods to update and draw the start screen.
+    //--------------------------------------------------------------------------------------------------
     public class StartScene : IScene
     {
         ButtonList mButtonList = null;

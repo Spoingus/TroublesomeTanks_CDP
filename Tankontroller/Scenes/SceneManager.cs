@@ -1,11 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tankontroller.Scenes
 {
+    //-------------------------------------------------------------------------------------------------
+    // SceneManager
+    //
+    // This class is used to manage a list of scenes. It allows the user to push a scene onto the list,
+    // to transition to the next scene, to pop the current scene, to get the top scene, and to update and
+    // draw the top scene.
+    //
+    // The class contains a list of scenes. The class provides methods to push a scene onto the list, to
+    // transition to the next scene, to pop the current scene, to get the top scene, and to update and draw
+    // the top scene.
+    //-------------------------------------------------------------------------------------------------
     public class SceneManager
     {
         private List<IScene> mScenes;

@@ -1,13 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tankontroller.Controller
 {
+    //--------------------------------------------------------------------------------
+    // PortNumLabel
+    //
+    // This class is used to display the port number on the screen.
+    // It contains the following:
+    //  - Texture2D[] numTextures: An array of textures for each number
+    //  - Vector2 numPosition: The position to draw the number
+    //  - int numWidth / int numHeight: The width / height of the number
+    //  - Draw: Draws the number to the screen
+    //--------------------------------------------------------------------------------
     public class PortNumLabel
     {
         private Texture2D[] numTextures;

@@ -1,14 +1,27 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tankontroller.World;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // HealthBar
+    //
+    // This class is used to represent the health bar of a tank. It displays the health bar in the game.
+    //
+    // It contains the following member variables:
+    // - A black and white heart texture
+    // - A colour heart texture
+    // - A white pixel texture
+    // - A rectangle representing the position of the health bar
+    // - An array of rectangles representing the position of the health bar's hearts
+    // - A tank
+    //
+    // It contains the following methods:
+    // - A constructor to initialise the health bar
+    // - A method to reposition the health bar
+    // - A method to draw the health bar
+    //-------------------------------------------------------------------------------------------------
     public class HealthBar
     {
         private Texture2D mHeartBlackAndWhite;
