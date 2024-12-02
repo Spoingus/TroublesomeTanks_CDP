@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tankontroller.Controller
+﻿namespace Tankontroller.Controller
 {
+    //--------------------------------------------------------------------------------
+    // PortMapping
+    //
+    // This class is used to map the Jack number to the port number on the Arduino
+    // This is because the ports don't line up in code/IRL
+    //--------------------------------------------------------------------------------
     public class PortMapping
     {
-        public static int getPortForPlayer(int pJackNum) // Eww. Sorry
+        //Fixed Name Violation: Capital letter for start of the method name
+        public static int GetPortForPlayer(int pJackNum) // Eww. Sorry
         {
 
             if (pJackNum == 0) // As the ports dont line up in code/IRL, I've had to hard code these - JD

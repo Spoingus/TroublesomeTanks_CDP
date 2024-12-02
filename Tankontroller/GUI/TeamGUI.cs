@@ -1,11 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tankontroller.Controller;
 using Tankontroller.World;
 
@@ -201,22 +196,22 @@ namespace Tankontroller.GUI
             IController controller = m_player.Controller;
             for (int j = 0; j < 7; j++)
             {
-                if (controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
+                if (controller.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
                 {
-                    if (controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
+                    if (controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), true);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), true);
                     }
                     else
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), false);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), false);
                     }
                 }
                 else
                 {
-                    m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.getPortForPlayer(j)), controller.GetJackCharge(PortMapping.getPortForPlayer(j)) > 0);
+                    m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) > 0);
                 }
-                m_JackIcons[j].Draw(pSpriteBatch, controller.GetJackControl(PortMapping.getPortForPlayer(j)));
+                m_JackIcons[j].Draw(pSpriteBatch, controller.GetJackControl(PortMapping.GetPortForPlayer(j)));
                 m_PortNumLabels[j].Draw(pSpriteBatch, j, m_Color);
             }
         }
