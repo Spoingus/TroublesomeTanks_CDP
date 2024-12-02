@@ -2,15 +2,46 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tankontroller.Controller;
-using Tankontroller.World;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // AvatarPicker
+    //
+    // This class is used to represent the avatar picker in the game. It displays the avatars and colours
+    // that the player can choose from.
+    //
+    // It contains the following member variables:
+    //
+    // - A rectangle representing the position of the avatar picker
+    // - A list of avatars
+    // - A list of colours
+    // - A list of rectangles representing the position of the selection
+    // - A white pixel, circle, A button, back button, rotate left button, rotate right button and back text texture
+    // - A rectangle representing the position of the A button, back button, rotate left button, rotate right button and back text
+    // - A vector representing the centre of the avatar picker
+    // - A float representing the radius of the avatar and avatar picker
+    // - A player
+    // - A rectangle representing the position of the avatar
+    // - A float representing the countdown
+    // - A float representing the A button countdown
+    // - A boolean representing whether the A button is shown
+    //
+    // It contains the following methods:
+    //
+    // - A constructor to initialise the avatar picker
+    // - A method to add a player
+    // - A method to check if the player exists
+    // - A method to get the player
+    // - A method to check if the player is ready
+    // - A method to remove the player
+    // - A method to prepare the draw variables, avatars, colours, selection rectangles and buttons
+    // - A method to draw the avatars, colours, selection, A button, bounds and the avatar picker
+    // - A method to reposition the avatar picker
+    // - A method to update the avatar picker
+    //-------------------------------------------------------------------------------------------------
+
     public class AvatarPicker
     {
         private Rectangle mBoundsRectangle;
@@ -150,19 +181,21 @@ namespace Tankontroller.GUI
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mAvatars = new List<Avatar>();
-            List<string> avatarStrings = new List<string>();
-            avatarStrings.Add("engineer");
-            avatarStrings.Add("robo");
-            avatarStrings.Add("winterjack");
-            avatarStrings.Add("yeti");
-            avatarStrings.Add("engineer");
-            avatarStrings.Add("robo");
-            avatarStrings.Add("winterjack");
-            avatarStrings.Add("yeti");
-            avatarStrings.Add("engineer");
-            avatarStrings.Add("robo");
-            avatarStrings.Add("winterjack");
-            avatarStrings.Add("yeti");
+            List<string> avatarStrings = new List<string>
+            {
+                "engineer",
+                "robo",
+                "winterjack",
+                "yeti",
+                "engineer",
+                "robo",
+                "winterjack",
+                "yeti",
+                "engineer",
+                "robo",
+                "winterjack",
+                "yeti"
+            };
             // need to add a bunch of different avatars here
             float anglePerAvatar = (float)(Math.PI * 2 / avatarStrings.Count);
 

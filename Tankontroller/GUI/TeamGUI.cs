@@ -6,6 +6,31 @@ using Tankontroller.World;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // TeamGUI
+    //
+    // This class is used to represent the GUI of a team.
+    //
+    // It contains the following member variables:
+    // - A white pixel texture
+    // - A rectangle representing the position of the GUI
+    // - A health bar
+    // - An avatar
+    // - An array of power bars, jack icons and port number labels
+    // - A player
+    // - A tank
+    // - A frame
+    // - A colour
+    //
+    // It contains the following methods:
+    // - A method to set up the static textures
+    // - A constructor to initialise the GUI
+    // - A method to get the tank
+    // - A method to draw the health bar
+    // - A method to reposition the GUI
+    // - A method to draw the avatar
+    // - A method to draw the GUI
+    //-------------------------------------------------------------------------------------------------
     public class TeamGUI
     {
         private Texture2D m_WhitePixel;
