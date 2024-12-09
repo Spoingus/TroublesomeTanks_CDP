@@ -435,10 +435,10 @@ namespace Tankontroller.Scenes
         public void Update(float pSeconds)
         {
             Escape();
+            IntroFinished();
 
             if (mControllersConnected) // Game should pause in the event of controller disconnect
             {
-                IntroFinished();
                 //Updates each controller to check for inputs
                 foreach (Player p in m_Teams)
                 {

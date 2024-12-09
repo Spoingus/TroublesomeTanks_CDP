@@ -213,12 +213,16 @@ namespace Tankontroller
                 }
                 else
                 {
-                    if (Tank.FireIfPrimed())
+                    if (Tank.IsFirePrimed())
                     {
-                        SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
-                        bulletShot.Play();
-                        Controller.DepleteCharge(Control.FIRE, DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION")); // BULLET CHARGE HERE
-                        Tank.SetFired(DGS.Instance.GetInt("BLAST_DELAY"));
+                        Tank.ResetPrime();
+                        if (Controller.DepleteCharge(Control.FIRE, DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION")))
+                        {
+                            Tank.Fire();
+                            SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
+                            bulletShot.Play();
+                            Tank.SetFired(DGS.Instance.GetInt("BLAST_DELAY"));
+                        }
                     }
                 }
 
