@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Tankontroller.Scenes
@@ -43,6 +43,7 @@ namespace Tankontroller.Scenes
                 game.SM().Transition(new StartScene());
             }
         }
+
         public void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);

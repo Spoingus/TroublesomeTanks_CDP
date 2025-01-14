@@ -50,7 +50,6 @@ namespace Tankontroller.Scenes
             }
             RepositionAsLosers();
         }
-
         //Repositions the winner GUI into the centre of the screen
         public void RepositionAsWinner()
         {
@@ -63,7 +62,6 @@ namespace Tankontroller.Scenes
             Rectangle newRectangle = new Rectangle(centreX, centreY, textureWidth, textureHeight);
             mPlayers[mWinner].GUI.Reposition(newRectangle);
         }
-
         //Repositions the loser GUIs into a row at the bottom of the screen
         public void RepositionAsLosers()
         {
@@ -92,7 +90,6 @@ namespace Tankontroller.Scenes
             }
             
         }
-
         public void Update(float pSeconds)
         {
             mSecondsLeft -= pSeconds;
