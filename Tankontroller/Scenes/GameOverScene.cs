@@ -1,14 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tankontroller.Scenes
 {
-    //The scene that is displayed once only one player remains
+    //-------------------------------------------------------------------------------------------------
+    // GameOverScene
+    //
+    // This class is used to display the game over screen. The game over screen displays the avatars and
+    // health bars of the players, with the winner in the centre of the screen and the losers in a row
+    // at the bottom of the screen.
+    //
+    // The class contains a background texture, a sprite batch, a rectangle to draw the background, the
+    // number of seconds left to display the game over screen, the list of players, and the index of the
+    // winner. The class provides methods to reposition the GUIs of the players, update the game over
+    // screen, and draw the game over screen.
+    //-------------------------------------------------------------------------------------------------
     public class GameOverScene : IScene
     {
         private List<Player> mPlayers;

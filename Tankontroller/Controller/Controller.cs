@@ -1,35 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System.Threading;
-using Tankontroller.World;
-using Microsoft.Xna.Framework;
 using System.Threading.Tasks;
+
 
 namespace Tankontroller.Controller
 {
     public enum Control { LEFT_TRACK_FORWARDS = 0, LEFT_TRACK_BACKWARDS = 1, RIGHT_TRACK_FORWARDS = 2, RIGHT_TRACK_BACKWARDS = 3, FIRE = 4, RECHARGE = 5, NONE = 6, TURRET_LEFT = 7, TURRET_RIGHT = 8 };
 
+    //---------------------------------------------------------------------------------------------------
+    // IController Interface:
+    //
+    // This interface is used to define the methods that all controllers will need to implement.
+    //---------------------------------------------------------------------------------------------------
     public interface IController
     {
 
         bool IsPressedWithCharge(Control pControl);
-        void DepleteCharge(Control pControl, float amount);
+        bool DepleteCharge(Control pControl, float amount);
         void AddCharge(Control pControl, float amount);
         float GetJackCharge(int pJackIndex);
         Control GetJackControl(int pJackIndex);
+        void TransferJackCharge(IController pController);
         bool IsPressed(Control pControl);
         void ResetJacks();
         void TurnOffLights();
         void TurnOnLights();
+        bool IsConnected();
 
         void SetColour(Color pColour);
 
         void UpdateController();
     }
 
+    //---------------------------------------------------------------------------------------------------
+    // Controller Class:
+    //
+    // This class is the base class for all controllers. It contains the basic functionality that all controllers will need.
+    // It contains the following:
+    // - A list of Jacks, which are the inputs for the controller. Each Jack has a Control, a charge, and a list of LED IDs.
+    // - A list of LED IDs, which are the LEDs on the controller.
+    // - A boolean for whether the lights are on or off.
+    // - A boolean for whether the controller is connected.
+    // - A method to set the colour of the controller.
+    // - A method to reset the charges of all the Jacks.
+    // - A method to turn off and on the lights.
+    // - A method to get the control and charge of a Jack.
+    // - A method to deplete, add charge and transfer the charge of a Jack.
+    // - A method to check if a control is pressed or pressed with charge.
+    // - A method to check if the controller is connected and another to update it.
+    //---------------------------------------------------------------------------------------------------
     public abstract class Controller : IController
     {
         protected class LEDArray
@@ -61,12 +82,14 @@ namespace Tankontroller.Controller
         protected Jack[] mJacks;
         protected LEDArray mLeds;
         protected bool mLightsOn;
+        protected bool mConnected;
 
         protected Controller()
         {
             mJacks = new Jack[7] { new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack() };
             mLeds = new LEDArray();
             mLightsOn = true;
+            mConnected = true;
         }
 
         public void SetColour(Color pColour)
@@ -109,12 +132,13 @@ namespace Tankontroller.Controller
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    return mJacks[i].IsDown && (pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || pControl != Control.FIRE && mJacks[i].charge > 0);
+                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || (pControl != Control.FIRE && mJacks[i].charge > 0)));
                 }
             }
             return false;
         }
-        public void DepleteCharge(Control pControl, float amount)
+
+        public bool DepleteCharge(Control pControl, float amount)
         {
             //return; //TESTING ONLY
             for (int i = 0; i < 7; ++i)
@@ -128,8 +152,10 @@ namespace Tankontroller.Controller
                     }
                     else
                         mJacks[i].charge = 0;
+                    return true;
                 }
             }
+            return false;
         }
 
         public void AddCharge(Control pControl, float amount)
@@ -149,6 +175,14 @@ namespace Tankontroller.Controller
             }
         }
 
+        public void TransferJackCharge(IController pController)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                mJacks[i].charge = pController.GetJackCharge(i);
+            }
+        }
+
         public bool IsPressed(Control pControl)
         {
             for (int i = 0; i < 7; ++i)
@@ -161,9 +195,21 @@ namespace Tankontroller.Controller
             return false;
         }
 
-
+        public bool IsConnected()
+        {
+            return mConnected;
+        }
     }
 
+    //---------------------------------------------------------------------------------------------------
+    // KeyboardController Class:
+    //
+    // This class is a subclass of Controller. It is used to control the tank with the keyboard.
+    // It contains the following:
+    // - A dictionary of Keys and Controls, which is used to map the keys to the controls.
+    // - A dictionary of Keys and ints, which is used to map the keys to the ports.
+    // - A method to update the controller.
+    //---------------------------------------------------------------------------------------------------
     public class KeyboardController : Controller
     {
         private Dictionary<Keys, Control> m_KeyMap;
@@ -219,6 +265,16 @@ namespace Tankontroller.Controller
         }
     }
 
+    //---------------------------------------------------------------------------------------------------
+    // ModularController Class:
+    //
+    // This class is a subclass of Controller. It is used to control the tank with the Hacktroller (3D Printed Controllers).
+    // It contains the following:
+    // - A Hacktroller object, which is used to communicate with the Hacktroller.
+    // - A method to pull the data from the Hacktroller.
+    // - A method to update the colours of the LEDs.
+    // - A method to update the controller.
+    //---------------------------------------------------------------------------------------------------
     public class ModularController : Controller
     {
         private Hacktroller mHacktroller;
@@ -256,7 +312,7 @@ namespace Tankontroller.Controller
                 result[i].G = 0;
                 result[i].B = 0;
             }
-            if (mLightsOn)
+            if (mLightsOn && mConnected)
             {
                 foreach (Jack J in mJacks)
                 {
@@ -297,7 +353,7 @@ namespace Tankontroller.Controller
         Task updateColourTask = null;
         public override void UpdateController()
         {
-            if (mLightsOn && (updateColourTask == null || updateColourTask.IsCompleted))
+            if (mConnected && mLightsOn && (updateColourTask == null || updateColourTask.IsCompleted))
             {
                 updateColourTask = Task.Run(async () => await UpdateColors());
             }
@@ -305,13 +361,14 @@ namespace Tankontroller.Controller
 
         private void PullData()
         {
-            while (mLightsOn)
+            while (mLightsOn && mConnected)
             {
                 PortState[] ports = mHacktroller.GetPorts();
 
                 if (ports == null)
                 {
-                    mLightsOn = false;
+                    mConnected = false;
+                    Tankontroller.Instance().GetControllers().Remove(this);
                     return;
                 }
                 for (int i = 0; i < ports.Length; ++i)

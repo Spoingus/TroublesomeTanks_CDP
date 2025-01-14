@@ -1,21 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tankontroller.World;
-using Microsoft.Xna.Framework.Graphics;
-
-using Microsoft.Xna.Framework.Input;
-using Tankontroller.World.Particles;
-using Tankontroller.GUI;
 using Tankontroller.Controller;
+using Tankontroller.GUI;
+using Tankontroller.World;
+using Tankontroller.World.Particles;
 
 namespace Tankontroller.Scenes
 {
+    //-------------------------------------------------------------------------------------------------
+    // GameScene
+    //
+    // This class is used to display the game scene. The game scene displays the tanks, bullets, tracks,
+    // and walls of the game. The class contains a list of controllers, a world, a sprite batch, and a
+    // list of tank positions and rotations. The class provides methods to draw the game scene, update
+    // the game scene, and transition to the game over scene.
+    //-------------------------------------------------------------------------------------------------
     public class GameScene : IScene
     {
         private List<IController> mControllers;
@@ -33,10 +37,12 @@ namespace Tankontroller.Scenes
         private Texture2D m_CannonTexture;
         private Texture2D m_CannonFireTexture;
         private Texture2D m_BulletTexture;
+        private Texture2D m_ErrorBGTexture;
         private SpriteBatch m_SpriteBatch;
         private SoundEffectInstance introMusicInstance = null;
         private SoundEffectInstance loopMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
+        private SpriteFont m_SpriteFont;
 
         private List<Vector2> m_TankPositions = new List<Vector2>();
         private List<float> m_TankRotations = new List<float>();
@@ -57,7 +63,7 @@ namespace Tankontroller.Scenes
         // private RenderTarget2D m_ShaderRenderTarget; // might not need this
         // private Texture2D m_ShaderTexture; // might not need this
 
-        private bool isPaused = false; // is the game paused
+        private bool mControllersConnected = true;
 
         public GameScene(List<Player> pPlayers)
         {
@@ -72,6 +78,7 @@ namespace Tankontroller.Scenes
             m_BulletTexture = game.CM().Load<Texture2D>("circle");
             mPlayAreaTexture = game.CM().Load<Texture2D>("playArea");
             mPixelTexture = game.CM().Load<Texture2D>("block");
+            m_ErrorBGTexture = game.CM().Load<Texture2D>("background_err");
             TrackSystem.SetupStaticMembers(game.CM().Load<Texture2D>("track"));
             TeamGUI.SetupStaticTextures(
                 game.CM().Load<Texture2D>("port1"),
@@ -97,6 +104,7 @@ namespace Tankontroller.Scenes
                 game.CM().Load<Texture2D>("powerBar_power"));
 
             m_CircleTexture = game.CM().Load<Texture2D>("circle");
+            m_SpriteFont = game.CM().Load<SpriteFont>("handwritingfont");
 
             m_SpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
 
@@ -209,43 +217,37 @@ namespace Tankontroller.Scenes
             int outerBlockXOffset = pPlayArea.Width / 8;
 
             //Creates a list of walls for 1 to 3 player map
-            List<RectWall> Walls = new List<RectWall>();
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)));
-
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)));
-
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - outerBlockHeight - 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight)));
+            List<RectWall> Walls = new List<RectWall> //Simplified initialisation of the list
+            {
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - outerBlockHeight - 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)),
+                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
+                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight))
+            };
 
             //Creates a list of tank positions and rotations for each of the players, ranging from 1 to 3 players
             if (pNumOfPlayers >= 1)
@@ -409,6 +411,15 @@ namespace Tankontroller.Scenes
                 w.Draw(m_SpriteBatch);
             }
 
+            if(!mControllersConnected)
+            {
+                string message = "A controller has been disconnected.\r\nPlease reconnect it to continue.\r\nSearching for controller...";
+                Vector2 centre = new Vector2(mPlayAreaRectangle.X + mPlayAreaRectangle.Width / 2, mPlayAreaRectangle.Y + mPlayAreaRectangle.Height / 2);
+                Vector2 fontSize = m_SpriteFont.MeasureString(message);
+                m_SpriteBatch.Draw(m_ErrorBGTexture, PlayArea, Color.White);
+                m_SpriteBatch.DrawString(m_SpriteFont, message, new Vector2(centre.X - (fontSize.X / 2), centre.Y - (fontSize.Y / 2)), Color.Black);
+            }
+
             m_SpriteBatch.End();
         }
 
@@ -421,71 +432,91 @@ namespace Tankontroller.Scenes
             }
         }
 
-        public void TogglePause()
-        {
-            isPaused = !isPaused;
-        }
-
         public void Update(float pSeconds)
         {
             Escape();
-
-            if (isPaused)
-            {
-                return; // If the game is paused, exit the method early
-            }
-
             IntroFinished();
-            //Updates each controller to check for inputs
-            foreach (Player p in m_Teams)
+
+            if (mControllersConnected) // Game should pause in the event of controller disconnect
             {
-                p.Controller.UpdateController();
-            }
-
-
-            bool tankMoved = false;
-
-            foreach (Player p in m_Teams)
-            {
-                tankMoved = tankMoved | p.DoTankControls(pSeconds);
-            }
-
-            //Checks for tank collisons between the play area and the walls
-            m_World.Update(pSeconds);
-            m_World.CollideAllTheThingsWithPlayArea(mPlayAreaRectangle);
-
-            if (tankMoved)
-            {
-                tankMoveSound.Play();
-            }
-            else
-            {
-                tankMoveSound.Pause();
-            }
-
-            //If there is only on player remaining, the GameOverScene is transitioned to
-            List<int> remainingTeamsList = remainingTeams();
-            if (remainingTeamsList.Count <= 1)
-            {
-                int winner = -1;
-                if (remainingTeamsList.Count == 1)
-                {
-                    winner = remainingTeamsList[0];
-                }
-                Reset();
-                Tankontroller.Instance().SM().Transition(new GameOverScene(mBackgroundTexture, m_Teams, winner));
-
-            }
-
-            //Updates the track particles for each tank
-            m_SecondsTillTracksAdded -= pSeconds;
-            if (m_SecondsTillTracksAdded <= 0)
-            {
-                m_SecondsTillTracksAdded += SECONDS_BETWEEN_TRACKS_ADDED;
-                TrackSystem trackSystem = TrackSystem.GetInstance();
+                //Updates each controller to check for inputs
                 foreach (Player p in m_Teams)
                 {
-                    trackSystem.AddTrack(p.Tank.GetWorldPosition(), p.Tank.GetRotation(), p.Tank.Colour());
+                    p.Controller.UpdateController();
+                    // Check if controller is disconnected
+                    mControllersConnected = mControllersConnected && p.Controller.IsConnected();
+                }
+
+                bool tankMoved = false;
+                foreach (Player p in m_Teams)
+                {
+                    tankMoved = tankMoved | p.DoTankControls(pSeconds);
+                }
+
+                //Checks for tank collisons between the play area and the walls
+                m_World.Update(pSeconds);
+                m_World.CollideAllTheThingsWithPlayArea(mPlayAreaRectangle);
+
+                if (tankMoved)
+                {
+                    tankMoveSound.Play();
+                }
+                else
+                {
+                    tankMoveSound.Pause();
+                }
+
+                //If there is only on player remaining, the GameOverScene is transitioned to
+                List<int> remainingTeamsList = remainingTeams();
+                if (remainingTeamsList.Count <= 1)
+                {
+                    int winner = -1;
+                    if (remainingTeamsList.Count == 1)
+                    {
+                        winner = remainingTeamsList[0];
+                    }
+                    Reset();
+                    Tankontroller.Instance().SM().Transition(new GameOverScene(mBackgroundTexture, m_Teams, winner));
+
+                }
+
+                //Updates the track particles for each tank
+                m_SecondsTillTracksAdded -= pSeconds;
+                if (m_SecondsTillTracksAdded <= 0)
+                {
+                    m_SecondsTillTracksAdded += SECONDS_BETWEEN_TRACKS_ADDED;
+                    TrackSystem trackSystem = TrackSystem.GetInstance();
+                    foreach (Player p in m_Teams)
+                    {
+                        trackSystem.AddTrack(p.Tank.GetWorldPosition(), p.Tank.GetRotation(), p.Tank.Colour());
+                    }
+                }
+            }
+            else // At least one controller is disconnected
+            {
+                IGame game = Tankontroller.Instance();
+                game.DetectControllers();
+
+                mControllersConnected = true;
+                foreach (Player p in m_Teams)
+                {
+                    if (!p.Controller.IsConnected())
+                    {
+                        // Check to see if there is a connected controller not yet associated to a player
+                        foreach (IController controller in game.GetControllers())
+                        {
+                            if (!m_Teams.Any(player => player.Controller == controller))
+                            {
+                                if (controller != null) // I don't think this is neccessary but the game crashed when controller was null
+                                {
+                                    controller.TransferJackCharge(p.Controller);
+                                    p.SetController(controller);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    mControllersConnected = mControllersConnected && p.Controller.IsConnected();
                 }
             }
         }
@@ -515,4 +546,3 @@ namespace Tankontroller.Scenes
         }
     }
 }
-

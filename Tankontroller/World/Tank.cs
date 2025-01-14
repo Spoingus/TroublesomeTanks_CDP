@@ -326,28 +326,26 @@ namespace Tankontroller.World
 
         public void PrimingWeapon(float pSeconds)
         {
-            if (m_TimePrimed > 0)
-            {
-                m_TimePrimed += pSeconds;
-            }
-            else
-            {
-                m_TimePrimed = pSeconds;
-            }
+            m_TimePrimed += pSeconds;
         }
 
-        public bool FireIfPrimed()
+        public bool IsFirePrimed()
         {
-            if (m_TimePrimed > 0)
-            {
-                float cannonRotation = GetCannonWorldRotation();
-                Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
-                Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-                m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * DGS.Instance.GetFloat("BULLET_SPEED"), Colour()));
-                m_TimePrimed = -1;
-                return true;
-            }
-            return false;
+            return m_TimePrimed > 0;
+        }
+
+        public void ResetPrime()
+        {
+            m_TimePrimed = 0;
+        }
+
+        public void Fire()
+        {
+            float cannonRotation = GetCannonWorldRotation();
+            Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
+            Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
+            m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * DGS.Instance.GetFloat("BULLET_SPEED"), Colour()));
+
             /*     if(m_TimePrimed > 0)
                  {
                      float cannonRotation = GetCannonWorldRotation();

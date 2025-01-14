@@ -1,16 +1,36 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tankontroller.Controller;
 using Tankontroller.World;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // TeamGUI
+    //
+    // This class is used to represent the GUI of a team.
+    //
+    // It contains the following member variables:
+    // - A white pixel texture
+    // - A rectangle representing the position of the GUI
+    // - A health bar
+    // - An avatar
+    // - An array of power bars, jack icons and port number labels
+    // - A player
+    // - A tank
+    // - A frame
+    // - A colour
+    //
+    // It contains the following methods:
+    // - A method to set up the static textures
+    // - A constructor to initialise the GUI
+    // - A method to get the tank
+    // - A method to draw the health bar
+    // - A method to reposition the GUI
+    // - A method to draw the avatar
+    // - A method to draw the GUI
+    //-------------------------------------------------------------------------------------------------
     public class TeamGUI
     {
         private Texture2D m_WhitePixel;
@@ -20,7 +40,7 @@ namespace Tankontroller.GUI
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
-        private IController m_Controller;
+        private Player m_player;
         private static Texture2D[] m_PortNumbers = new Texture2D[8];
         private static Texture2D m_PowerBarBorderTexture;
         private static Texture2D m_PowerBarPowerTexture;
@@ -57,13 +77,13 @@ namespace Tankontroller.GUI
             Texture2D pAvatarColourLayer,
             Rectangle pRectangle,
             Tank pTank,
-            IController pController,
+            Player pPlayer,
             Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
-            m_Controller = pController;
+            m_player = pPlayer;
             m_Tank = pTank;
             PrepareAvatar(pAvatarBlackAndWhiteLayer, pAvatarColourLayer);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
@@ -94,13 +114,13 @@ namespace Tankontroller.GUI
            Avatar pAvatar,
            Rectangle pRectangle,
            Tank pTank,
-           IController pController,
+           Player pPlayer,
            Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
-            m_Controller = pController;
+            m_player = pPlayer;
             m_Tank = pTank;
             PrepareAvatar(pAvatar);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
@@ -198,25 +218,25 @@ namespace Tankontroller.GUI
         {
             DrawAvatar(pSpriteBatch);
             DrawHealthBar(pSpriteBatch);
-
+            IController controller = m_player.Controller;
             for (int j = 0; j < 7; j++)
             {
-                if (m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)) == Control.FIRE)
+                if (controller.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
                 {
-                    if (m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
+                    if (controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), true);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), true);
                     }
                     else
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), false);
+                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), false);
                     }
                 }
                 else
                 {
-                    m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)), m_Controller.GetJackCharge(PortMapping.getPortForPlayer(j)) > 0);
+                    m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) > 0);
                 }
-                m_JackIcons[j].Draw(pSpriteBatch, m_Controller.GetJackControl(PortMapping.getPortForPlayer(j)));
+                m_JackIcons[j].Draw(pSpriteBatch, controller.GetJackControl(PortMapping.GetPortForPlayer(j)));
                 m_PortNumLabels[j].Draw(pSpriteBatch, j, m_Color);
             }
         }

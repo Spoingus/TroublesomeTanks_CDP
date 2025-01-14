@@ -1,13 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // PowerBar
+    //
+    // This class is used to represent the power bar of a tank. It displays the power bar in the game.
+    //
+    // It contains the following member variables:
+    // - A border texture
+    // - A power texture
+    // - A position of the power bar
+    // - A width of the power bar
+    // - A height of the power bar
+    //
+    // It contains the following methods:
+    // - A constructor to initialise the power bar
+    // - A method to draw the power bar
+    //-------------------------------------------------------------------------------------------------
     public class PowerBar
     {
         private static Texture2D powerBarBorder, powerBarPower;

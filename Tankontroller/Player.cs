@@ -59,6 +59,10 @@ namespace Tankontroller
             AvatarSet = false;
             Avatar = null;
         }
+        public void SetController(IController pController)
+        {
+            Controller = pController;
+        }
         public Player(Color pColour, IController pController,
             float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
             Texture2D pWhitePixel,
@@ -73,7 +77,7 @@ namespace Tankontroller
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
             GUI = new TeamGUI(pWhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, pAvatarBlackAndWhiteLayer,
-                pAvatarColourLayer, pRectangle, Tank, Controller, Colour);
+                pAvatarColourLayer, pRectangle, Tank, this, Colour);
         }
         public void GamePreparation(
             float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
@@ -86,12 +90,12 @@ namespace Tankontroller
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
             Texture2D whitePixel = game.CM().Load<Texture2D>("white_pixel");
-            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Tank, Controller, Colour);
+            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Tank, this, Colour);
         }
         public void Reset()
         {
             Controller.ResetJacks();
-            
+
         }
         public bool DoTankControls(float pSeconds)
         {
@@ -209,12 +213,16 @@ namespace Tankontroller
                 }
                 else
                 {
-                    if (Tank.FireIfPrimed())
+                    if (Tank.IsFirePrimed())
                     {
-                        SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
-                        bulletShot.Play();
-                        Controller.DepleteCharge(Control.FIRE, DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION")); // BULLET CHARGE HERE
-                        Tank.SetFired(DGS.Instance.GetInt("BLAST_DELAY"));
+                        Tank.ResetPrime();
+                        if (Controller.DepleteCharge(Control.FIRE, DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION")))
+                        {
+                            Tank.Fire();
+                            SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
+                            bulletShot.Play();
+                            Tank.SetFired(DGS.Instance.GetInt("BLAST_DELAY"));
+                        }
                     }
                 }
 
@@ -231,9 +239,9 @@ namespace Tankontroller
                     Tank.ChargeReleased();
                 }
 
-                
 
-               
+
+
             }
             if (Tank.Fired() > 0)
             {

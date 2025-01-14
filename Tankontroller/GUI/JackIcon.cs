@@ -1,14 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tankontroller.Controller;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // JackIcon
+    //
+    // This class is used to represent the icons of the controls. It displays the icons in the game.
+    //
+    // It contains the following member variables:
+    // - An array of textures representing the icons
+    // - A position of the icon
+    // - A width of the icon
+    // - A height of the icon
+    //
+    // It contains the following methods:
+    // - A constructor to initialise the icon
+    // - A method to draw the icon
+    //-------------------------------------------------------------------------------------------------
     class JackIcon
     {
         private static Texture2D[] icons;

@@ -589,6 +589,18 @@
 /processorParam:TextureFormat=Color
 /build:background_06.png
 
+#begin background_err.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:background_err.png
+
 #begin block.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -780,6 +792,13 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:fire.png
+
+#begin handwritingfont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:handwritingfont.spritefont
 
 #begin healthbar_engineer_01.png
 /importer:TextureImporter

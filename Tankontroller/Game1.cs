@@ -26,7 +26,7 @@ namespace Tankontroller
         IController GetController(int pIndex);
         int GetControllerCount();
         List<IController> GetControllers();
-        Task DetectControllers();
+        void DetectControllers();
         void Exit();
     }
 
@@ -52,16 +52,33 @@ namespace Tankontroller
             }
             return mGameInterface;
         }
-        public async Task DetectControllers()
+
+        Task mDetectControllerTask = null;
+        public void DetectControllers()
+        {
+            if (mDetectControllerTask == null || mDetectControllerTask.IsCompleted)
+            {
+                mDetectControllerTask = Task.Run(async () => await DetectControllersAsync());
+            }
+        }
+
+        private async Task DetectControllersAsync()
         {
             string[] portNames = SerialPort.GetPortNames();
             foreach (string portName in portNames)
             {
                 if (!mControllers.ContainsKey(portName))
                 {
-                    SerialPort port = new SerialPort(portName, 19200);//, Parity.None, 8, StopBits.One);
-
-                    port.Open();
+                    SerialPort port;
+                    try
+                    {
+                        port = new SerialPort(portName, 19200); //, Parity.None, 8, StopBits.One);
+                        port.Open();
+                    }
+                    catch (Exception e)
+                    {
+                        continue;
+                    }
 
                     port.DtrEnable = true;
 
@@ -72,7 +89,7 @@ namespace Tankontroller
                     //port.Write(new byte[] { (byte)'I' }, 0, 1);
                     await port.BaseStream.WriteAsync(new byte[] { (byte)'I' }, 0, 1);
 
-                    System.Threading.Thread.Sleep(10);
+                    System.Threading.Thread.Sleep(10); 
 
                     if (port.BytesToRead > 0)
                     {
@@ -88,7 +105,6 @@ namespace Tankontroller
                             }
                             else
                             {
-                                bool stopHere = true;
                                 port.Close();
                             }
                         }
@@ -97,12 +113,21 @@ namespace Tankontroller
                             //possible timeout - ignore
                         }
                     }
-                    else
-                    {
-                        bool stopHere = true;
-                        port.Close();
-                    }
+                    else { port.Close(); }
                 }
+            }
+
+            List<string> toRemove = new List<string>();
+            foreach (KeyValuePair<string, IController> controller in mControllers)
+            {
+                if (!controller.Value.IsConnected())
+                {
+                    toRemove.Add(controller.Key);
+                }
+            }
+            foreach (string key in toRemove)
+            {
+                mControllers.Remove(key);
             }
         }
 

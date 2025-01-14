@@ -2,16 +2,23 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tankontroller.GUI
 {
+    //-------------------------------------------------------------------------------------------------
+    // ButtonList
+    //
+    // This class is used to manage a list of buttons. It allows the user to select the next or previous
+    // button in the list, and to press the currently selected button.
+    //
+    // The class contains a list of buttons, and an index to the currently selected button. The class
+    // provides methods to select the next or previous button in the list, and to press the currently
+    // selected button. The class also provides a method to draw the buttons.
+    //-------------------------------------------------------------------------------------------------
     class ButtonList
     {
-        List<Button> mButtons = null; //List of buttons
-        int currentSelectedButtonIndex = 0; //Index of the currently selected button
+        List<Button> mButtons = null;
+        int currentSelectedButtonIndex = 0;
 
         public ButtonList()
         {
@@ -24,31 +31,31 @@ namespace Tankontroller.GUI
 
         public void SelectNextButton()
         {
-            Console.WriteLine("NextButton start: " + currentSelectedButtonIndex); //Debug
-            int nextSelectedButtonIndex = currentSelectedButtonIndex + 1; //Get the index of the next button
-            if (nextSelectedButtonIndex >= mButtons.Count) //If the index is out of range
+            Console.WriteLine("NextButton start: " + currentSelectedButtonIndex);
+            int nextSelectedButtonIndex = currentSelectedButtonIndex + 1;
+            if (nextSelectedButtonIndex >= mButtons.Count)
             {
-                nextSelectedButtonIndex = 0; //Set the index to the first button
+                nextSelectedButtonIndex = 0;
             }
-            mButtons[nextSelectedButtonIndex].Selected = true; //Select the next button
-            mButtons[currentSelectedButtonIndex].Selected = false; //Deselect the current button
-            currentSelectedButtonIndex = nextSelectedButtonIndex; //Set the current button index to the next button
-            Console.WriteLine("NextButton finish: " + currentSelectedButtonIndex); //Debug
+            mButtons[nextSelectedButtonIndex].Selected = true;
+            mButtons[currentSelectedButtonIndex].Selected = false;
+            currentSelectedButtonIndex = nextSelectedButtonIndex;
+            Console.WriteLine("NextButton finish: " + currentSelectedButtonIndex);
 
         }
 
         public void SelectPreviousButton()
         {
-            Console.WriteLine("PreviousButton start: " + currentSelectedButtonIndex); //Debug
-            int previousSelectedButtonIndex = currentSelectedButtonIndex - 1; //Get the index of the previous button
-            if (previousSelectedButtonIndex < 0) //If the index is out of range
+            Console.WriteLine("PreviousButton start: " + currentSelectedButtonIndex);
+            int previousSelectedButtonIndex = currentSelectedButtonIndex - 1;
+            if (previousSelectedButtonIndex < 0)
             {
-                previousSelectedButtonIndex = mButtons.Count - 1; //Set the index to the last button
+                previousSelectedButtonIndex = mButtons.Count - 1;
             }
-            mButtons[previousSelectedButtonIndex].Selected = true; //Select the previous button
-            mButtons[currentSelectedButtonIndex].Selected = false; //Deselect the current button
-            currentSelectedButtonIndex = previousSelectedButtonIndex; //Set the current button index to the previous button
-            Console.WriteLine("PreviousButton finish: " + currentSelectedButtonIndex); //Debug
+            mButtons[previousSelectedButtonIndex].Selected = true;
+            mButtons[currentSelectedButtonIndex].Selected = false;
+            currentSelectedButtonIndex = previousSelectedButtonIndex;
+            Console.WriteLine("PreviousButton finish: " + currentSelectedButtonIndex);
         }
 
         public void PressSelectedButton()
