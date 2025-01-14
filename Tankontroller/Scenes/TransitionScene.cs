@@ -71,8 +71,7 @@ namespace Tankontroller.Scenes
 
         public void GenerateNextTexture()
         {
-            IGame game = Tankontroller.Instance();
-            GraphicsDevice graphicsDevice = game.GDM().GraphicsDevice;
+            GraphicsDevice graphicsDevice = gameInstance.GDM().GraphicsDevice;
             mNextTexture = new RenderTarget2D(graphicsDevice, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
             // Set the render target
             graphicsDevice.SetRenderTarget(mNextTexture);
@@ -98,12 +97,12 @@ namespace Tankontroller.Scenes
             mNextPosition += mVelocity;
             if (mNextPosition.Y > 0)
             {
-                IGame game = Tankontroller.Instance();
-                game.SM().Pop();
+                IGame gameInstance = Tankontroller.Instance();
+                gameInstance.SM().Pop();
 
-                if (mNextScene != game.SM().Top)
+                if (mNextScene != gameInstance.SM().Top)
                 {
-                    game.SM().Push(mNextScene);
+                    gameInstance.SM().Push(mNextScene);
                 }                
 
             }

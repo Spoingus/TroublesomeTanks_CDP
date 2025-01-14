@@ -17,12 +17,6 @@ using System.Threading.Tasks;
     {
         void Draw(float pSeconds);
         void Update(float pSeconds);
-        void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
+        void Escape();
     }
 }
