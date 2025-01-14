@@ -9,6 +9,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Threading.Tasks;
 using Tankontroller.Controller;
+using Tankontroller.Managers;
 using Tankontroller.Scenes;
 
 namespace Tankontroller
@@ -35,10 +36,10 @@ namespace Tankontroller
     /// </summary>
     public class Tankontroller : Game, IGame
     {
-        private SoundManager mSoundManager;
+        private SoundManager mSoundManager = SoundManager.Instance;
         private GraphicsDeviceManager mGraphics;
         private SpriteBatch mBatch;
-        private SceneManager mSceneManager;
+        private SceneManager mSceneManager = SceneManager.Instance;
         private Dictionary<string, IController> mControllers;
         private static IGame mGameInterface = null;
         private SoundEffectInstance mCurrentMusic;
@@ -144,7 +145,6 @@ namespace Tankontroller
         {
             mGraphics               = new GraphicsDeviceManager(this);
             Content.RootDirectory   = "Content";
-            mSceneManager           = new SceneManager();
             mControllers = new Dictionary<string, IController>();
             
                 
@@ -209,7 +209,7 @@ namespace Tankontroller
                 mControllers.Add("Keyboard2", controller);
             }
 
-            mSoundManager = new SoundManager();
+            //mSoundManager = SoundManager.Instance;
 
             mGraphics.PreferredBackBufferHeight = DGS.Instance.GetInt("SCREENHEIGHT");
             mGraphics.PreferredBackBufferWidth = DGS.Instance.GetInt("SCREENWIDTH");

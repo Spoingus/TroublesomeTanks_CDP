@@ -1,22 +1,19 @@
 ﻿using Microsoft.Xna.Framework.Audio;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Tankontroller
+namespace Tankontroller.Managers
 {
-    
-
     public class SoundManager
     {
-        private Dictionary<string, SoundEffect> mSoundEffects = null;
+        private Dictionary<string, SoundEffect> mSoundEffects = new Dictionary<string, SoundEffect>();
+        static SoundManager mInstance = new SoundManager();
 
-        public SoundManager()
+        static SoundManager() { }
+        private SoundManager() { }
+
+        public static SoundManager Instance
         {
-            mSoundEffects = new Dictionary<string, SoundEffect>();
-
+            get { return mInstance; }
         }
 
         public void Add(string pName)
