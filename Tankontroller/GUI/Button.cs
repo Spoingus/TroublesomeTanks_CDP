@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tankontroller.Scenes
+namespace Tankontroller.GUI
 {
     public class Button
     {

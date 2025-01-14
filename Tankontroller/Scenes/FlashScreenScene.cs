@@ -10,13 +10,13 @@ namespace Tankontroller.Scenes
 {
     public class FlashScreenScene : IScene
     {
+        IGame game = Tankontroller.Instance();
         Texture2D mLogoTexture = null; // The logo texture
         SpriteBatch mSpriteBatch = null; // The sprite batch
         Rectangle mRectangle; // The rectangle to draw the logo
         float mSecondsLeft; // The seconds left to display the flash screen
         public FlashScreenScene() // Constructor
         {
-            IGame game = Tankontroller.Instance(); // Get the game instance
             mLogoTexture = game.CM().Load<Texture2D>("selogo"); // Load the logo texture
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice); // Create the sprite batch
             int screenWidth = game.GDM().GraphicsDevice.Viewport.Width; // Get the screen width
@@ -34,7 +34,7 @@ namespace Tankontroller.Scenes
             mSecondsLeft -= pSeconds; // Decrease the seconds left
             if (mSecondsLeft <= 0.0f) // If the seconds left is less than or equal to 0
             {
-                IGame game = Tankontroller.Instance(); // Get the game instance
+                 // Get the game instance
                 game.SM().Transition(new StartScene()); // Transition to the start scene
             }
         }

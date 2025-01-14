@@ -50,7 +50,6 @@ namespace Tankontroller.Scenes
                 DepthStencilState.None, RasterizerState.CullCounterClockwise);
             mPreviousScene.Draw(0);
             mSpriteBatch.End();
-
             // Drop the render target
             graphicsDevice.SetRenderTarget(null);
         }
