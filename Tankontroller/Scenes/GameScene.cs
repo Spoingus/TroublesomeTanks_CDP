@@ -334,34 +334,25 @@ namespace Tankontroller.Scenes
 
             TrackSystem.GetInstance().Draw(m_SpriteBatch);
 
-            //Draws the background of the bullets
-            int bulletRadius = 10;
-            int radius = bulletRadius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS");
-            Rectangle bulletRect = new Rectangle(0, 0, radius, radius);
+            //Draw the background of the bullets
             foreach (Player p in m_Teams)
             {
                 List<Bullet> bullets = p.Tank.GetBulletList();
                 foreach (Bullet b in bullets)
                 {
-                    bulletRect.X = (int)b.Position.X - radius / 2;
-                    bulletRect.Y = (int)b.Position.Y - radius / 2;
-                    m_SpriteBatch.Draw(m_BulletTexture, bulletRect, Color.Black);
+                    b.DrawBackground(m_SpriteBatch, m_BulletTexture);
                 }
             }
 
             World.Particles.ParticleManager.Instance().Draw(m_SpriteBatch);
 
-            //Draws the foreground of the bullets
-            bulletRect.Width = bulletRadius;
-            bulletRect.Height = bulletRadius;
+            //Draw the foreground of the bullets
             foreach (Player p in m_Teams)
             {
                 List<Bullet> bullets = p.Tank.GetBulletList();
                 foreach (Bullet b in bullets)
                 {
-                    bulletRect.X = (int)b.Position.X - bulletRadius / 2;
-                    bulletRect.Y = (int)b.Position.Y - bulletRadius / 2;
-                    m_SpriteBatch.Draw(m_BulletTexture, bulletRect, b.Colour);
+                    b.DrawForeground(m_SpriteBatch, m_BulletTexture);
                 }
             }
 
@@ -411,7 +402,7 @@ namespace Tankontroller.Scenes
                 w.Draw(m_SpriteBatch);
             }
 
-            if(!mControllersConnected)
+            if (!mControllersConnected)
             {
                 string message = "A controller has been disconnected.\r\nPlease reconnect it to continue.\r\nSearching for controller...";
                 Vector2 centre = new Vector2(mPlayAreaRectangle.X + mPlayAreaRectangle.Width / 2, mPlayAreaRectangle.Y + mPlayAreaRectangle.Height / 2);
