@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.World.Particles;
 
 namespace Tankontroller.World
 {
     public class Bullet
     {
-        public Vector2 Position { get; private set;}
+        const int BULLET_RADIUS = 10;
+        public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
         public Color Colour { get; private set; }
 
@@ -30,7 +32,7 @@ namespace Tankontroller.World
 
         public bool Collide(Rectangle pRectangle, out Vector2 pCollisionNormal)
         {
-            if(!pRectangle.Contains(Position))
+            if (!pRectangle.Contains(Position))
             {
                 float difference = Math.Abs(Position.X - pRectangle.Left);
                 pCollisionNormal = new Vector2(1, 0);
@@ -58,22 +60,18 @@ namespace Tankontroller.World
         }
         public bool Collide(Tank pTank, out Vector2 pCollisionNormal)
         {
-            /*
-            Vector2 tankPos = pTank.GetWorldPosition();
-            float tankRot = pTank.GetRotation();
-            Vector2 bulletPos = Position;
-
-            if((tankPos - bulletPos).Length() < DGS.TANK_RADIUS)
-            {
-                pCollisionNormal = (bulletPos - tankPos);
-                pCollisionNormal.Normalize();
-                return true;
-            }
-            pCollisionNormal = Vector2.Zero;
-            return false;
-        */
             pCollisionNormal = Vector2.Normalize(Position - pTank.GetWorldPosition());
             return pTank.PointIsInTank(Position);
+        }
+
+        public void DrawBackground(SpriteBatch pBatch, Texture2D pTexture)
+        {
+            Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS"), Position, Color.Black);
+        }
+
+        public void DrawForeground(SpriteBatch pBatch, Texture2D pTexture)
+        {
+            Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS, Position, Colour);
         }
     }
 }
