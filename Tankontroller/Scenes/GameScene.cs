@@ -28,14 +28,8 @@ namespace Tankontroller.Scenes
         private IController mController2;
         private IController mController3;
         private TheWorld m_World;
-        private Texture2D m_TankBaseTexture;
-        private Texture2D m_TankBrokenTexture;
-        private Texture2D m_TankRightTrackTexture;
-        private Texture2D m_TankLeftTrackTexture;
         private Texture2D mPlayAreaTexture;
         private Texture2D m_CircleTexture;
-        private Texture2D m_CannonTexture;
-        private Texture2D m_CannonFireTexture;
         private Texture2D m_BulletTexture;
         private Texture2D m_ErrorBGTexture;
         private SpriteBatch m_SpriteBatch;
@@ -69,12 +63,14 @@ namespace Tankontroller.Scenes
         {
             //Loads all the relevant textures for the game scene
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            m_TankBaseTexture = game.CM().Load<Texture2D>("Tank-B-05");
-            m_TankBrokenTexture = game.CM().Load<Texture2D>("BrokenTank");
-            m_TankRightTrackTexture = game.CM().Load<Texture2D>("Tank track B-R");
-            m_TankLeftTrackTexture = game.CM().Load<Texture2D>("Tank track B-L");
-            m_CannonTexture = game.CM().Load<Texture2D>("cannon");
-            m_CannonFireTexture = game.CM().Load<Texture2D>("cannonFire");
+
+            Tank.SetupStaticTextures(
+                game.CM().Load<Texture2D>("Tank-B-05"),
+                game.CM().Load<Texture2D>("BrokenTank"),
+                game.CM().Load<Texture2D>("Tank track B-R"),
+                game.CM().Load<Texture2D>("Tank track B-L"),
+                game.CM().Load<Texture2D>("cannon"),
+                game.CM().Load<Texture2D>("cannonFire"));
             m_BulletTexture = game.CM().Load<Texture2D>("circle");
             mPlayAreaTexture = game.CM().Load<Texture2D>("playArea");
             mPixelTexture = game.CM().Load<Texture2D>("block");
@@ -357,38 +353,11 @@ namespace Tankontroller.Scenes
             }
 
             //Draws the tanks
-            Rectangle trackRect = new Rectangle(0, 0, m_TankLeftTrackTexture.Width, m_TankLeftTrackTexture.Height / 15);
-
             float tankScale = (float)mPlayAreaRectangle.Width / (50 * 40);
-
-            for (int i = 0; true; i++)
+            for (int i = 0; i < m_Teams.Count(); i++)
             {
                 Tank t = m_World.GetTank(i);
-                if (t == null)
-                {
-                    break;
-                }
-                if (t.Health() > 0)
-                {
-                    trackRect.Y = t.LeftTrackFrame() * m_TankLeftTrackTexture.Height / 15;
-                    m_SpriteBatch.Draw(m_TankLeftTrackTexture, t.GetWorldPosition(), trackRect, t.Colour(), t.GetRotation(), new Vector2(m_TankBaseTexture.Width / 2, m_TankBaseTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    trackRect.Y = t.RightTrackFrame() * m_TankLeftTrackTexture.Height / 15;
-                    m_SpriteBatch.Draw(m_TankRightTrackTexture, t.GetWorldPosition(), trackRect, t.Colour(), t.GetRotation(), new Vector2(m_TankBaseTexture.Width / 2, m_TankBaseTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    m_SpriteBatch.Draw(m_TankBaseTexture, t.GetWorldPosition(), null, t.Colour(), t.GetRotation(), new Vector2(m_TankBaseTexture.Width / 2, m_TankBaseTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    if (t.Fired() == 0)
-                    {
-                        m_SpriteBatch.Draw(m_CannonTexture, t.GetCannonWorldPosition(), null, t.Colour(), t.GetCannonWorldRotation(), new Vector2(m_CannonTexture.Width / 2, m_CannonTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    }
-                    else
-                    {
-                        m_SpriteBatch.Draw(m_CannonFireTexture, t.GetCannonWorldPosition(), null, t.Colour(), t.GetCannonWorldRotation(), new Vector2(m_CannonTexture.Width / 2, m_CannonTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    }
-                }
-                //If a tank has no health, its drawn as a destroyed tank
-                else
-                {
-                    m_SpriteBatch.Draw(m_TankBrokenTexture, t.GetWorldPosition(), null, t.Colour(), t.GetRotation(), new Vector2(m_TankBrokenTexture.Width / 2, m_TankBrokenTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                }
+                t?.Draw(m_SpriteBatch, tankScale);
             }
 
             //Draws the walls
