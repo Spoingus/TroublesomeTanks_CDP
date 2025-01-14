@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Tankontroller.Scenes
 {
@@ -17,6 +18,8 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class TransitionScene : IScene
     {
+        IGame gameInstance = Tankontroller.Instance();
+        IGame tankControllerInstance = Tankontroller.Instance();
         RenderTarget2D mPreviousTexture = null;
         RenderTarget2D mNextTexture = null;
         SpriteBatch mSpriteBatch = null;
@@ -30,10 +33,10 @@ namespace Tankontroller.Scenes
         Vector2 mAcceleration;
         public TransitionScene(IScene pPreviousScene, IScene pNextScene)
         {
-            IGame game = Tankontroller.Instance();
+            
             mPreviousScene = pPreviousScene;
             mNextScene = pNextScene;
-            mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
+            mSpriteBatch = new SpriteBatch(gameInstance.GDM().GraphicsDevice);
             
             mRectangle = new Rectangle(0, 0, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             mSecondsLeft = DGS.Instance.GetInt("SECONDS_TO_DISPLAY_FLASH_SCREEN");
@@ -47,8 +50,8 @@ namespace Tankontroller.Scenes
 
         public void GeneratePreviousTexture()
         {
-            IGame game = Tankontroller.Instance();
-            GraphicsDevice graphicsDevice = game.GDM().GraphicsDevice;
+           
+            GraphicsDevice graphicsDevice = tankControllerInstance.GDM().GraphicsDevice;
             mPreviousTexture = new RenderTarget2D(graphicsDevice, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
             // Set the render target
             graphicsDevice.SetRenderTarget(mPreviousTexture);
@@ -113,6 +116,13 @@ namespace Tankontroller.Scenes
             mSpriteBatch.Draw(mPreviousTexture, mRectangle, Color.White);
             mSpriteBatch.Draw(mNextTexture, mNextPosition, mRectangle, Color.White);
             mSpriteBatch.End();
+        }
+        public void Escape()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Tankontroller.Instance().SM().Transition(null);
+            }
         }
     }
 }

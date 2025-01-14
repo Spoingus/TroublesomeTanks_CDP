@@ -22,6 +22,7 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class GameScene : IScene
     {
+        IGame gameInstance = Tankontroller.Instance();
         private List<IController> mControllers;
         private IController mController0;
         private IController mController1;
@@ -383,15 +384,6 @@ namespace Tankontroller.Scenes
             m_SpriteBatch.End();
         }
 
-        //If the escape key is pressed, the scene transitions to the main menu
-        public void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
-
         public void Update(float pSeconds)
         {
             Escape();
@@ -454,8 +446,8 @@ namespace Tankontroller.Scenes
             }
             else // At least one controller is disconnected
             {
-                IGame game = Tankontroller.Instance();
-                game.DetectControllers();
+                
+                gameInstance.DetectControllers();
 
                 mControllersConnected = true;
                 foreach (Player p in m_Teams)
@@ -463,7 +455,7 @@ namespace Tankontroller.Scenes
                     if (!p.Controller.IsConnected())
                     {
                         // Check to see if there is a connected controller not yet associated to a player
-                        foreach (IController controller in game.GetControllers())
+                        foreach (IController controller in gameInstance.GetControllers())
                         {
                             if (!m_Teams.Any(player => player.Controller == controller))
                             {
@@ -478,6 +470,13 @@ namespace Tankontroller.Scenes
                     }
                     mControllersConnected = mControllersConnected && p.Controller.IsConnected();
                 }
+            }
+        }
+        public void Escape()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Tankontroller.Instance().SM().Transition(null);
             }
         }
 
