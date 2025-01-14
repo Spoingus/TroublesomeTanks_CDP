@@ -35,7 +35,7 @@ namespace Tankontroller.World.Particles
             Colour = pColour;
             TimeTillDead = pTimeTillDead;
         }
-        
+
         /// <summary>
         /// Update particle
         /// </summary>
@@ -47,6 +47,44 @@ namespace Tankontroller.World.Particles
             Radius = Radius + RadiusIncreaseRate * pSeconds;
             TimeTillDead = TimeTillDead - pSeconds;
             return TimeTillDead > 0;
+        }
+
+        /// <summary>
+        /// Draws a circle. Used to draw the particle.
+        /// </summary>
+        /// <param name="pBatch">SpriteBatch to draw to</param>
+        /// <param name="pTexture">Texture to draw</param>
+        /// <param name="pRadius">Radius of circle</param>
+        /// <param name="pPos">Position of circle centre</param>
+        /// <param name="pColour">Colour of circle</param>
+        static public void DrawCircle(SpriteBatch pBatch, Texture2D pTexture, int pRadius, Vector2 pPos, Color pColour)
+        {
+            Rectangle rectangle = new Rectangle();
+            rectangle.Width = pRadius;
+            rectangle.Height = pRadius;
+            rectangle.X = (int)pPos.X - pRadius / 2;
+            rectangle.Y = (int)pPos.Y - pRadius / 2;
+            pBatch.Draw(pTexture, rectangle, pColour);
+        }
+
+        /// <summary>
+        /// Draws the background of the particle.
+        /// </summary>
+        /// <param name="pBatch"></param>
+        /// <param name="pTexture"></param>
+        public void DrawBackground(SpriteBatch pBatch, Texture2D pTexture)
+        {
+            DrawCircle(pBatch, pTexture, (int)Radius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS"), Position, Color.Black);
+        }
+
+        /// <summary>
+        /// Draws the foreground particle.
+        /// </summary>
+        /// <param name="pBatch"></param>
+        /// <param name="pTexture"></param>
+        public void DrawForeground(SpriteBatch pBatch, Texture2D pTexture)
+        {
+            DrawCircle(pBatch, pTexture, (int)Radius, Position, Colour);
         }
     }
 
@@ -68,7 +106,7 @@ namespace Tankontroller.World.Particles
             m_Texture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
             m_Rectangle = new Rectangle();
             m_Particles = new Particle[1000];
-            for(int i = 0; i < m_Particles.Length; i++)
+            for (int i = 0; i < m_Particles.Length; i++)
             {
                 m_Particles[i] = new Particle();
             }
@@ -80,7 +118,7 @@ namespace Tankontroller.World.Particles
         /// <returns>The instance of ParticleManager</returns>
         public static ParticleManager Instance()
         {
-            if(m_Instance == null)
+            if (m_Instance == null)
             {
                 m_Instance = new ParticleManager();
             }
@@ -93,9 +131,9 @@ namespace Tankontroller.World.Particles
         /// <param name="pSeconds">delta time (seconds)</param>
         public void Update(float pSeconds)
         {
-            for(int i = 0; i < m_LastParticleIndex; i++)
+            for (int i = 0; i < m_LastParticleIndex; i++)
             {
-                if(!m_Particles[i].Update(pSeconds))
+                if (!m_Particles[i].Update(pSeconds))
                 {
                     Particle temp = m_Particles[i];
                     m_Particles[i] = m_Particles[m_LastParticleIndex - 1];
@@ -114,7 +152,7 @@ namespace Tankontroller.World.Particles
         private Particle[] GetParticles(int pNumberOfParticles)
         {
             Particle[] particles;
-            
+
             int availableParticles = m_Particles.Length - m_LastParticleIndex;
 
             if (availableParticles > pNumberOfParticles)
@@ -151,26 +189,13 @@ namespace Tankontroller.World.Particles
         /// <param name="pBatch">SpriteBatch to use to draw with.</param>
         public void Draw(SpriteBatch pBatch)
         {
-            int radius;
-            for(int i = 0; i < m_LastParticleIndex; i++)
-            {
-                radius = (int)m_Particles[i].Radius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS");
-                m_Rectangle.Width = radius;
-                m_Rectangle.Height = radius;
-                m_Rectangle.X = (int)m_Particles[i].Position.X - radius / 2;
-                m_Rectangle.Y = (int)m_Particles[i].Position.Y - radius / 2;
-                pBatch.Draw(m_Texture, m_Rectangle, Color.Black);
-            }
-
             for (int i = 0; i < m_LastParticleIndex; i++)
             {
-                radius = (int)m_Particles[i].Radius;
-                m_Rectangle.Width = radius;
-                m_Rectangle.Height = radius;
-                m_Rectangle.X = (int)m_Particles[i].Position.X - radius / 2;
-                m_Rectangle.Y = (int)m_Particles[i].Position.Y - radius / 2;
-                pBatch.Draw(m_Texture, m_Rectangle, m_Particles[i].Colour);
-                pBatch.Draw(m_Texture, m_Rectangle, m_Particles[i].Colour);
+                m_Particles[i].DrawBackground(pBatch, m_Texture);
+            }
+            for (int i = 0; i < m_LastParticleIndex; i++)
+            {
+                m_Particles[i].DrawForeground(pBatch, m_Texture);
             }
         }
     }
@@ -248,7 +273,7 @@ namespace Tankontroller.World.Particles
         private Vector2 m_Position;
         private Color m_Colour;
         private Random m_Rng = new Random();
-        
+
         public BulletInitialisationPolicy(Vector2 pPosition, Color pColour)
         {
             m_Position = pPosition;

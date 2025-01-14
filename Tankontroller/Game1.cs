@@ -70,9 +70,16 @@ namespace Tankontroller
             {
                 if (!mControllers.ContainsKey(portName))
                 {
-                    SerialPort port = new SerialPort(portName, 19200);//, Parity.None, 8, StopBits.One);
-
-                    port.Open();
+                    SerialPort port;
+                    try
+                    {
+                        port = new SerialPort(portName, 19200); //, Parity.None, 8, StopBits.One);
+                        port.Open();
+                    }
+                    catch (Exception e)
+                    {
+                        continue;
+                    }
 
                     port.DtrEnable = true;
 
@@ -165,14 +172,13 @@ namespace Tankontroller
 
                 Dictionary<Keys, int> Player1PortMap = new Dictionary<Keys, int>
                 {
-                    { Keys.D1, 3 },
-                    { Keys.D2, 2 },
-                    { Keys.D3, 6 },
-                    { Keys.D4, 7 },
+                    { Keys.D1, 5 },
+                    { Keys.D2, 4 },
+                    { Keys.D3, 3 },
+                    { Keys.D4, 2 },
                     { Keys.D5, 1 },
                     { Keys.D6, 0 },
-                    { Keys.D7, 5 },
-                    { Keys.D8, 4 }
+                    { Keys.D7, 6 },
                 };
 
                 IController controller = new KeyboardController(Player1KeyMap, Player1PortMap);
@@ -195,14 +201,13 @@ namespace Tankontroller
 
                 Dictionary<Keys, int> Player2PortMap = new Dictionary<Keys, int>
                 {
-                    { Keys.F1, 3 },
-                    { Keys.F2, 2 },
-                    { Keys.F3, 6 },
-                    { Keys.F4, 7 },
+                    { Keys.F1, 5 },
+                    { Keys.F2, 4 },
+                    { Keys.F3, 3 },
+                    { Keys.F4, 2 },
                     { Keys.F5, 1 },
                     { Keys.F6, 0 },
-                    { Keys.F7, 5 },
-                    { Keys.F8, 4 }
+                    { Keys.F7, 6 },
                 };
 
                 IController controller = new KeyboardController(Player2KeyMap, Player2PortMap);

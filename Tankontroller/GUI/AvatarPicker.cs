@@ -82,7 +82,7 @@ namespace Tankontroller.GUI
             prepareDrawVariables();
             prepareAvatars();
             prepareColours("engineer");
-            prepareSelectionRectangles();
+            prepareSelectionRectangles(mAvatars.Count);
             prepareButtons();
             mShowAButton = true;
         }
@@ -99,18 +99,18 @@ namespace Tankontroller.GUI
             height = 60;
             width = (int)(height * widthRatio);
             mBackButtonTexture = game.CM().Load<Texture2D>("charge");
-            mBackButtonRectangle = new Rectangle(mBoundsRectangle.X + (mBoundsRectangle.Width / 16) - width, mBoundsRectangle.Y + (mBoundsRectangle.Height/ 8) - height, width, height);
+            mBackButtonRectangle = new Rectangle(mBoundsRectangle.X + (mBoundsRectangle.Width / 16) - width, mBoundsRectangle.Y + (mBoundsRectangle.Height / 8) - height, width, height);
 
             height = 40;
             width = (int)(height * widthRatio);
             mBackTextTexture = game.CM().Load<Texture2D>("back");
             mBackTextRectangle = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 16) + 30) - width, mBoundsRectangle.Y + (mBoundsRectangle.Height / 8) - height, width, height / 2);
-            
+
             mRotateLeftTexture = game.CM().Load<Texture2D>("turretLeft");
             mRotateLeftButton = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 10) * 3) - width + 20, mBoundsRectangle.Y + (mBoundsRectangle.Height / 8) - height, width, height);
 
             mRotateRightTexture = game.CM().Load<Texture2D>("turretRight");
-            mRotateRightButton = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 10) * 7) - width + 20, mBoundsRectangle.Y + (mBoundsRectangle.Height/ 8) - height, width, height);
+            mRotateRightButton = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 10) * 7) - width + 20, mBoundsRectangle.Y + (mBoundsRectangle.Height / 8) - height, width, height);
         }
         public void AddPlayer(Player pPlayer)
         {
@@ -186,14 +186,6 @@ namespace Tankontroller.GUI
                 "engineer",
                 "robo",
                 "winterjack",
-                "yeti",
-                "engineer",
-                "robo",
-                "winterjack",
-                "yeti",
-                "engineer",
-                "robo",
-                "winterjack",
                 "yeti"
             };
             // need to add a bunch of different avatars here
@@ -220,20 +212,20 @@ namespace Tankontroller.GUI
                 mAvatars.Add(avatar);
             }
         }
-        private void prepareSelectionRectangles()
+        private void prepareSelectionRectangles(int selectionCount)
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mSelectionRectangles = new List<Rectangle>();
             // need to add a bunch of different avatars here
-            float anglePerAvatar = (float)(Math.PI * 2 / DGS.Instance.GetInt("NUMBER_OF_AVATARS"));
+            float anglePerAvatar = (float)(Math.PI * 2 / selectionCount);
 
             float centreX = mCentre.X;
             float centreY = mCentre.Y;
             float topLeftAngle = (float)Math.PI * 5 / 4;
             float bottomRightAngle = (float)Math.PI / 4;
-            for (int i = 0; i < DGS.Instance.GetInt("NUMBER_OF_AVATARS"); i++)
+            for (int i = 0; i < selectionCount; i++)
             {
                 float angle = i * anglePerAvatar;
                 float x = centreX + (float)Math.Cos(angle) * mRadius;
@@ -254,22 +246,19 @@ namespace Tankontroller.GUI
             int screenHeight = mBoundsRectangle.Height;
             mColours = new List<Avatar>();
             List<Color> colours = new List<Color>();
-            Color colorCreator = new Color(143, 205, 157, 255);
-            colours.Add(colorCreator);
-            colorCreator = new Color(180, 226, 239, 255);
-            colours.Add(colorCreator);
-            colorCreator = new Color(248, 247, 139, 255);
-            colours.Add(colorCreator);
-            colorCreator = new Color(238, 167, 201, 255);
-            colours.Add(colorCreator);
-            colours.Add(Color.Firebrick);
-            colours.Add(Color.Gainsboro);
-            colours.Add(Color.Honeydew);
-            colours.Add(Color.IndianRed);
-            colours.Add(Color.Khaki);
-            colours.Add(Color.Lavender);
-            colours.Add(Color.Magenta);
+            colours.Add(Color.Red);
+            colours.Add(Color.Lime);
+            colours.Add(Color.DarkGreen);
+            colours.Add(Color.MonoGameOrange);
+            colours.Add(Color.Blue);
+            colours.Add(Color.Yellow);
             colours.Add(Color.NavajoWhite);
+            colours.Add(Color.DarkSlateGray);
+            colours.Add(Color.SaddleBrown);
+            colours.Add(Color.Indigo);
+            colours.Add(Color.Magenta);
+            colours.Add(Color.Aqua);
+
             // need to add a bunch of different colours here
             float anglePerAvatar = (float)(Math.PI * 2 / colours.Count);
 
@@ -360,7 +349,6 @@ namespace Tankontroller.GUI
                 }
                 else
                 {
-
                     if (!mPlayer.ColourSet)
                     {
                         DrawSelection(pSpriteBatch);
@@ -407,11 +395,13 @@ namespace Tankontroller.GUI
                             mPlayer.Avatar.SetColour(colour);
                             string name = mPlayer.Avatar.GetName();
                             prepareColours(name);
+                            prepareSelectionRectangles(mColours.Count);
                         }
                         else if (!mPlayer.ColourSet)
                         {
                             // add a colour to the player
                             mPlayer.SetColour();
+                            mPlayer.Controller.SetColour(mPlayer.Colour);
                             mPlayer.SelectionIndex = 0;
                             prepareCentreAvatar();
                             mPlayer.Avatar.Reposition(mAvatarRectangle);
@@ -444,6 +434,7 @@ namespace Tankontroller.GUI
 
                                 avatar = new Avatar(mWhitePixel, name, mAvatarRectangle, Color.White);
                                 mPlayer.AddAvatar(avatar);
+                                prepareSelectionRectangles(mAvatars.Count);
                             }
                             else
                             {
@@ -454,7 +445,7 @@ namespace Tankontroller.GUI
                         }
                     }
                 }
-                if (controller.IsPressed(Control.TURRET_LEFT))
+                if (controller.IsPressed(Control.TURRET_RIGHT))
                 {
                     // if controller is already a player
                     // cycle through the options
@@ -492,7 +483,7 @@ namespace Tankontroller.GUI
                         }
                     }
                 }
-                else if (controller.IsPressed(Control.TURRET_RIGHT))
+                else if (controller.IsPressed(Control.TURRET_LEFT))
                 {
                     // if controller is already a player
                     // cycle through the options

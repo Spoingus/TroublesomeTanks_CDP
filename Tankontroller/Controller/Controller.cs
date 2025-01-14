@@ -18,7 +18,7 @@ namespace Tankontroller.Controller
     {
 
         bool IsPressedWithCharge(Control pControl);
-        void DepleteCharge(Control pControl, float amount);
+        bool DepleteCharge(Control pControl, float amount);
         void AddCharge(Control pControl, float amount);
         float GetJackCharge(int pJackIndex);
         Control GetJackControl(int pJackIndex);
@@ -132,12 +132,13 @@ namespace Tankontroller.Controller
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    return mJacks[i].IsDown && (pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || pControl != Control.FIRE && mJacks[i].charge > 0);
+                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || (pControl != Control.FIRE && mJacks[i].charge > 0)));
                 }
             }
             return false;
         }
-        public void DepleteCharge(Control pControl, float amount)
+
+        public bool DepleteCharge(Control pControl, float amount)
         {
             //return; //TESTING ONLY
             for (int i = 0; i < 7; ++i)
@@ -151,8 +152,10 @@ namespace Tankontroller.Controller
                     }
                     else
                         mJacks[i].charge = 0;
+                    return true;
                 }
             }
+            return false;
         }
 
         public void AddCharge(Control pControl, float amount)

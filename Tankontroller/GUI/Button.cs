@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Tankontroller.Scenes
+namespace Tankontroller.GUI
 {
     //-------------------------------------------------------------------------------------------------
     // Button Class

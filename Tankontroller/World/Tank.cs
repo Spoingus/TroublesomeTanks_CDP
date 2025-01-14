@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.World.Particles;
 
 
@@ -11,6 +12,22 @@ namespace Tankontroller.World
 {
     public class Tank
     {
+        static private Texture2D mBaseTexture;
+        static private Texture2D mBrokenTexture;
+        static private Texture2D mRightTrackTexture;
+        static private Texture2D mLeftTrackTexture;
+        static private Texture2D mCannonTexture;
+        static private Texture2D mCannonFireTexture;
+
+        public static void SetupStaticTextures(Texture2D pBase, Texture2D brokenTexture, Texture2D pRightTrack, Texture2D pLeftTrack, Texture2D pCannon, Texture2D pCannonFire)
+        {
+            mBaseTexture = pBase;
+            mBrokenTexture = brokenTexture;
+            mRightTrackTexture = pRightTrack;
+            mLeftTrackTexture = pLeftTrack;
+            mCannonTexture = pCannon;
+            mCannonFireTexture = pCannonFire;
+        }
 
         private Vector2[] TANK_CORNERS = { new Vector2(DGS.Instance.GetInt("TANK_HEIGHT") / 2 - DGS.Instance.GetInt("TANK_FRONT_BUFFER"), -DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(-DGS.Instance.GetInt("TANK_HEIGHT") / 2, -DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(-DGS.Instance.GetInt("TANK_HEIGHT") / 2, DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(DGS.Instance.GetInt("TANK_HEIGHT") / 2 - DGS.Instance.GetInt("TANK_FRONT_BUFFER"), DGS.Instance.GetInt("TANK_WIDTH") / 2) };
 
@@ -326,28 +343,26 @@ namespace Tankontroller.World
 
         public void PrimingWeapon(float pSeconds)
         {
-            if (m_TimePrimed > 0)
-            {
-                m_TimePrimed += pSeconds;
-            }
-            else
-            {
-                m_TimePrimed = pSeconds;
-            }
+            m_TimePrimed += pSeconds;
         }
 
-        public bool FireIfPrimed()
+        public bool IsFirePrimed()
         {
-            if (m_TimePrimed > 0)
-            {
-                float cannonRotation = GetCannonWorldRotation();
-                Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
-                Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-                m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * DGS.Instance.GetFloat("BULLET_SPEED"), Colour()));
-                m_TimePrimed = -1;
-                return true;
-            }
-            return false;
+            return m_TimePrimed > 0;
+        }
+
+        public void ResetPrime()
+        {
+            m_TimePrimed = 0;
+        }
+
+        public void Fire()
+        {
+            float cannonRotation = GetCannonWorldRotation();
+            Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
+            Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
+            m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * DGS.Instance.GetFloat("BULLET_SPEED"), Colour()));
+
             /*     if(m_TimePrimed > 0)
                  {
                      float cannonRotation = GetCannonWorldRotation();
@@ -418,6 +433,32 @@ namespace Tankontroller.World
             if (m_Health < 0)
             {
                 m_Health = 0;
+            }
+        }
+
+        public void Draw(SpriteBatch pSpriteBatch, float pScale)
+        {
+            Rectangle trackRect = new Rectangle(0, 0, mLeftTrackTexture.Width, mLeftTrackTexture.Height / 15);
+
+            if (m_Health > 0)
+            {
+                trackRect.Y = m_LeftTrackFrame * mLeftTrackTexture.Height / 15;
+                pSpriteBatch.Draw(mLeftTrackTexture, GetWorldPosition(), trackRect, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                trackRect.Y = m_RightTrackFrame * mLeftTrackTexture.Height / 15;
+                pSpriteBatch.Draw(mRightTrackTexture, GetWorldPosition(), trackRect, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                pSpriteBatch.Draw(mBaseTexture, GetWorldPosition(), null, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                if (mFired == 0)
+                {
+                    pSpriteBatch.Draw(mCannonTexture, GetCannonWorldPosition(), null, mColour, mCannonRotation, new Vector2(mCannonTexture.Width / 2, mCannonTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                }
+                else
+                {
+                    pSpriteBatch.Draw(mCannonFireTexture, GetCannonWorldPosition(), null, mColour, mCannonRotation, new Vector2(mCannonTexture.Width / 2, mCannonTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                }
+            }
+            else //If a tank has no health, its drawn as a destroyed tank
+            {
+                pSpriteBatch.Draw(mBrokenTexture, GetWorldPosition(), null, Colour(), GetRotation(), new Vector2(mBrokenTexture.Width / 2, mBrokenTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
             }
         }
     }

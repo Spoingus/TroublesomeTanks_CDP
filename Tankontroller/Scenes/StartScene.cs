@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tankontroller.Controller;
+using Tankontroller.GUI;
 
 
 namespace Tankontroller.Scenes
@@ -17,6 +18,8 @@ namespace Tankontroller.Scenes
     //--------------------------------------------------------------------------------------------------
     public class StartScene : IScene
     {
+        IGame gameInstance = Tankontroller.Instance();
+        Tankontroller tControllerInstance = (Tankontroller)Tankontroller.Instance();
         ButtonList mButtonList = null;
         Texture2D mBackgroundTexture = null;
         Rectangle mBackgroundRectangle;
@@ -31,31 +34,25 @@ namespace Tankontroller.Scenes
         float mSecondsLeft;
         public StartScene()
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
+            mSpriteBatch = new SpriteBatch(tControllerInstance.GDM().GraphicsDevice);
+            int screenWidth = tControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tControllerInstance.GDM().GraphicsDevice.Viewport.Height;
 
-            mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
-            
+            mBackgroundTexture = tControllerInstance.CM().Load<Texture2D>("background_01");
 
-            game.GDM().IsFullScreen = true;
-            game.GDM().ApplyChanges();
-            int screenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            int screenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-
-            mBackgroundTexture = game.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
+            mForgroundTexture = tControllerInstance.CM().Load<Texture2D>("menu_white");
 
-            mForgroundTexture = game.CM().Load<Texture2D>("menu_white");
-
-            mTitleTexture = game.CM().Load<Texture2D>("menu_title");
+            mTitleTexture = tControllerInstance.CM().Load<Texture2D>("menu_title");
             mTitleRectangle = new Rectangle((screenWidth / 2) - (644 / 2), (screenHeight / 2) - (128 / 2), 644, 128);
 
             mButtonList = new ButtonList();
 
-            Texture2D startGameButtonTexture = game.CM().Load<Texture2D>("menu_play_white");
-            Texture2D startGameButtonTexturePressed = game.CM().Load<Texture2D>("menu_play_dark");
+            //Start Game Button
+            Texture2D startGameButtonTexture = tControllerInstance.CM().Load<Texture2D>("menu_play_white");
+            Texture2D startGameButtonTexturePressed = tControllerInstance.CM().Load<Texture2D>("menu_play_dark");
 
-            //Makes the start game button
             Rectangle startGameButtonRectangle =
                 new Rectangle(
                     ((int)((screenWidth - startGameButtonTexture.Width) / 2) - (int)(startGameButtonTexture.Width * 0.75f)),
@@ -67,9 +64,10 @@ namespace Tankontroller.Scenes
             startGameButton.Selected = true;
             mButtonList.Add(startGameButton);
 
+
             //Makes the exit game button
-            Texture2D exitGameButtonTexture = game.CM().Load<Texture2D>("menu_quit_white");
-            Texture2D exitGameButtonTexturePressed = game.CM().Load<Texture2D>("menu_quit_dark");
+            Texture2D exitGameButtonTexture = tControllerInstance.CM().Load<Texture2D>("menu_quit_white");
+            Texture2D exitGameButtonTexturePressed = tControllerInstance.CM().Load<Texture2D>("menu_quit_dark");
 
             Rectangle exitGameButtonRectangle =
                 new Rectangle((screenWidth - exitGameButtonTexture.Width) / 2 + (int)(startGameButtonTexture.Width * 0.75f),
@@ -80,31 +78,27 @@ namespace Tankontroller.Scenes
             exitGameButton.Selected = false;
             mButtonList.Add(exitGameButton);
             mSecondsLeft = 0.1f;
-            game.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            tControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
         }
 
         //Exits the game
         private void ExitGame()
         {
-            IGame game = Tankontroller.Instance();
-            game.SM().Transition(null);
+            gameInstance.SM().Transition(null);
         }
 
         //Starts the game
         private void StartGame()
         {
-            IGame game = Tankontroller.Instance();
-            game.SM().Transition(new PlayerSelectionScene(), false);
+            gameInstance.SM().Transition(new PlayerSelectionScene(), false);
         }
 
         public void Update(float pSeconds)
         {
             Escape();
+            gameInstance.DetectControllers();
 
-            IGame game = Tankontroller.Instance();
-            game.DetectControllers();
-
-            foreach (IController controller in game.GetControllers())
+            foreach (IController controller in gameInstance.GetControllers())
             {
                 controller.UpdateController();
                 mSecondsLeft -= pSeconds;
@@ -148,13 +142,6 @@ namespace Tankontroller.Scenes
 
             }
         }
-        public void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
 
         //Draws the start screen and buttons
         public void Draw(float pSeconds)
@@ -171,6 +158,13 @@ namespace Tankontroller.Scenes
             mButtonList.Draw(mSpriteBatch);
 
             mSpriteBatch.End();
+        }
+        public void Escape()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Tankontroller.Instance().SM().Transition(null);
+            }
         }
     }
 }

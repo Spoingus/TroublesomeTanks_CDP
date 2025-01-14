@@ -22,20 +22,15 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class GameScene : IScene
     {
+        IGame gameInstance = Tankontroller.Instance();
         private List<IController> mControllers;
         private IController mController0;
         private IController mController1;
         private IController mController2;
         private IController mController3;
         private TheWorld m_World;
-        private Texture2D m_TankBaseTexture;
-        private Texture2D m_TankBrokenTexture;
-        private Texture2D m_TankRightTrackTexture;
-        private Texture2D m_TankLeftTrackTexture;
         private Texture2D mPlayAreaTexture;
         private Texture2D m_CircleTexture;
-        private Texture2D m_CannonTexture;
-        private Texture2D m_CannonFireTexture;
         private Texture2D m_BulletTexture;
         private Texture2D m_ErrorBGTexture;
         private SpriteBatch m_SpriteBatch;
@@ -69,12 +64,14 @@ namespace Tankontroller.Scenes
         {
             //Loads all the relevant textures for the game scene
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            m_TankBaseTexture = game.CM().Load<Texture2D>("Tank-B-05");
-            m_TankBrokenTexture = game.CM().Load<Texture2D>("BrokenTank");
-            m_TankRightTrackTexture = game.CM().Load<Texture2D>("Tank track B-R");
-            m_TankLeftTrackTexture = game.CM().Load<Texture2D>("Tank track B-L");
-            m_CannonTexture = game.CM().Load<Texture2D>("cannon");
-            m_CannonFireTexture = game.CM().Load<Texture2D>("cannonFire");
+
+            Tank.SetupStaticTextures(
+                game.CM().Load<Texture2D>("Tank-B-05"),
+                game.CM().Load<Texture2D>("BrokenTank"),
+                game.CM().Load<Texture2D>("Tank track B-R"),
+                game.CM().Load<Texture2D>("Tank track B-L"),
+                game.CM().Load<Texture2D>("cannon"),
+                game.CM().Load<Texture2D>("cannonFire"));
             m_BulletTexture = game.CM().Load<Texture2D>("circle");
             mPlayAreaTexture = game.CM().Load<Texture2D>("playArea");
             mPixelTexture = game.CM().Load<Texture2D>("block");
@@ -334,70 +331,34 @@ namespace Tankontroller.Scenes
 
             TrackSystem.GetInstance().Draw(m_SpriteBatch);
 
-            //Draws the background of the bullets
-            int bulletRadius = 10;
-            int radius = bulletRadius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS");
-            Rectangle bulletRect = new Rectangle(0, 0, radius, radius);
+            //Draw the background of the bullets
             foreach (Player p in m_Teams)
             {
                 List<Bullet> bullets = p.Tank.GetBulletList();
                 foreach (Bullet b in bullets)
                 {
-                    bulletRect.X = (int)b.Position.X - radius / 2;
-                    bulletRect.Y = (int)b.Position.Y - radius / 2;
-                    m_SpriteBatch.Draw(m_BulletTexture, bulletRect, Color.Black);
+                    b.DrawBackground(m_SpriteBatch, m_BulletTexture);
                 }
             }
 
             World.Particles.ParticleManager.Instance().Draw(m_SpriteBatch);
 
-            //Draws the foreground of the bullets
-            bulletRect.Width = bulletRadius;
-            bulletRect.Height = bulletRadius;
+            //Draw the foreground of the bullets
             foreach (Player p in m_Teams)
             {
                 List<Bullet> bullets = p.Tank.GetBulletList();
                 foreach (Bullet b in bullets)
                 {
-                    bulletRect.X = (int)b.Position.X - bulletRadius / 2;
-                    bulletRect.Y = (int)b.Position.Y - bulletRadius / 2;
-                    m_SpriteBatch.Draw(m_BulletTexture, bulletRect, b.Colour);
+                    b.DrawForeground(m_SpriteBatch, m_BulletTexture);
                 }
             }
 
             //Draws the tanks
-            Rectangle trackRect = new Rectangle(0, 0, m_TankLeftTrackTexture.Width, m_TankLeftTrackTexture.Height / 15);
-
             float tankScale = (float)mPlayAreaRectangle.Width / (50 * 40);
-
-            for (int i = 0; true; i++)
+            for (int i = 0; i < m_Teams.Count(); i++)
             {
                 Tank t = m_World.GetTank(i);
-                if (t == null)
-                {
-                    break;
-                }
-                if (t.Health() > 0)
-                {
-                    trackRect.Y = t.LeftTrackFrame() * m_TankLeftTrackTexture.Height / 15;
-                    m_SpriteBatch.Draw(m_TankLeftTrackTexture, t.GetWorldPosition(), trackRect, t.Colour(), t.GetRotation(), new Vector2(m_TankBaseTexture.Width / 2, m_TankBaseTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    trackRect.Y = t.RightTrackFrame() * m_TankLeftTrackTexture.Height / 15;
-                    m_SpriteBatch.Draw(m_TankRightTrackTexture, t.GetWorldPosition(), trackRect, t.Colour(), t.GetRotation(), new Vector2(m_TankBaseTexture.Width / 2, m_TankBaseTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    m_SpriteBatch.Draw(m_TankBaseTexture, t.GetWorldPosition(), null, t.Colour(), t.GetRotation(), new Vector2(m_TankBaseTexture.Width / 2, m_TankBaseTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    if (t.Fired() == 0)
-                    {
-                        m_SpriteBatch.Draw(m_CannonTexture, t.GetCannonWorldPosition(), null, t.Colour(), t.GetCannonWorldRotation(), new Vector2(m_CannonTexture.Width / 2, m_CannonTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    }
-                    else
-                    {
-                        m_SpriteBatch.Draw(m_CannonFireTexture, t.GetCannonWorldPosition(), null, t.Colour(), t.GetCannonWorldRotation(), new Vector2(m_CannonTexture.Width / 2, m_CannonTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                    }
-                }
-                //If a tank has no health, its drawn as a destroyed tank
-                else
-                {
-                    m_SpriteBatch.Draw(m_TankBrokenTexture, t.GetWorldPosition(), null, t.Colour(), t.GetRotation(), new Vector2(m_TankBrokenTexture.Width / 2, m_TankBrokenTexture.Height / 2), tankScale, SpriteEffects.None, 0.0f);
-                }
+                t?.Draw(m_SpriteBatch, tankScale);
             }
 
             //Draws the walls
@@ -411,7 +372,7 @@ namespace Tankontroller.Scenes
                 w.Draw(m_SpriteBatch);
             }
 
-            if(!mControllersConnected)
+            if (!mControllersConnected)
             {
                 string message = "A controller has been disconnected.\r\nPlease reconnect it to continue.\r\nSearching for controller...";
                 Vector2 centre = new Vector2(mPlayAreaRectangle.X + mPlayAreaRectangle.Width / 2, mPlayAreaRectangle.Y + mPlayAreaRectangle.Height / 2);
@@ -423,22 +384,13 @@ namespace Tankontroller.Scenes
             m_SpriteBatch.End();
         }
 
-        //If the escape key is pressed, the scene transitions to the main menu
-        public void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
-
         public void Update(float pSeconds)
         {
             Escape();
+            IntroFinished();
 
             if (mControllersConnected) // Game should pause in the event of controller disconnect
             {
-                IntroFinished();
                 //Updates each controller to check for inputs
                 foreach (Player p in m_Teams)
                 {
@@ -494,8 +446,8 @@ namespace Tankontroller.Scenes
             }
             else // At least one controller is disconnected
             {
-                IGame game = Tankontroller.Instance();
-                game.DetectControllers();
+                
+                gameInstance.DetectControllers();
 
                 mControllersConnected = true;
                 foreach (Player p in m_Teams)
@@ -503,7 +455,7 @@ namespace Tankontroller.Scenes
                     if (!p.Controller.IsConnected())
                     {
                         // Check to see if there is a connected controller not yet associated to a player
-                        foreach (IController controller in game.GetControllers())
+                        foreach (IController controller in gameInstance.GetControllers())
                         {
                             if (!m_Teams.Any(player => player.Controller == controller))
                             {
@@ -518,6 +470,13 @@ namespace Tankontroller.Scenes
                     }
                     mControllersConnected = mControllersConnected && p.Controller.IsConnected();
                 }
+            }
+        }
+        public void Escape()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Tankontroller.Instance().SM().Transition(null);
             }
         }
 
