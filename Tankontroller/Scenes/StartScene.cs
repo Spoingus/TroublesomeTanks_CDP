@@ -35,9 +35,6 @@ namespace Tankontroller.Scenes
 
             mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
             
-
-            game.GDM().IsFullScreen = true;
-            game.GDM().ApplyChanges();
             int screenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             int screenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
