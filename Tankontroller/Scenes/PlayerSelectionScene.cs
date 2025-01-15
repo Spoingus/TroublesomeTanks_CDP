@@ -33,6 +33,8 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class PlayerSelectionScene : IScene
     {
+        IGame gameInstance = Tankontroller.Instance();
+        Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
         Texture2D mBackgroundTexture = null;
         Rectangle mBackgroundRectangle;
         Texture2D[] mCountDownTextures = new Texture2D[6];
@@ -44,16 +46,16 @@ namespace Tankontroller.Scenes
 
         public PlayerSelectionScene()
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
+            
 
-            mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
+            mSpriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
+            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
 
-            mBackgroundTexture = game.CM().Load<Texture2D>("background_06");
+            mBackgroundTexture = tankControllerInstance.CM().Load<Texture2D>("background_06");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
-            game.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
             prepareAvatarPickers();
             mPlayersWereReady = false;
             prepareCountDown();
@@ -62,15 +64,14 @@ namespace Tankontroller.Scenes
         }
         private void prepareCountDown()
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
-            mCountDownTextures[0] = game.CM().Load<Texture2D>("countdown/five");
-            mCountDownTextures[1] = game.CM().Load<Texture2D>("countdown/four");
-            mCountDownTextures[2] = game.CM().Load<Texture2D>("countdown/three");
-            mCountDownTextures[3] = game.CM().Load<Texture2D>("countdown/two");
-            mCountDownTextures[4] = game.CM().Load<Texture2D>("countdown/one");
-            mCountDownTextures[5] = game.CM().Load<Texture2D>("countdown/ready");
+            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
+            mCountDownTextures[0] = tankControllerInstance.CM().Load<Texture2D>("countdown/five");
+            mCountDownTextures[1] = tankControllerInstance.CM().Load<Texture2D>("countdown/four");
+            mCountDownTextures[2] = tankControllerInstance.CM().Load<Texture2D>("countdown/three");
+            mCountDownTextures[3] = tankControllerInstance.CM().Load<Texture2D>("countdown/two");
+            mCountDownTextures[4] = tankControllerInstance.CM().Load<Texture2D>("countdown/one");
+            mCountDownTextures[5] = tankControllerInstance.CM().Load<Texture2D>("countdown/ready");
 
             for (int i = 0; i < mCountDownTextures.Length; i++)
             {
@@ -85,10 +86,8 @@ namespace Tankontroller.Scenes
         }
         private void prepareAvatarPickers() // this is quite slow, I assume because it is loading all the textures;
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
-
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
+            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
             int halfWidth = screenWidth / 2;
             int halfHeight = screenHeight / 2;
             mAvatarPickers = new List<AvatarPicker>();
@@ -110,11 +109,11 @@ namespace Tankontroller.Scenes
 
 
 
-        private void ExitGame()
-        {
-            IGame game = Tankontroller.Instance();
-            game.SM().Transition(null);
-        }
+        //private void ExitGame()
+        //{
+        //    IGame game = Tankontroller.Instance();
+        //    game.SM().Transition(null);
+        //}
 
         private List<Player> getReadyPlayers()
         {
@@ -131,8 +130,7 @@ namespace Tankontroller.Scenes
 
         private void StartGame()
         {
-            IGame game = Tankontroller.Instance();
-            game.SM().Transition(new GameScene(getReadyPlayers()), true);
+            gameInstance.SM().Transition(new GameScene(getReadyPlayers()), true);
         }
 
         private Player makeNewPlayer(IController pController)
@@ -170,17 +168,17 @@ namespace Tankontroller.Scenes
         }
 
 
-        private AvatarPicker getPlayerAvatarPicker(Player pPlayer)
-        {
-            foreach (AvatarPicker avatarPicker in mAvatarPickers)
-            {
-                if (avatarPicker.GetPlayer() == pPlayer)
-                {
-                    return avatarPicker;
-                }
-            }
-            return null;
-        }
+        //private AvatarPicker getPlayerAvatarPicker(Player pPlayer)
+        //{
+        //    foreach (AvatarPicker avatarPicker in mAvatarPickers)
+        //    {
+        //        if (avatarPicker.GetPlayer() == pPlayer)
+        //        {
+        //            return avatarPicker;
+        //        }
+        //    }
+        //    return null;
+        //}
 
         private bool playersReady()
         {
@@ -215,13 +213,12 @@ namespace Tankontroller.Scenes
         public void Update(float pSeconds)
         {
             Escape();
-            IGame game = Tankontroller.Instance();
-            game.DetectControllers();
+            gameInstance.DetectControllers();
 
             updateAvatarPickers(pSeconds);
-            for (int i = 0; i < game.GetControllerCount(); i++)
+            for (int i = 0; i < gameInstance.GetControllerCount(); i++)
             {
-                IController controller = game.GetController(i);
+                IController controller = gameInstance.GetController(i);
                 AvatarPicker avatarPicker = getControllerAvatarPicker(controller);
 
                 if (!controller.IsConnected() && avatarPicker != null)
