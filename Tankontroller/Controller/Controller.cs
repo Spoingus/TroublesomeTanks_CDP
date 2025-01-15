@@ -16,7 +16,6 @@ namespace Tankontroller.Controller
     //---------------------------------------------------------------------------------------------------
     public interface IController
     {
-
         bool IsPressedWithCharge(Control pControl);
         bool DepleteCharge(Control pControl, float amount);
         void AddCharge(Control pControl, float amount);
@@ -24,6 +23,7 @@ namespace Tankontroller.Controller
         Control GetJackControl(int pJackIndex);
         void TransferJackCharge(IController pController);
         bool IsPressed(Control pControl);
+        bool WasPressed(Control pControl);
         void ResetJacks();
         void TurnOffLights();
         void TurnOnLights();
@@ -53,24 +53,28 @@ namespace Tankontroller.Controller
     //---------------------------------------------------------------------------------------------------
     public abstract class Controller : IController
     {
-        protected class LEDArray
-        {
-            public int[] LED_IDS = new int[4];
-            public LEDArray()
-            {
-
-            }
-        }
         protected class Jack
         {
+            private bool mWasDown;
+            private bool mIsDown;
+
             public Control Control;
-            public bool IsDown;
             public int[] LED_IDS = new int[4];
             public float charge;
-
+            public bool WasDown { get { return mWasDown; } }
+            public bool IsDown
+            {
+                get { return mIsDown; }
+                set
+                {
+                    mWasDown = mIsDown;
+                    mIsDown = value;
+                }
+            }
 
             public Jack()
             {
+                mIsDown = mWasDown = false;
                 ResetCharge();
             }
             public void ResetCharge()
@@ -80,14 +84,14 @@ namespace Tankontroller.Controller
         };
         protected Color mColour;
         protected Jack[] mJacks;
-        protected LEDArray mLeds;
+        protected int[] mLedArray;
         protected bool mLightsOn;
         protected bool mConnected;
 
         protected Controller()
         {
             mJacks = new Jack[7] { new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack() };
-            mLeds = new LEDArray();
+            mLedArray = new int[4];
             mLightsOn = true;
             mConnected = true;
         }
@@ -140,7 +144,6 @@ namespace Tankontroller.Controller
 
         public bool DepleteCharge(Control pControl, float amount)
         {
-            //return; //TESTING ONLY
             for (int i = 0; i < 7; ++i)
             {
                 if (mJacks[i].Control == pControl)
@@ -190,6 +193,18 @@ namespace Tankontroller.Controller
                 if (mJacks[i].Control == pControl)
                 {
                     return mJacks[i].IsDown;
+                }
+            }
+            return false;
+        }
+
+        public bool WasPressed(Control pControl)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                if (mJacks[i].Control == pControl)
+                {
+                    return mJacks[i].WasDown;
                 }
             }
             return false;
@@ -289,7 +304,7 @@ namespace Tankontroller.Controller
             mJacks[1].LED_IDS = new int[8] { 32, 33, 34, 35, 36, 37, 38, 39 };
             mJacks[0].LED_IDS = new int[8] { 40, 41, 42, 43, 44, 45, 46, 47 };
             mJacks[6].LED_IDS = new int[8] { 48, 49, 50, 51, 52, 53, 54, 55 };
-            mLeds.LED_IDS = new int[5] { 56, 57, 58, 59, 60 };
+            mLedArray = new int[5] { 56, 57, 58, 59, 60 };
             mHacktroller = pHackTroller;
 
             PullDataThread();
@@ -338,7 +353,7 @@ namespace Tankontroller.Controller
                         }
                         remainingCharge--;
                     }
-                    foreach (int i in mLeds.LED_IDS)
+                    foreach (int i in mLedArray)
                     {
                         result[i].R = 30;
                         result[i].G = 30;
