@@ -55,26 +55,25 @@ namespace Tankontroller.Controller
     {
         protected class Jack
         {
-            private bool mWasDown;
             private bool mIsDown;
 
             public Control Control;
             public int[] LED_IDS = new int[4];
             public float charge;
-            public bool WasDown { get { return mWasDown; } }
+            public bool WasDown { get; private set; }
             public bool IsDown
             {
                 get { return mIsDown; }
                 set
                 {
-                    mWasDown = mIsDown;
+                    WasDown = mIsDown;
                     mIsDown = value;
                 }
             }
 
             public Jack()
             {
-                mIsDown = mWasDown = false;
+                mIsDown = WasDown = false;
                 ResetCharge();
             }
             public void ResetCharge()
@@ -235,8 +234,8 @@ namespace Tankontroller.Controller
             m_KeyMap = pKeyMap;
             m_PortMap = pPortMap;
 
-            mJacks[0].Control = Control.LEFT_TRACK_FORWARDS;
-            mJacks[1].Control = Control.LEFT_TRACK_BACKWARDS;
+            mJacks[0].Control = Control.RECHARGE;
+            mJacks[1].Control = Control.LEFT_TRACK_FORWARDS;
             mJacks[2].Control = Control.RIGHT_TRACK_FORWARDS;
             mJacks[3].Control = Control.RIGHT_TRACK_BACKWARDS;
             mJacks[4].Control = Control.FIRE;
