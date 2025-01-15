@@ -47,8 +47,6 @@ namespace Tankontroller.GUI
         private Rectangle mRotateRightButton;
         private Rectangle mBackTextRectangle;
 
-        public Rectangle Rect { get { return mBoundsRectangle; } }
-
         public AvatarPicker(Rectangle pRectangle)
         {
             mBoundsRectangle = pRectangle;
