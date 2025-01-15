@@ -323,7 +323,7 @@ namespace Tankontroller.GUI
                 mAvatarSet = false;
                 mSelectionIndex = 0;
                 mSelectionRectangles = GetSelectionRectangles(mAvatars.Count);
-                SetUpAvatarSelection();
+                UpdateCentreAvatar();
             }
             else
             {
