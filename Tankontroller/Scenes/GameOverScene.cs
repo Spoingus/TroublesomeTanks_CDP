@@ -6,8 +6,6 @@ using System.Collections.Generic;
 namespace Tankontroller.Scenes
 {
     //-------------------------------------------------------------------------------------------------
-    // GameOverScene
-    //
     // This class is used to display the game over screen after the gameScene ends. It repositions the
     // GUIs of each player. The winner in the centre and the losers below them.
     //-------------------------------------------------------------------------------------------------
