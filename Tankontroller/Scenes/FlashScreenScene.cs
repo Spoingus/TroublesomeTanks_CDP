@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Tankontroller.Scenes
 {
@@ -52,6 +53,15 @@ namespace Tankontroller.Scenes
             mSpriteBatch.Draw(mLogoTexture, mRectangle, Color.White);
 
             mSpriteBatch.End();
+        }
+        
+        public void Escape()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Tankontroller.Instance().SM().Transition(null);
+            }
+
         }
     }
 }

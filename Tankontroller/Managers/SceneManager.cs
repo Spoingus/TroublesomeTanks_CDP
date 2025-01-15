@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Tankontroller.Scenes;
 
-namespace Tankontroller.Scenes
+namespace Tankontroller.Managers
 {
     //-------------------------------------------------------------------------------------------------
     // SceneManager
@@ -16,11 +17,15 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class SceneManager
     {
-        private List<IScene> mScenes;
+        private List<IScene> mScenes = new List<IScene>();
+        static SceneManager mInstance = new SceneManager();
 
-        public SceneManager()
+        static SceneManager() { }
+        private SceneManager() { }
+
+        public static SceneManager Instance
         {
-            mScenes = new List<IScene>();
+            get { return mInstance; }
         }
 
         public void Push(IScene p_Scene)
@@ -48,9 +53,9 @@ namespace Tankontroller.Scenes
             else
             {
                 // we should exit the game here...
-                  Tankontroller game = (Tankontroller)Tankontroller.Instance();
+                Tankontroller game = (Tankontroller)Tankontroller.Instance();
                 game.TurnOffControllers();
-                  game.Exit();
+                game.Exit();
             }
         }
 
