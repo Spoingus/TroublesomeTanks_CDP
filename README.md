@@ -6,7 +6,7 @@ classDiagram
         +makeSound(): void
     }
 
-    class Dog {
+    class Cow {
         +breed: string
         +bark(): void
     }
