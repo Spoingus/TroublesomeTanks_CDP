@@ -14,38 +14,44 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     public class AvatarPicker
     {
+        private List<Avatar> mAvatars;
+        private List<Avatar> mColours;
+        private List<Rectangle> mSelectionRectangles;
+
+        private IController mController;
+        private Avatar mCentreAvatar;
+        private int mSelectionIndex;
+        private bool mAvatarSet;
+        private bool mColourSet;
+
+        private float mSelectionCoolDown;
+        private float mJoinButtonFlashTimer;
+        private bool mShowJoinButton;
+
         private Rectangle mBoundsRectangle;
-        List<Avatar> mAvatars;
-        List<Avatar> mColours;
-        List<Rectangle> mSelectionRectangles;
-        Texture2D mWhitePixel;
-        Texture2D mCircle;
-        Texture2D mJoinButtonTexture;
-        Texture2D mBackButtonTexture;
-        Texture2D mRotateLeftTexture;
-        Texture2D mRotateRightTexture;
-        Texture2D mBackTextTexture;
-        Rectangle mAButtonRectangle;
-        Rectangle mBackButtonRectangle;
-        Rectangle mRotateLeftButton;
-        Rectangle mRotateRightButton;
-        Rectangle mBackTextRectangle;
-        Vector2 mCentre;
-        float mRadius;
-        float mAvatarRadius;
-        Player mPlayer;
-        Rectangle mAvatarRectangle;
-        float mCountDown;
-        float mAButtonCountDown;
-        bool mShowJoinButton;
+        private Vector2 mCentre;
+        private float mRadius;
+        private float mAvatarRadius;
+
+        // Textures and Bounds
+        private Texture2D mWhitePixel;
+        private Texture2D mCircle;
+        private Texture2D mJoinButtonTexture;
+        private Texture2D mBackButtonTexture;
+        private Texture2D mRotateLeftTexture;
+        private Texture2D mRotateRightTexture;
+        private Texture2D mBackTextTexture;
+        private Rectangle mAButtonRectangle;
+        private Rectangle mBackButtonRectangle;
+        private Rectangle mRotateLeftButton;
+        private Rectangle mRotateRightButton;
+        private Rectangle mBackTextRectangle;
 
         public Rectangle Rect { get { return mBoundsRectangle; } }
 
         public AvatarPicker(Rectangle pRectangle)
         {
             mBoundsRectangle = pRectangle;
-            mPlayer = null;
-            mShowJoinButton = true;
 
             // Load Textures
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
@@ -62,29 +68,61 @@ namespace Tankontroller.GUI
             mCentre = new Vector2(mBoundsRectangle.X + mBoundsRectangle.Width / 2, mBoundsRectangle.Y + mBoundsRectangle.Height / 2);
             mAvatarRadius = 70;
             mRadius = mBoundsRectangle.Height / 2 - mAvatarRadius;
-            PrepareCentreAvatar();
+
             SetUpAvatarSelection();
             PrepareColourSelection("engineer");
-            mSelectionRectangles = GetSelectionRectangles(mAvatars.Count);
+            Reset();
         }
 
-        public void AddPlayer(Player pPlayer)
+        public void SetController(IController pController)
         {
-            mPlayer = pPlayer;
-            mPlayer.SelectionIndex = 0;
-            string name = mAvatars[mPlayer.SelectionIndex].GetName();
-            Avatar avatar = new Avatar(mWhitePixel, name, mAvatarRectangle, Color.White);
-            mPlayer.AddAvatar(avatar);
+            if (mController == null)
+            {
+                mController = pController;
+                mSelectionIndex = 0;
+                UpdateCentreAvatar();
+            }
         }
+        public IController GetController() { return mController; }
+        public void RemoveController() { mController = null; }
 
-        public bool Ready() { return HasPlayer() && mPlayer.AvatarSet && mPlayer.ColourSet; }
-        public bool HasPlayer() { return mPlayer != null; }
-        public Player GetPlayer() { return mPlayer; }
-        public void RemovePlayer() { mPlayer = null; }
+        public Avatar GetAvatar() { return mCentreAvatar; }
+
+        public bool Ready() { return HasController() && mAvatarSet && mColourSet; }
+        public bool HasController() { return mController != null; }
+
 
         public void Reposition(Rectangle pRectangle)
         {
             mBoundsRectangle = pRectangle;
+        }
+
+        public void Reset()
+        {
+            mController = null;
+            mShowJoinButton = true;
+            mSelectionIndex = 0;
+            mAvatarSet = false;
+            mColourSet = false;
+            mJoinButtonFlashTimer = 0;
+            mSelectionCoolDown = 0;
+            mSelectionRectangles = GetSelectionRectangles(mAvatars.Count);
+            UpdateCentreAvatar();
+        }
+
+        private void UpdateCentreAvatar()
+        {
+            string name = mAvatarSet ? mCentreAvatar.GetName() : mAvatars[mSelectionIndex].GetName();
+
+            Rectangle avatarRect = new Rectangle();
+            float middleAvatarRadius = (HasController() && mColourSet) ? mBoundsRectangle.Height * 0.45f : 100;
+            avatarRect.X = (int)(mCentre.X - middleAvatarRadius);
+            avatarRect.Y = (int)(mCentre.Y - middleAvatarRadius);
+            avatarRect.Width = avatarRect.Height = (int)(middleAvatarRadius * 2);
+
+            Color color = mAvatarSet ? mColours[mSelectionIndex].GetColour() : Color.White;
+
+            mCentreAvatar = new Avatar(mWhitePixel, name, avatarRect, color);
         }
 
         private void PrepareButtons()
@@ -106,15 +144,7 @@ namespace Tankontroller.GUI
 
             mRotateRightButton = new Rectangle(mBoundsRectangle.X + ((mBoundsRectangle.Width / 10) * 7) - width + 20, mBoundsRectangle.Y + (mBoundsRectangle.Height / 8) - height, width, height);
         }
-        private void PrepareCentreAvatar()
-        {
-            float middleAvatarRadius = 100;
-            if (HasPlayer() && mPlayer.ColourSet)
-            {
-                middleAvatarRadius = mBoundsRectangle.Height * 0.45f;
-            }
-            mAvatarRectangle = new Rectangle((int)(mCentre.X - middleAvatarRadius), (int)(mCentre.Y - middleAvatarRadius), (int)(middleAvatarRadius * 2), (int)(middleAvatarRadius * 2));
-        }
+
 
         private List<Rectangle> GetSelectionRectangles(int pSelectionCount)
         {
@@ -204,9 +234,8 @@ namespace Tankontroller.GUI
         }
         public void DrawSelection(SpriteBatch pSpriteBatch)
         {
-            pSpriteBatch.Draw(mCircle, mSelectionRectangles[mPlayer.SelectionIndex], Color.White);
+            pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.White);
         }
-
         public void DrawJoinButton(SpriteBatch pSpriteBatch)
         {
             if (mShowJoinButton)
@@ -217,21 +246,23 @@ namespace Tankontroller.GUI
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
-            if (HasPlayer())
+            if (HasController())
             {
-                mPlayer.Avatar.Draw(pSpriteBatch, true, 0);
-                if (!mPlayer.AvatarSet)
+                mCentreAvatar.Draw(pSpriteBatch, true, 0);
+                if (!mAvatarSet)
                 {
                     DrawSelection(pSpriteBatch);
                     DrawAvatars(pSpriteBatch);
+                    pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
+                    pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
                 }
-                else if (!mPlayer.ColourSet)
+                else if (!mColourSet)
                 {
                     DrawSelection(pSpriteBatch);
                     DrawColours(pSpriteBatch);
+                    pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
+                    pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
                 }
-                pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
-                pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
                 pSpriteBatch.Draw(mBackButtonTexture, mBackButtonRectangle, Color.White);
                 pSpriteBatch.Draw(mBackTextTexture, mBackTextRectangle, Color.White);
             }
@@ -241,171 +272,73 @@ namespace Tankontroller.GUI
             }
         }
 
-        public void Update(float pSeconds)
+        public void ChangeSelection(int pAmount)
         {
-            IGame game = Tankontroller.Instance();
-            mCountDown -= pSeconds;
-            if (HasPlayer())
+            if (HasController() && mSelectionCoolDown <= 0)
             {
-                mShowJoinButton = false;
-                IController controller = mPlayer.Controller;
-                controller.UpdateController();
-
-                if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE))
+                mSelectionIndex += pAmount;
+                if (mSelectionIndex < 0)
                 {
-                    // if this controller is not already a player
-                    // need to make a player here as this controller wants to play
-                    if (!mPlayer.AvatarSet)
-                    {
-                        // add an avatar to the player
-                        mPlayer.SetAvatar();
-                        mPlayer.SelectionIndex = 0;
-                        Color colour = mColours[mPlayer.SelectionIndex].GetColour();
-                        mPlayer.AddColour(colour);
-                        mPlayer.Avatar.SetColour(colour);
-                        string name = mPlayer.Avatar.GetName();
-                        PrepareColourSelection(name);
-                        mSelectionRectangles = GetSelectionRectangles(mColours.Count);
-                    }
-                    else if (!mPlayer.ColourSet)
-                    {
-                        // add a colour to the player
-                        mPlayer.SetColour();
-                        mPlayer.Controller.SetColour(mPlayer.Colour);
-                        mPlayer.SelectionIndex = 0;
-                        PrepareCentreAvatar();
-                        mPlayer.Avatar.Reposition(mAvatarRectangle);
-                    }
+                    mSelectionIndex = mSelectionRectangles.Count + mSelectionIndex;
                 }
-                if (controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
+                if (mSelectionIndex >= mAvatars.Count)
                 {
-                    // if this controller is already a player
-                    // need to remove this player
-                    if (mPlayer != null)
-                    {
-                        mPlayer.SelectionIndex = 0;
-                        if (mPlayer.ColourSet)
-                        {
-                            mPlayer.RemoveColour();
-                            Color colour = mColours[mPlayer.SelectionIndex].GetColour();
-                            mPlayer.AddColour(colour);
-                            mPlayer.Avatar.SetColour(colour);
-                            PrepareCentreAvatar();
-                            mPlayer.Avatar.Reposition(mAvatarRectangle);
-                        }
-                        else if (mPlayer.AvatarSet)
-                        {
-                            mPlayer.RemoveAvatar();
-                            Avatar avatar = mAvatars[mPlayer.SelectionIndex];
-                            string name = avatar.GetName();
-
-                            avatar = new Avatar(mWhitePixel, name, mAvatarRectangle, Color.White);
-                            mPlayer.AddAvatar(avatar);
-                            mSelectionRectangles = GetSelectionRectangles(mAvatars.Count);
-                        }
-                        else
-                        {
-                            mPlayer = null;
-                            return;
-                        }
-                    }
+                    mSelectionIndex = mSelectionIndex % mSelectionRectangles.Count;
                 }
-                if (controller.IsPressed(Control.TURRET_RIGHT))
+                UpdateCentreAvatar();
+                mSelectionCoolDown = 0.2f;
+            }
+        }
+
+
+        public void MakeSelection()
+        {
+            if (HasController())
+            {
+                if (!mAvatarSet)
                 {
-                    // if controller is already a player
-                    // cycle through the options
-                    if (mPlayer != null)
-                    {
-                        if (mCountDown <= 0)
-                        {
-                            mCountDown = 0.2f;
-                            mPlayer.SelectionIndex--;
-                            if (mPlayer.SelectionIndex < 0)
-                            {
-                                if (!mPlayer.AvatarSet)
-                                {
-                                    mPlayer.SelectionIndex = mAvatars.Count - 1;
-                                }
-                                else if (!mPlayer.ColourSet)
-                                {
-                                    mPlayer.SelectionIndex = mColours.Count - 1;
-                                }
-                            }
-                            if (!mPlayer.AvatarSet)
-                            {
-                                Avatar avatar = mAvatars[mPlayer.SelectionIndex];
-                                string name = avatar.GetName();
-
-                                avatar = new Avatar(mWhitePixel, name, mAvatarRectangle, Color.White);
-                                mPlayer.AddAvatar(avatar);
-                            }
-                            else if (!mPlayer.ColourSet)
-                            {
-                                Color colour = mColours[mPlayer.SelectionIndex].GetColour();
-                                mPlayer.AddColour(colour);
-                                mPlayer.Avatar.SetColour(colour);
-                            }
-                        }
-                    }
+                    mAvatarSet = true;
+                    mSelectionIndex = 0;
+                    PrepareColourSelection(mCentreAvatar.GetName());
+                    mSelectionRectangles = GetSelectionRectangles(mColours.Count);
+                    UpdateCentreAvatar();
                 }
-                else if (controller.IsPressed(Control.TURRET_LEFT))
+                else if (!mColourSet)
                 {
-                    // if controller is already a player
-                    // cycle through the options
-                    if (mPlayer != null)
-                    {
-                        if (mCountDown <= 0)
-                        {
-                            mCountDown = 0.2f;
-                            mPlayer.SelectionIndex++;
-
-                            if (!mPlayer.AvatarSet)
-                            {
-                                if (mPlayer.SelectionIndex >= mAvatars.Count)
-                                {
-                                    mPlayer.SelectionIndex = 0;
-                                }
-                            }
-                            else if (!mPlayer.ColourSet)
-                            {
-                                if (mPlayer.SelectionIndex >= mColours.Count)
-                                {
-                                    mPlayer.SelectionIndex = 0;
-                                }
-                            }
-                        }
-                        if (!mPlayer.AvatarSet)
-                        {
-                            Avatar avatar = mAvatars[mPlayer.SelectionIndex];
-                            string name = avatar.GetName();
-
-                            avatar = new Avatar(mWhitePixel, name, mAvatarRectangle, Color.White);
-                            mPlayer.AddAvatar(avatar);
-                        }
-                        else if (!mPlayer.ColourSet)
-                        {
-                            Color colour = mColours[mPlayer.SelectionIndex].GetColour();
-                            mPlayer.AddColour(colour);
-                            mPlayer.Avatar.SetColour(colour);
-                        }
-                    }
+                    mColourSet = true;
+                    UpdateCentreAvatar();
                 }
+            }
+        }
+
+        public void UndoSelection()
+        {
+            if (mColourSet)
+            {
+                mColourSet = false;
+                UpdateCentreAvatar();
+            }
+            else if (mAvatarSet)
+            {
+                mAvatarSet = false;
+                mSelectionIndex = 0;
+                mSelectionRectangles = GetSelectionRectangles(mAvatars.Count);
+                SetUpAvatarSelection();
             }
             else
             {
-                mAButtonCountDown -= pSeconds;
-                if (mAButtonCountDown <= 0)
-                {
-                    if (mShowJoinButton)
-                    {
-                        mAButtonCountDown = 0.25f;
-                    }
-                    else
-                    {
-                        mAButtonCountDown = 1f;
-                    }
-                    mShowJoinButton = !mShowJoinButton;
-                }
+                mController = null;
+            }
+        }
+
+        public void Update(float pSeconds)
+        {
+            mJoinButtonFlashTimer -= pSeconds;
+            mSelectionCoolDown -= pSeconds;
+            if (mJoinButtonFlashTimer <= 0)
+            {
+                mJoinButtonFlashTimer = mShowJoinButton ? 0.25f : 1.0f;
+                mShowJoinButton = !mShowJoinButton;
             }
         }
     }

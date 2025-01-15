@@ -14,22 +14,6 @@ namespace Tankontroller.Scenes
     // This class is used to display the player selection screen.
     // The player selection screen displays the avatars of the players, and allows the players to
     // select their avatars and colours.
-    //
-    // The class contains a background texture, a sprite batch, a rectangle to draw the background, the list of
-    // avatar pickers, the countdown textures, the countdown rectangles, the countdown, and a boolean to
-    // check if the players were ready.
-    //
-    // The class provides methods to:
-    //  - exit the game
-    //  - get the ready players
-    //  - start the game
-    //  - make a new player
-    //  - get an empty avatar picker
-    //  - get the controller avatar picker
-    //  - get the player avatar picker
-    //  - check if the players are ready
-    //  - update the avatar pickers
-    //  - draw the avatar pickers and countdown.
     //-------------------------------------------------------------------------------------------------
     public class PlayerSelectionScene : IScene
     {
@@ -57,9 +41,8 @@ namespace Tankontroller.Scenes
             prepareAvatarPickers();
             mPlayersWereReady = false;
             prepareCountDown();
-
-
         }
+
         private void prepareCountDown()
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
@@ -108,22 +91,14 @@ namespace Tankontroller.Scenes
             mAvatarPickers.Add(new AvatarPicker(rectangle));
         }
 
-
-
-        private void ExitGame()
-        {
-            IGame game = Tankontroller.Instance();
-            game.SM().Transition(null);
-        }
-
         private List<Player> getReadyPlayers()
         {
             List<Player> players = new List<Player>();
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
             {
-                if (avatarPicker.HasPlayer())
+                if (avatarPicker.HasController())
                 {
-                    players.Add(avatarPicker.GetPlayer());
+                    players.Add(new Player(avatarPicker.GetController(), avatarPicker.GetAvatar()));
                 }
             }
             return players;
@@ -135,32 +110,32 @@ namespace Tankontroller.Scenes
             game.SM().Transition(new GameScene(getReadyPlayers()), true);
         }
 
-        private Player makeNewPlayer(IController pController)
+        public void Escape()
         {
-            Player player = new Player(pController);
-            AvatarPicker avatarPicker = getEmptyAvatarPicker();
-            avatarPicker.AddPlayer(player);
-            return player;
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Tankontroller.Instance().SM().Transition(null);
+            }
         }
 
         private AvatarPicker getEmptyAvatarPicker()
         {
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
             {
-                if (!avatarPicker.HasPlayer())
+                if (!avatarPicker.HasController())
                 {
                     return avatarPicker;
                 }
             }
             return null;
         }
-        private AvatarPicker getControllerAvatarPicker(IController pController)
+        private AvatarPicker getAvatarPickerFromController(IController pController)
         {
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
             {
-                if (avatarPicker.HasPlayer())
+                if (avatarPicker.HasController())
                 {
-                    if (avatarPicker.GetPlayer().Controller == pController)
+                    if (avatarPicker.GetController() == pController)
                     {
                         return avatarPicker;
                     }
@@ -169,42 +144,25 @@ namespace Tankontroller.Scenes
             return null;
         }
 
-
-        private AvatarPicker getPlayerAvatarPicker(Player pPlayer)
-        {
-            foreach (AvatarPicker avatarPicker in mAvatarPickers)
-            {
-                if (avatarPicker.GetPlayer() == pPlayer)
-                {
-                    return avatarPicker;
-                }
-            }
-            return null;
-        }
-
-        private bool playersReady()
+        private bool PlayersReady()
         {
             int countAvatarPickerWithPlayers = 0;
             int countReadyPlayers = 0;
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
             {
-                if (avatarPicker.HasPlayer())
+                if (avatarPicker.HasController())
                 {
                     countAvatarPickerWithPlayers++;
-                    if (avatarPicker.GetPlayer().ColourSet)
+                    if (avatarPicker.Ready())
                     {
                         countReadyPlayers++;
                     }
                 }
             }
-            if (countReadyPlayers > 1 && countReadyPlayers == countAvatarPickerWithPlayers)
-            {
-                return true;
-            }
-            return false;
+            return (countReadyPlayers > 1 && countReadyPlayers == countAvatarPickerWithPlayers);
         }
 
-        private void updateAvatarPickers(float pSeconds)
+        private void UpdateAvatarPickers(float pSeconds)
         {
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
             {
@@ -214,35 +172,56 @@ namespace Tankontroller.Scenes
 
         public void Update(float pSeconds)
         {
-            Escape();
             IGame game = Tankontroller.Instance();
             game.DetectControllers();
 
-            updateAvatarPickers(pSeconds);
+            Escape();
+            UpdateAvatarPickers(pSeconds);
+
             for (int i = 0; i < game.GetControllerCount(); i++)
             {
                 IController controller = game.GetController(i);
-                AvatarPicker avatarPicker = getControllerAvatarPicker(controller);
+                controller.UpdateController();
+                AvatarPicker avatarPicker = getAvatarPickerFromController(controller);
 
-                if (!controller.IsConnected() && avatarPicker != null)
+                if (avatarPicker != null)
                 {
-                    int index = mAvatarPickers.IndexOf(avatarPicker);
-                    mAvatarPickers[index] = new AvatarPicker(avatarPicker.Rect);
-                    return;
-                }
-                if (avatarPicker == null)
-                {
-                    controller.UpdateController();
-                }
-                if (controller.IsPressed(Control.FIRE))
-                {
-                    if (avatarPicker == null)
+                    if (!controller.IsConnected())
                     {
-                        makeNewPlayer(controller);
+                        avatarPicker.Reset();
+                        continue;
+                    }
+                    if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE))
+                    {
+                        avatarPicker.MakeSelection();
+
+                    }
+                    if (controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
+                    {
+                        avatarPicker.UndoSelection();
+                    }
+                    if (controller.IsPressed(Control.TURRET_RIGHT))
+                    {
+                        avatarPicker.ChangeSelection(1);
+
+                    }
+                    else if (controller.IsPressed(Control.TURRET_LEFT))
+                    {
+                        avatarPicker.ChangeSelection(-1);
+                    }
+                }
+                else
+                {
+                    if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE))
+                    {
+                        avatarPicker = getEmptyAvatarPicker();
+                        if (avatarPicker != null)
+                            avatarPicker.SetController(controller);
                     }
                 }
             }
-            if (playersReady())
+
+            if (PlayersReady())
             {
                 if (!mPlayersWereReady)
                 {
@@ -261,13 +240,7 @@ namespace Tankontroller.Scenes
                 mPlayersWereReady = false;
             }
         }
-        public void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
+
         private void DrawAvatarPickers(SpriteBatch pSpriteBatch)
         {
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
