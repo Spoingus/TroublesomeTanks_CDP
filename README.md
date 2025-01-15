@@ -16,7 +16,7 @@ classDiagram
         +meow(): void
     }
 
-    Animal <|-- Dog
+    Animal <|-- Cow
     Animal <|-- Cat
 
 ```
