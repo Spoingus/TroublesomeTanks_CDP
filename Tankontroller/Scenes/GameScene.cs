@@ -24,19 +24,11 @@ namespace Tankontroller.Scenes
     {
         IGame gameInstance = Tankontroller.Instance();
         Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
-        private List<IController> mControllers;
-        private IController mController0;
-        private IController mController1;
-        private IController mController2;
-        private IController mController3;
         private TheWorld m_World;
-        private Texture2D mPlayAreaTexture;
-        private Texture2D m_CircleTexture;
         private Texture2D m_BulletTexture;
         private Texture2D m_ErrorBGTexture;
         private SpriteBatch m_SpriteBatch;
         private SoundEffectInstance introMusicInstance = null;
-        private SoundEffectInstance loopMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
         private SpriteFont m_SpriteFont;
 
@@ -55,17 +47,10 @@ namespace Tankontroller.Scenes
         Rectangle mPlayAreaOutlineRectangle;
         public Rectangle PlayArea { get { return mPlayAreaRectangle; } }
 
-        // private Effect m_Shader;
-        // private RenderTarget2D m_ShaderRenderTarget; // might not need this
-        // private Texture2D m_ShaderTexture; // might not need this
-
         private bool mControllersConnected = true;
 
         public GameScene(List<Player> pPlayers)
         {
-            //Loads all the relevant textures for the game scene
-            
-
             Tank.SetupStaticTextures(
                 tankControllerInstance.CM().Load<Texture2D>("Tank-B-05"),
                 tankControllerInstance.CM().Load<Texture2D>("BrokenTank"),
@@ -74,7 +59,6 @@ namespace Tankontroller.Scenes
                 tankControllerInstance.CM().Load<Texture2D>("cannon"),
                 tankControllerInstance.CM().Load<Texture2D>("cannonFire"));
             m_BulletTexture = tankControllerInstance.CM().Load<Texture2D>("circle");
-            mPlayAreaTexture = tankControllerInstance.CM().Load<Texture2D>("playArea");
             mPixelTexture = tankControllerInstance.CM().Load<Texture2D>("block");
             m_ErrorBGTexture = tankControllerInstance.CM().Load<Texture2D>("background_err");
             TrackSystem.SetupStaticMembers(tankControllerInstance.CM().Load<Texture2D>("track"));
@@ -101,19 +85,10 @@ namespace Tankontroller.Scenes
             PowerBar.SetupStaticTextures(tankControllerInstance.CM().Load<Texture2D>("powerBar_border"),
                 tankControllerInstance.CM().Load<Texture2D>("powerBar_power"));
 
-            m_CircleTexture = tankControllerInstance.CM().Load<Texture2D>("circle");
             m_SpriteFont = tankControllerInstance.CM().Load<SpriteFont>("handwritingfont");
 
             m_SpriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
 
-            /*m_Shader = game.CM().Load<Effect>("shader");
-            m_ShaderRenderTarget = new RenderTarget2D(game.GDM().GraphicsDevice,
-                game.GDM().GraphicsDevice.PresentationParameters.BackBufferWidth,
-                game.GDM().GraphicsDevice.PresentationParameters.BackBufferHeight);
-            m_ShaderTexture = new Texture2D(game.GDM().GraphicsDevice,
-                game.GDM().GraphicsDevice.PresentationParameters.BackBufferWidth,
-                game.GDM().GraphicsDevice.PresentationParameters.BackBufferHeight, false, m_ShaderRenderTarget.Format);
-                */
             mBackgroundTexture = tankControllerInstance.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, tankControllerInstance.GDM().GraphicsDevice.Viewport.Width, tankControllerInstance.GDM().GraphicsDevice.Viewport.Height);
             mPlayAreaRectangle = new Rectangle(tankControllerInstance.GDM().GraphicsDevice.Viewport.Width * 2 / 100, tankControllerInstance.GDM().GraphicsDevice.Viewport.Height * 25 / 100, tankControllerInstance.GDM().GraphicsDevice.Viewport.Width * 96 / 100, tankControllerInstance.GDM().GraphicsDevice.Viewport.Height * 73 / 100);
@@ -130,10 +105,7 @@ namespace Tankontroller.Scenes
                 IController controller = Tankontroller.Instance().GetController(i);
                 controller.ResetJacks();
             }
-
-            //loopMusicInstance = game.GetSoundManager().GetLoopableSoundEffectInstance("Music/Music_loopable");  // Put the name of your song here instead of "song_title"
-            // game.ReplaceCurrentMusicInstance("Music/Music_loopable", true);
-            tankMoveSound = tankControllerInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks");  // Put the name of your song here instead of "song_title"
+            tankMoveSound = tankControllerInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks"); 
 
             if (numberOfPlayers < 4)
             {
@@ -271,7 +243,6 @@ namespace Tankontroller.Scenes
                         m_TankRotations.Add((float)Math.PI / 2);
                     }
                 }
-
             }
 
             m_World = new TheWorld(pPlayArea, Walls);
@@ -296,16 +267,6 @@ namespace Tankontroller.Scenes
             }
 
         }
-
-        private void IntroFinished()
-        {
-            //Playes a loopable music track once the intro music has finished
-            if (introMusicInstance.State == SoundState.Stopped)
-            {
-                tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_loopable", true);
-            }
-        }
-
 
         public void Draw(float pSeconds)
         {
@@ -385,7 +346,10 @@ namespace Tankontroller.Scenes
         public void Update(float pSeconds)
         {
             Escape();
-            IntroFinished();
+            if (introMusicInstance.State == SoundState.Stopped)
+            {
+                tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_loopable", true);
+            }
 
             if (mControllersConnected) // Game should pause in the event of controller disconnect
             {
@@ -444,7 +408,6 @@ namespace Tankontroller.Scenes
             }
             else // At least one controller is disconnected
             {
-                
                 gameInstance.DetectControllers();
 
                 mControllersConnected = true;
