@@ -51,6 +51,7 @@ classDiagram
         +Texture2D Texture
         +Texture2D TexturePressed
         +Color SelectedColour
+        +Press
     }
    
 ```
