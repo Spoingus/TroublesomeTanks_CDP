@@ -59,9 +59,9 @@ classDiagram
 
     TeamGUI *-- Avatar
     TeamGUI *-- HealthBar
-    TeamGUI *-- Player
-    TeamGUI *-- Tank
-    HealthBar *-- Tank
+    TeamGUI o-- Player
+    TeamGUI o-- Tank
+    HealthBar o-- Tank
     class TeamGUI{
         +Avatar m_Avatar
         +HealthBar m_HealthBar
@@ -83,11 +83,11 @@ classDiagram
         +PrepareRectangles()
         +Draw()
     }
-    Player *-- TeamGUI
+    Player o-- TeamGUI
     Player *-- Tank
     Player *-- Avatar
     Player *-- IController
-    Player *-- Bullet
+    Player o-- Bullet
     class Player{
         +TeamGUI GUI
         +Tank Tank
@@ -97,7 +97,7 @@ classDiagram
         List~Bullet~ Bullets
         +DoTankControls() bool
     }
-    Tank *-- Bullet
+    Tank o-- Bullet
     class Tank{
         List~Bullet~ m_Bullets
         -Texture2D TankTextures
