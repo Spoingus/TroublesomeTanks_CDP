@@ -1,3 +1,4 @@
+Scenes - Class Diagram
 ```mermaid
 classDiagram
     IScene <|-- FlashScreenScene
@@ -40,7 +41,7 @@ classDiagram
         +GenerateNextTexture() void
     }
 ```
-
+GUIs - Class Diagram
 ```mermaid
 classDiagram
     ButtonList <-- Button
