@@ -24,7 +24,8 @@ classDiagram
         +RepositionGUIs() void
     }
     class PlayerSelectionScene{
-
+        +PrepareAvatarPickers() void
+        +UpdateAvatarPickers() void
     }
     class StartScene{
         +ExitGame() void
