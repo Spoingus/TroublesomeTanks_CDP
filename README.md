@@ -8,7 +8,6 @@ classDiagram
     IScene <|-- TransitionScene
     <<Interface>> IScene
 
-    IScene : +float mSecondsLeft
     IScene : +Spritebatch mSpriteBatch
     IScene : +Draw(float pSeconds) void
     IScene : +Update(float pSeconds) void
@@ -17,5 +16,22 @@ classDiagram
     class FlashScreenScene{
         +Texture2D mLogotexture
         +Rectangle mRectangle
+    }
+    class GameScene{
+        
+    }
+    class GameOverScene{
+        +RepositionGUIs() void
+    }
+    class PlayerSelectionScene{
+
+    }
+    class StartScene{
+        +ExitGame() void
+        +StartGame() void
+    }
+    class TransitionScene{
+        +GeneratePreviousTexture() void
+        +GenerateNextTexture() void
     }
 ```
