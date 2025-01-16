@@ -61,7 +61,6 @@ classDiagram
     TeamGUI *-- HealthBar
     TeamGUI o-- Player
     TeamGUI o-- Tank
-    HealthBar o-- Tank
     class TeamGUI{
         +Avatar m_Avatar
         +HealthBar m_HealthBar
@@ -78,7 +77,6 @@ classDiagram
         +Draw()
     }
     class HealthBar{
-        +Tank m_Tank
         +Texture2D mHeartColour
         +PrepareRectangles()
         +Draw()
