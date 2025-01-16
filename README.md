@@ -11,10 +11,10 @@ classDiagram
     IScene : +Update(float pSeconds) void
     IScene : +Escape() void
 
-    Class FlashScreenScene{
-    +Texture2D mLogotexture
-    +Spritebatch mSpriteBatch
-    +Rectangle mRectangle
-    +float mSecondsLeft
+    class FlashScreenScene{
+        +Texture2D mLogotexture
+        +Spritebatch mSpriteBatch
+        +Rectangle mRectangle
+        +float mSecondsLeft
     }
 ```
