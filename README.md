@@ -56,5 +56,52 @@ classDiagram
         +Color SelectedColour
         +Press
     }
+
+    TeamGUI *-- Avatar
+    TeamGUI *-- HealthBar
+    TeamGUI *-- Player
+    TeamGUI *-- Tank
+    HealthBar *-- Tank
+    class TeamGUI{
+        +Avatar m_Avatar
+        +HealthBar m_HealthBar
+        +Player m_Player
+        +Tank m_Tank
+        +PrepareAvatar(Avatar)
+        +DrawHealthBar(SpriteBatch)
+        +DrawAvatar(SpriteBatch)
+    }
+    class Avatar{
+        -Color m_Colour
+        -string m_Name
+        -PrepareDrawrectangles()
+        +Draw()
+    }
+    class HealthBar{
+        +Tank m_Tank
+        +Texture2D mHeartColour
+        +PrepareRectangles()
+        +Draw()
+    }
+    class Player{
+
+    }
+    Tank *-- Bullet
+    class Tank{
+        List~Bullet~ m_Bullets
+        -Texture2D TankTextures
+        +Fire() void
+        +TankMovements() void
+        +TankTurrentMovements() vois
+        +Collide(Tank) void
+        +CollideWithPlayArea(Rectangle) void
+    }
+    class Bullet{
+        +Vector2 Position
+        +Vector2 Velocity
+        +Color Colour
+        +Collide(Rectangle, out Vector2)
+        +Collide(Tank, out Vector2)
+    }
    
 ```
