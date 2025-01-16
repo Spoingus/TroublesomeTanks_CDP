@@ -84,7 +84,13 @@ classDiagram
         +Draw()
     }
     class Player{
-
+        +TeamGUI GUI
+        +Tank Tank
+        +IController Controller
+        +Color Colour
+        +Avatar Avatar
+        List~Bullet~ Bullets
+        +DoTankControls() bool
     }
     Tank *-- Bullet
     class Tank{
