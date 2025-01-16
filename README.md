@@ -7,6 +7,7 @@ classDiagram
     IScene <|-- StartScene
     IScene <|-- TransitionScene
     SceneManager <-- IScene
+    class SoundManager
     <<Interface>> IScene
 
     IScene : +Spritebatch mSpriteBatch
