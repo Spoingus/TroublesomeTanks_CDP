@@ -7,14 +7,15 @@ classDiagram
     IScene <|-- StartScene
     IScene <|-- TransitionScene
     <<Interface>> IScene
+
+    IScene : +float mSecondsLeft
+    IScene : +Spritebatch mSpriteBatch
     IScene : +Draw(float pSeconds) void
     IScene : +Update(float pSeconds) void
     IScene : +Escape() void
 
     class FlashScreenScene{
         +Texture2D mLogotexture
-        +Spritebatch mSpriteBatch
         +Rectangle mRectangle
-        +float mSecondsLeft
     }
 ```
