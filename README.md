@@ -6,6 +6,7 @@ classDiagram
     IScene <|-- PlayerSelectionScene
     IScene <|-- StartScene
     IScene <|-- TransitionScene
+    SceneManager <-- IScene
     <<Interface>> IScene
 
     IScene : +Spritebatch mSpriteBatch
