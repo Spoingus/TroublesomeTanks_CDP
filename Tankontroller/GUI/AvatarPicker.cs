@@ -272,7 +272,7 @@ namespace Tankontroller.GUI
 
         public void ChangeSelection(int pAmount)
         {
-            if (HasController() && mSelectionCoolDown <= 0)
+            if (HasController() && !Ready() && mSelectionCoolDown <= 0)
             {
                 mSelectionIndex += pAmount;
                 if (mSelectionIndex < 0)
