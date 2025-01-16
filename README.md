@@ -9,11 +9,12 @@ classDiagram
     SceneManager <-- IScene
     <<Interface>> IScene
 
-    IScene : +Spritebatch mSpriteBatch
-    IScene : +Draw(float pSeconds) void
-    IScene : +Update(float pSeconds) void
-    IScene : +Escape() void
-
+    class IScene{
+    +Spritebatch mSpriteBatch
+    +Draw(float pSeconds) void
+    +Update(float pSeconds) void
+    +Escape() void
+    }
     class FlashScreenScene{
         +Texture2D mLogotexture
         +Rectangle mRectangle
@@ -41,5 +42,15 @@ classDiagram
 ```mermaid
 classDiagram
     ButtonList <-- Button
+    class ButtonList{
+        List~Button~ mButtons
+        +SelectNextButton() void
+        +SelectPreviousButton() void
+    }
+    class Button{
+        +Texture2D Texture
+        +Texture2D TexturePressed
+        +Color SelectedColour
+    }
    
 ```
