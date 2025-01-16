@@ -20,7 +20,9 @@ classDiagram
         +Rectangle mRectangle
     }
     class GameScene{
-        
+        +Setup4Player() void
+        +SetupNot4Player() void
+        +SetupPlayers() void
     }
     class GameOverScene{
         +RepositionGUIs() void
