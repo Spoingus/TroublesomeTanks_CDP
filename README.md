@@ -83,6 +83,11 @@ classDiagram
         +PrepareRectangles()
         +Draw()
     }
+    Player *-- TeamGUI
+    Player *-- Tank
+    Player *-- Avatar
+    Player *-- IController
+    Player *-- Bullet
     class Player{
         +TeamGUI GUI
         +Tank Tank
