@@ -60,7 +60,6 @@ classDiagram
     TeamGUI *-- Avatar
     TeamGUI *-- HealthBar
     TeamGUI o-- Player
-    TeamGUI o-- Tank
     class TeamGUI{
         +Avatar m_Avatar
         +HealthBar m_HealthBar
