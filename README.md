@@ -6,11 +6,10 @@ classDiagram
     IScene <|-- PlayerSelectionScene
     IScene <|-- StartScene
     IScene <|-- TransitionScene
-    class IScene {
-        +Draw(float pSeconds) void
-        +Update(float pSeconds) void
-        +Escape() void
-    }
+    <<Interface>> IScene
+    IScene : +Draw(float pSeconds) void
+    IScene : +Update(float pSeconds) void
+    IScene : +Escape() void
 
     class Cow {
         +breed: string
