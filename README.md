@@ -6,10 +6,10 @@ classDiagram
     IScene <|-- PlayerSelectionScene
     IScene <|-- StartScene
     IScene <|-- TransitionScene
-    class Animal {
-        +name: string
-        +age: int
-        +makeSound(): void
+    class IScene {
+        +Draw(float pSeconds): void
+        +Update(float pSeconds): void
+        +Escape(): void
     }
 
     class Cow {
