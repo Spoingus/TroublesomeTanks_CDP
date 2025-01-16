@@ -39,16 +39,13 @@ namespace Tankontroller.Scenes
         Rectangle mBackgroundRectangle;
         Texture2D[] mCountDownTextures = new Texture2D[6];
         Rectangle[] mCountDownRectangles = new Rectangle[6];
-        SpriteBatch mSpriteBatch = null;
         List<AvatarPicker> mAvatarPickers;
         float mCountdown;
         bool mPlayersWereReady;
 
         public PlayerSelectionScene()
         {
-            
-
-            mSpriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
+            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
             int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
 
@@ -106,8 +103,6 @@ namespace Tankontroller.Scenes
             rectangle = new Rectangle(left, top, halfWidth, halfHeight);
             mAvatarPickers.Add(new AvatarPicker(rectangle));
         }
-
-
 
         //private void ExitGame()
         //{
@@ -303,20 +298,21 @@ namespace Tankontroller.Scenes
                 }
                 Texture2D texture = mCountDownTextures[index];
                 Rectangle rectangle = mCountDownRectangles[index];
-                mSpriteBatch.Draw(texture, rectangle, Color.White);
+                spriteBatch.Draw(texture, rectangle, Color.White);
             }
         }
         public void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
-            mSpriteBatch.Begin();
+            spriteBatch.Begin();
             Color backColour = Color.White;
 
-            mSpriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
+            spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
 
-            DrawAvatarPickers(mSpriteBatch);
-            DrawCountDown(mSpriteBatch);
-            mSpriteBatch.End();
+            DrawAvatarPickers(spriteBatch);
+            DrawCountDown(spriteBatch);
+            spriteBatch.End();
         }
+        public SpriteBatch spriteBatch { get; set; }
     }
 }

@@ -23,21 +23,17 @@ namespace Tankontroller.Scenes
         Texture2D mForgroundTexture = null;
         Texture2D mTitleTexture = null;
         Rectangle mTitleRectangle;
-        SpriteBatch mSpriteBatch = null;
-
-        float mSecondsLeft;
+        private float secondsLeft;
         public StartScene()
         {
-            mSpriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
+            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
             int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
 
             mBackgroundTexture = tankControllerInstance.CM().Load<Texture2D>("background_01");
-
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
             mForgroundTexture = tankControllerInstance.CM().Load<Texture2D>("menu_white");
-
             mTitleTexture = tankControllerInstance.CM().Load<Texture2D>("menu_title");
             mTitleRectangle = new Rectangle((screenWidth / 2) - (644 / 2), (screenHeight / 2) - (128 / 2), 644, 128);
 
@@ -71,7 +67,7 @@ namespace Tankontroller.Scenes
             Button exitGameButton = new Button(exitGameButtonTexture, exitGameButtonTexturePressed, exitGameButtonRectangle, Color.Red, ExitGame);
             exitGameButton.Selected = false;
             mButtonList.Add(exitGameButton);
-            mSecondsLeft = 0.1f;
+            secondsLeft = 0.1f;
             tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
         }
 
@@ -80,13 +76,11 @@ namespace Tankontroller.Scenes
         {
             gameInstance.SM().Transition(null);
         }
-
         //Starts the game
         private void StartGame()
         {
             gameInstance.SM().Transition(new PlayerSelectionScene(), false);
         }
-
         public void Update(float pSeconds)
         {
             Escape();
@@ -95,65 +89,63 @@ namespace Tankontroller.Scenes
             foreach (IController controller in gameInstance.GetControllers())
             {
                 controller.UpdateController();
-                mSecondsLeft -= pSeconds;
+                secondsLeft -= pSeconds;
 
                 if (controller.IsPressedWithCharge(Control.LEFT_TRACK_FORWARDS) || controller.IsPressed(Control.TURRET_LEFT))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
                         mButtonList.SelectPreviousButton();
-                        mSecondsLeft = 1.0f;
+                        secondsLeft = 1.0f;
                     }
                 }
                 if (controller.IsPressed(Control.LEFT_TRACK_BACKWARDS) || controller.IsPressed(Control.TURRET_RIGHT))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
                         mButtonList.SelectNextButton();
-                        mSecondsLeft = 1.0f;
+                        secondsLeft = 1.0f;
                     }
                 }
 
-
                 if (controller.IsPressed(Control.FIRE))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
                         SoundEffectInstance buttonPress = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Button_Push");
                         buttonPress.Play();
                         mButtonList.PressSelectedButton();
-                        mSecondsLeft = 0.1f;
+                        secondsLeft = 0.1f;
                     }
                 }
                 if (controller.IsPressed(Control.RECHARGE))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
                         SoundEffectInstance buttonPress = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Button_Push");
                         buttonPress.Play();
                         mButtonList.PressSelectedButton();
-                        mSecondsLeft = 0.1f;
+                        secondsLeft = 0.1f;
                     }
                 }
 
             }
         }
-
         //Draws the start screen and buttons
         public void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
-            mSpriteBatch.Begin();
+            spriteBatch.Begin();
             Color backColour = Color.White;
 
-            mSpriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
-            mSpriteBatch.Draw(mForgroundTexture, mBackgroundRectangle, backColour);
+            spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
+            spriteBatch.Draw(mForgroundTexture, mBackgroundRectangle, backColour);
 
-            mSpriteBatch.Draw(mTitleTexture, mTitleRectangle, backColour);
+            spriteBatch.Draw(mTitleTexture, mTitleRectangle, backColour);
 
-            mButtonList.Draw(mSpriteBatch);
+            mButtonList.Draw(spriteBatch);
 
-            mSpriteBatch.End();
+            spriteBatch.End();
         }
         public void Escape()
         {
@@ -162,5 +154,6 @@ namespace Tankontroller.Scenes
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
+        public SpriteBatch spriteBatch { get; set; }
     }
 }

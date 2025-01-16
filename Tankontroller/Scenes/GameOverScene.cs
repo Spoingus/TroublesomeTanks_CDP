@@ -14,14 +14,13 @@ namespace Tankontroller.Scenes
         Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
         private List<Player> mPlayers;
         Texture2D mBackgroundTexture = null;
-        SpriteBatch mSpriteBatch = null;
         Rectangle mRectangle;
-        float mSecondsLeft;
         int mWinner;
+        private float secondsLeft;
         public GameOverScene(Texture2D pBackgroundTexture, List<Player> pPlayers, int pWinner)
         {
             mBackgroundTexture = pBackgroundTexture;
-            mSpriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
+            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
             int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
             int height = screenHeight / 2;
@@ -29,7 +28,7 @@ namespace Tankontroller.Scenes
             int x = (screenWidth - width) / 2;
             int y = (screenHeight - height) / 2;
             mRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
-            mSecondsLeft = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_GAMEOVER_SCREEN");
+            secondsLeft = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_GAMEOVER_SCREEN");
             tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
             mPlayers = pPlayers;
             mWinner = pWinner;
@@ -68,8 +67,8 @@ namespace Tankontroller.Scenes
         }
         public void Update(float pSeconds)
         {
-            mSecondsLeft -= pSeconds;
-            if (mSecondsLeft <= 0.0f)
+            secondsLeft -= pSeconds;
+            if (secondsLeft <= 0.0f)
             {
                 IGame game = Tankontroller.Instance();
                 game.SM().Transition(null);
@@ -78,15 +77,15 @@ namespace Tankontroller.Scenes
         public void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
-            mSpriteBatch.Begin();
+            spriteBatch.Begin();
 
-            mSpriteBatch.Draw(mBackgroundTexture, mRectangle, Color.White);
+            spriteBatch.Draw(mBackgroundTexture, mRectangle, Color.White);
             for (int i = 0; i < mPlayers.Count; i++)
             {
-                mPlayers[i].GUI.DrawAvatar(mSpriteBatch);
-                mPlayers[i].GUI.DrawHealthBar(mSpriteBatch);
+                mPlayers[i].GUI.DrawAvatar(spriteBatch);
+                mPlayers[i].GUI.DrawHealthBar(spriteBatch);
             }
-            mSpriteBatch.End();
+            spriteBatch.End();
         }
         public void Escape()
         {
@@ -95,5 +94,6 @@ namespace Tankontroller.Scenes
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
+        public SpriteBatch spriteBatch { get; set; }
     }
 }

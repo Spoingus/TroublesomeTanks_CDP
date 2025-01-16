@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,7 @@ using System.Threading.Tasks;
         void Draw(float pSeconds);
         void Update(float pSeconds);
         void Escape();
+
+        SpriteBatch spriteBatch { get; set;  }
     }
 }

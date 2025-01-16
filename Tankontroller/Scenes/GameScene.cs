@@ -27,7 +27,6 @@ namespace Tankontroller.Scenes
         private TheWorld m_World;
         private Texture2D m_BulletTexture;
         private Texture2D m_ErrorBGTexture;
-        private SpriteBatch m_SpriteBatch;
         private SoundEffectInstance introMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
         private SpriteFont m_SpriteFont;
@@ -48,6 +47,8 @@ namespace Tankontroller.Scenes
         public Rectangle PlayArea { get { return mPlayAreaRectangle; } }
 
         private bool mControllersConnected = true;
+
+        
 
         public GameScene(List<Player> pPlayers)
         {
@@ -87,7 +88,7 @@ namespace Tankontroller.Scenes
 
             m_SpriteFont = tankControllerInstance.CM().Load<SpriteFont>("handwritingfont");
 
-            m_SpriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
+            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
 
             mBackgroundTexture = tankControllerInstance.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, tankControllerInstance.GDM().GraphicsDevice.Viewport.Width, tankControllerInstance.GDM().GraphicsDevice.Viewport.Height);
@@ -272,23 +273,23 @@ namespace Tankontroller.Scenes
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            m_SpriteBatch.Begin();
+            spriteBatch.Begin();
 
-            m_SpriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
+            spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
 
             //Draws the GUI for each player
             foreach (Player player in m_Teams)
             {
                 if (player.GUI != null)
                 {
-                    player.GUI.Draw(m_SpriteBatch);
+                    player.GUI.Draw(spriteBatch);
                 }
             }
 
-            m_SpriteBatch.Draw(mPixelTexture, mPlayAreaOutlineRectangle, Color.Black);
-            m_SpriteBatch.Draw(mPixelTexture, mPlayAreaRectangle, DGS.Instance.GetColour("COLOUR_GROUND"));
+            spriteBatch.Draw(mPixelTexture, mPlayAreaOutlineRectangle, Color.Black);
+            spriteBatch.Draw(mPixelTexture, mPlayAreaRectangle, DGS.Instance.GetColour("COLOUR_GROUND"));
 
-            TrackSystem.GetInstance().Draw(m_SpriteBatch);
+            TrackSystem.GetInstance().Draw(spriteBatch);
 
             //Draw the background of the bullets
             foreach (Player p in m_Teams)
@@ -296,11 +297,11 @@ namespace Tankontroller.Scenes
                 List<Bullet> bullets = p.Tank.GetBulletList();
                 foreach (Bullet b in bullets)
                 {
-                    b.DrawBackground(m_SpriteBatch, m_BulletTexture);
+                    b.DrawBackground(spriteBatch, m_BulletTexture);
                 }
             }
 
-            World.Particles.ParticleManager.Instance().Draw(m_SpriteBatch);
+            World.Particles.ParticleManager.Instance().Draw(spriteBatch);
 
             //Draw the foreground of the bullets
             foreach (Player p in m_Teams)
@@ -308,7 +309,7 @@ namespace Tankontroller.Scenes
                 List<Bullet> bullets = p.Tank.GetBulletList();
                 foreach (Bullet b in bullets)
                 {
-                    b.DrawForeground(m_SpriteBatch, m_BulletTexture);
+                    b.DrawForeground(spriteBatch, m_BulletTexture);
                 }
             }
 
@@ -317,18 +318,18 @@ namespace Tankontroller.Scenes
             for (int i = 0; i < m_Teams.Count(); i++)
             {
                 Tank t = m_World.GetTank(i);
-                t?.Draw(m_SpriteBatch, tankScale);
+                t?.Draw(spriteBatch, tankScale);
             }
 
             //Draws the walls
             foreach (RectWall w in m_World.Walls)
             {
-                w.DrawOutlines(m_SpriteBatch);
+                w.DrawOutlines(spriteBatch);
             }
 
             foreach (RectWall w in m_World.Walls)
             {
-                w.Draw(m_SpriteBatch);
+                w.Draw(spriteBatch);
             }
 
             if (!mControllersConnected)
@@ -336,11 +337,11 @@ namespace Tankontroller.Scenes
                 string message = "A controller has been disconnected.\r\nPlease reconnect it to continue.\r\nSearching for controller...";
                 Vector2 centre = new Vector2(mPlayAreaRectangle.X + mPlayAreaRectangle.Width / 2, mPlayAreaRectangle.Y + mPlayAreaRectangle.Height / 2);
                 Vector2 fontSize = m_SpriteFont.MeasureString(message);
-                m_SpriteBatch.Draw(m_ErrorBGTexture, PlayArea, Color.White);
-                m_SpriteBatch.DrawString(m_SpriteFont, message, new Vector2(centre.X - (fontSize.X / 2), centre.Y - (fontSize.Y / 2)), Color.Black);
+                spriteBatch.Draw(m_ErrorBGTexture, PlayArea, Color.White);
+                spriteBatch.DrawString(m_SpriteFont, message, new Vector2(centre.X - (fontSize.X / 2), centre.Y - (fontSize.Y / 2)), Color.Black);
             }
 
-            m_SpriteBatch.End();
+            spriteBatch.End();
         }
 
         public void Update(float pSeconds)
@@ -464,5 +465,8 @@ namespace Tankontroller.Scenes
             }
             return remaining;
         }
+
+        public SpriteBatch spriteBatch { get; set; }
+
     }
 }
