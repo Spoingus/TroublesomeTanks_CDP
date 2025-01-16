@@ -7,9 +7,9 @@ classDiagram
     IScene <|-- StartScene
     IScene <|-- TransitionScene
     class IScene {
-        +Draw(float pSeconds): void
-        +Update(float pSeconds): void
-        +Escape(): void
+        +Draw(float pSeconds) void
+        +Update(float pSeconds) void
+        +Escape() void
     }
 
     class Cow {
