@@ -44,7 +44,7 @@ classDiagram
 GUIs - Class Diagram
 ```mermaid
 classDiagram
-    ButtonList <-- Button
+    ButtonList *-- Button
     class ButtonList{
         List~Button~ mButtons
         +SelectNextButton() void
