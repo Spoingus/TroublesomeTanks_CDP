@@ -61,7 +61,7 @@ classDiagram
     TeamGUI *-- HealthBar
     TeamGUI *-- Player
     TeamGUI *-- Tank
-    HealthBar *-- Tank
+    Tank *-- HealthBar
     class TeamGUI{
         +Avatar m_Avatar
         +HealthBar m_HealthBar
