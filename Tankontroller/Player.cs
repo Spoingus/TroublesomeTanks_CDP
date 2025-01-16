@@ -73,7 +73,7 @@ namespace Tankontroller
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
             GUI = new TeamGUI(pWhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, pAvatarBlackAndWhiteLayer,
-                pAvatarColourLayer, pRectangle, Tank, this, Colour);
+                pAvatarColourLayer, pRectangle, Controller, Tank.Health(), Colour);
         }
         public void GamePreparation(
             float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
@@ -86,7 +86,7 @@ namespace Tankontroller
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
             Texture2D whitePixel = game.CM().Load<Texture2D>("white_pixel");
-            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Tank, this, Colour);
+            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Controller, Tank.Health(), Colour);
         }
         public void Reset()
         {

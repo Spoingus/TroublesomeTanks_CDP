@@ -40,11 +40,9 @@ namespace Tankontroller.GUI
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
-        private Player m_player;
         private static Texture2D[] m_PortNumbers = new Texture2D[8];
-        private static Texture2D m_PowerBarBorderTexture;
-        private static Texture2D m_PowerBarPowerTexture;
-        private Tank m_Tank;
+        private int mHealth;
+        private IController mController;
         private Vector2 Frame { get; set; }
         private Color m_Color { get; set; }
 
@@ -76,15 +74,15 @@ namespace Tankontroller.GUI
             Texture2D pAvatarBlackAndWhiteLayer,
             Texture2D pAvatarColourLayer,
             Rectangle pRectangle,
-            Tank pTank,
-            Player pPlayer,
+            IController pController,
+            int pHealth,
             Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
-            m_player = pPlayer;
-            m_Tank = pTank;
+            mController = pController;
+            mHealth = pHealth;
             PrepareAvatar(pAvatarBlackAndWhiteLayer, pAvatarColourLayer);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
 
@@ -113,15 +111,15 @@ namespace Tankontroller.GUI
            Texture2D pHealthBarColourLayer,
            Avatar pAvatar,
            Rectangle pRectangle,
-           Tank pTank,
-           Player pPlayer,
+           IController pController,
+           int pHealth,
            Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
-            m_player = pPlayer;
-            m_Tank = pTank;
+            mController = pController;
+            mHealth = pHealth;
             PrepareAvatar(pAvatar);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
 
@@ -167,12 +165,7 @@ namespace Tankontroller.GUI
             int healthBarLeft = m_Rectangle.Left + m_Rectangle.Width - healthBarWidth;
             int healthBarTop = m_Rectangle.Top + m_Rectangle.Height - healthBarHeight;
             Rectangle healthBarRectangle = new Rectangle(healthBarLeft, healthBarTop, healthBarWidth, healthBarHeight);
-            m_HealthBar = new HealthBar(m_WhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, healthBarRectangle, m_Tank);
-        }
-
-        public Tank GetTank()
-        {
-            return m_Tank;
+            m_HealthBar = new HealthBar(m_WhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, healthBarRectangle, mHealth);
         }
 
         public void DrawHealthBar(SpriteBatch pSpriteBatch)
@@ -190,53 +183,51 @@ namespace Tankontroller.GUI
         public void DrawAvatar(SpriteBatch pSpriteBatch)
         {
             int avatarIndex = 4;
-            int health = m_Tank.Health();
-            if (health == 5)
+            if (mHealth == 5)
             {
                 avatarIndex = 0;
             }
-            else if (health == 4)
+            else if (mHealth == 4)
             {
                 avatarIndex = 1;
             }
-            else if (health == 3)
+            else if (mHealth == 3)
             {
                 avatarIndex = 2;
             }
-            else if (health == 2)
+            else if (mHealth == 2)
             {
                 avatarIndex = 3;
             }
-            else if (health == 1)
+            else if (mHealth == 1)
             {
                 avatarIndex = 4;
             }
-            m_Avatar.Draw(pSpriteBatch, m_Tank.Health() > 0, avatarIndex);
+            m_Avatar.Draw(pSpriteBatch, mHealth > 0, avatarIndex);
         }
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
             DrawAvatar(pSpriteBatch);
             DrawHealthBar(pSpriteBatch);
-            IController controller = m_player.Controller;
             for (int j = 0; j < 7; j++)
             {
-                if (controller.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
+                if (mController.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
                 {
-                    if (controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
+                    if (mController.GetJackCharge(PortMapping.GetPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), true);
+                        m_PowerBars[j].Draw(pSpriteBatch, mController.GetJackCharge(PortMapping.GetPortForPlayer(j)), true);
                     }
                     else
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), false);
+                        m_PowerBars[j].Draw(pSpriteBatch, mController.GetJackCharge(PortMapping.GetPortForPlayer(j)), false);
                     }
                 }
                 else
                 {
-                    m_PowerBars[j].Draw(pSpriteBatch, controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) > 0);
+                    m_PowerBars[j].Draw(pSpriteBatch, mController.GetJackCharge(PortMapping.GetPortForPlayer(j)), mController.GetJackCharge(PortMapping.GetPortForPlayer(j)) > 0);
                 }
-                m_JackIcons[j].Draw(pSpriteBatch, controller.GetJackControl(PortMapping.GetPortForPlayer(j)));
+                m_JackIcons[j].Draw(pSpriteBatch, mController.GetJackControl(PortMapping.GetPortForPlayer(j)));
                 m_PortNumLabels[j].Draw(pSpriteBatch, j, m_Color);
             }
         }

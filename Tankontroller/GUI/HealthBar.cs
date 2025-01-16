@@ -7,20 +7,7 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     // HealthBar
     //
-    // This class is used to represent the health bar of a tank. It displays the health bar in the game.
-    //
-    // It contains the following member variables:
-    // - A black and white heart texture
-    // - A colour heart texture
-    // - A white pixel texture
-    // - A rectangle representing the position of the health bar
-    // - An array of rectangles representing the position of the health bar's hearts
-    // - A tank
-    //
-    // It contains the following methods:
-    // - A constructor to initialise the health bar
-    // - A method to reposition the health bar
-    // - A method to draw the health bar
+    // Draws a health bar for the player.
     //-------------------------------------------------------------------------------------------------
     public class HealthBar
     {
@@ -29,17 +16,16 @@ namespace Tankontroller.GUI
         private Texture2D mWhitePixel;
         private Rectangle mBoundsRectangle;
         private Rectangle[] mRectangles = new Rectangle[DGS.Instance.GetInt("MAX_TANK_HEALTH")];
-        private Tank mTank;
+        private int mHealth;
 
-        public HealthBar(Texture2D pWhitePixel, Texture2D pHeartBlackAndWhite, Texture2D pHeartColour, Rectangle pRectangle, Tank pTank)
+        public HealthBar(Texture2D pWhitePixel, Texture2D pHeartBlackAndWhite, Texture2D pHeartColour, Rectangle pRectangle, int pHealth)
         {
             mHeartBlackAndWhite = pHeartBlackAndWhite;
             mHeartColour = pHeartColour;
             mWhitePixel = pWhitePixel;
             mBoundsRectangle = pRectangle;
+            mHealth = pHealth;
             PrepareRectangles();
-            mTank = pTank;
-
         }
 
         private void PrepareRectangles()
@@ -65,8 +51,6 @@ namespace Tankontroller.GUI
                 mRectangles[i] = rectangle;
                 left += paddingWidth + width;
             }
-
-
         }
 
         public void Reposition(Rectangle pRectangle)
@@ -88,7 +72,7 @@ namespace Tankontroller.GUI
             for (int i = 0; i < DGS.Instance.GetInt("MAX_TANK_HEALTH"); i++)
             {
                 pSpriteBatch.Draw(mHeartBlackAndWhite, mRectangles[i], Color.White);
-                if (i < mTank.Health())
+                if (i < mHealth)
                 {
                     pSpriteBatch.Draw(mHeartColour, mRectangles[i], Color.Red);
                 }
