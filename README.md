@@ -11,17 +11,10 @@ classDiagram
     IScene : +Update(float pSeconds) void
     IScene : +Escape() void
 
-    class Cow {
-        +breed: string
-        +bark(): void
+    Class FlashScreenScene {
+    +Texture2D mLogotexture
+    +Spritebatch mSpriteBatch
+    +Rectangle mRectangle
+    +float mSecondsLeft
     }
-
-    class Cat {
-        +color: string
-        +meow(): void
-    }
-
-    Animal <|-- Cow
-    Animal <|-- Cat
-
 ```
