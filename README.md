@@ -40,6 +40,6 @@ classDiagram
 
 ```mermaid
 classDiagram
-    Button <-- ButtonList
+    ButtonList <-- Button
    
 ```
