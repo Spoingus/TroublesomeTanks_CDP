@@ -248,6 +248,7 @@ namespace Tankontroller
             mSoundManager.Add("Music/Music_start");
             mSoundManager.Add("Music/Music_intro");
             mSoundManager.Add("Music/Music_loopable");
+            mSoundManager.Add("Sounds/Button_Push");
             mSoundManager.Add("Sounds/Tank_Gun");
             mSoundManager.Add("Sounds/Tank_Tracks");
             mSoundManager.Add("Sounds/Tank_Clang1");

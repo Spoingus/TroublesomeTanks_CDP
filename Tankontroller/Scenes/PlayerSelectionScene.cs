@@ -17,27 +17,26 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class PlayerSelectionScene : IScene
     {
+        IGame gameInstance = Tankontroller.Instance();
+        Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
         Texture2D mBackgroundTexture = null;
         Rectangle mBackgroundRectangle;
         Texture2D[] mCountDownTextures = new Texture2D[6];
         Rectangle[] mCountDownRectangles = new Rectangle[6];
-        SpriteBatch mSpriteBatch = null;
         List<AvatarPicker> mAvatarPickers;
         float mCountdown;
         bool mPlayersWereReady;
 
         public PlayerSelectionScene()
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
+            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
+            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
 
-            mSpriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
-
-            mBackgroundTexture = game.CM().Load<Texture2D>("background_06");
+            mBackgroundTexture = tankControllerInstance.CM().Load<Texture2D>("background_06");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
-            game.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
             prepareAvatarPickers();
             mPlayersWereReady = false;
             prepareCountDown();
@@ -45,15 +44,14 @@ namespace Tankontroller.Scenes
 
         private void prepareCountDown()
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
-            mCountDownTextures[0] = game.CM().Load<Texture2D>("countdown/five");
-            mCountDownTextures[1] = game.CM().Load<Texture2D>("countdown/four");
-            mCountDownTextures[2] = game.CM().Load<Texture2D>("countdown/three");
-            mCountDownTextures[3] = game.CM().Load<Texture2D>("countdown/two");
-            mCountDownTextures[4] = game.CM().Load<Texture2D>("countdown/one");
-            mCountDownTextures[5] = game.CM().Load<Texture2D>("countdown/ready");
+            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
+            mCountDownTextures[0] = tankControllerInstance.CM().Load<Texture2D>("countdown/five");
+            mCountDownTextures[1] = tankControllerInstance.CM().Load<Texture2D>("countdown/four");
+            mCountDownTextures[2] = tankControllerInstance.CM().Load<Texture2D>("countdown/three");
+            mCountDownTextures[3] = tankControllerInstance.CM().Load<Texture2D>("countdown/two");
+            mCountDownTextures[4] = tankControllerInstance.CM().Load<Texture2D>("countdown/one");
+            mCountDownTextures[5] = tankControllerInstance.CM().Load<Texture2D>("countdown/ready");
 
             for (int i = 0; i < mCountDownTextures.Length; i++)
             {
@@ -68,10 +66,8 @@ namespace Tankontroller.Scenes
         }
         private void prepareAvatarPickers() // this is quite slow, I assume because it is loading all the textures;
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
-
-            int screenWidth = game.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = game.GDM().GraphicsDevice.Viewport.Height;
+            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
             int halfWidth = screenWidth / 2;
             int halfHeight = screenHeight / 2;
             mAvatarPickers = new List<AvatarPicker>();
@@ -91,6 +87,10 @@ namespace Tankontroller.Scenes
             mAvatarPickers.Add(new AvatarPicker(rectangle));
         }
 
+        }
+
+        }
+
         private List<Player> getReadyPlayers()
         {
             List<Player> players = new List<Player>();
@@ -106,8 +106,7 @@ namespace Tankontroller.Scenes
 
         private void StartGame()
         {
-            IGame game = Tankontroller.Instance();
-            game.SM().Transition(new GameScene(getReadyPlayers()), true);
+            gameInstance.SM().Transition(new GameScene(getReadyPlayers()), true);
         }
 
         public void Escape()
@@ -142,9 +141,9 @@ namespace Tankontroller.Scenes
                 }
             }
             return null;
-        }
-
         private bool PlayersReady()
+        {
+        private bool playersReady()
         {
             int countAvatarPickerWithPlayers = 0;
             int countReadyPlayers = 0;
@@ -170,16 +169,14 @@ namespace Tankontroller.Scenes
             }
         }
 
-        public void Update(float pSeconds)
-        {
             IGame game = Tankontroller.Instance();
             game.DetectControllers();
-
+            IGame game = Tankontroller.Instance();
             Escape();
             UpdateAvatarPickers(pSeconds);
 
             for (int i = 0; i < game.GetControllerCount(); i++)
-            {
+            updateAvatarPickers(pSeconds);
                 IController controller = game.GetController(i);
                 controller.UpdateController();
                 AvatarPicker avatarPicker = getAvatarPickerFromController(controller);
@@ -194,6 +191,8 @@ namespace Tankontroller.Scenes
                     if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE))
                     {
                         avatarPicker.MakeSelection();
+                IController controller = game.GetController(i);
+                AvatarPicker avatarPicker = getControllerAvatarPicker(controller);
 
                     }
                     if (controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
@@ -279,20 +278,21 @@ namespace Tankontroller.Scenes
                 }
                 Texture2D texture = mCountDownTextures[index];
                 Rectangle rectangle = mCountDownRectangles[index];
-                mSpriteBatch.Draw(texture, rectangle, Color.White);
+                spriteBatch.Draw(texture, rectangle, Color.White);
             }
         }
         public void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
-            mSpriteBatch.Begin();
+            spriteBatch.Begin();
             Color backColour = Color.White;
 
-            mSpriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
+            spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
 
-            DrawAvatarPickers(mSpriteBatch);
-            DrawCountDown(mSpriteBatch);
-            mSpriteBatch.End();
+            DrawAvatarPickers(spriteBatch);
+            DrawCountDown(spriteBatch);
+            spriteBatch.End();
         }
+        public SpriteBatch spriteBatch { get; set; }
     }
 }

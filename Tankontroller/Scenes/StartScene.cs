@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tankontroller.Controller;
@@ -8,50 +9,39 @@ using Tankontroller.GUI;
 namespace Tankontroller.Scenes
 {
     //--------------------------------------------------------------------------------------------------
-    // StartScene
-    //
-    // This class is used to display the start screen. The start screen displays the game title and two
-    // buttons: one to start the game and one to exit the game. The class contains a background texture,
-    // a sprite batch, a rectangle to draw the background, a list of buttons, and the number of seconds
-    // left to display the start screen.
-    // The class provides methods to update and draw the start screen.
+    // This is the main menu scene with the games title, play button and the exit button. This class
+    // is responsible for creating the buttons and dealing with any controller inputs detected on the
+    // main menu.
     //--------------------------------------------------------------------------------------------------
     public class StartScene : IScene
     {
         IGame gameInstance = Tankontroller.Instance();
-        Tankontroller tControllerInstance = (Tankontroller)Tankontroller.Instance();
+        Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
         ButtonList mButtonList = null;
         Texture2D mBackgroundTexture = null;
         Rectangle mBackgroundRectangle;
-
         Texture2D mForgroundTexture = null;
-
         Texture2D mTitleTexture = null;
         Rectangle mTitleRectangle;
-
-        SpriteBatch mSpriteBatch = null;
-
-        float mSecondsLeft;
+        private float secondsLeft;
         public StartScene()
         {
-            mSpriteBatch = new SpriteBatch(tControllerInstance.GDM().GraphicsDevice);
-            int screenWidth = tControllerInstance.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = tControllerInstance.GDM().GraphicsDevice.Viewport.Height;
+            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
+            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
 
-            mBackgroundTexture = tControllerInstance.CM().Load<Texture2D>("background_01");
-
+            mBackgroundTexture = tankControllerInstance.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
-            mForgroundTexture = tControllerInstance.CM().Load<Texture2D>("menu_white");
-
-            mTitleTexture = tControllerInstance.CM().Load<Texture2D>("menu_title");
+            mForgroundTexture = tankControllerInstance.CM().Load<Texture2D>("menu_white");
+            mTitleTexture = tankControllerInstance.CM().Load<Texture2D>("menu_title");
             mTitleRectangle = new Rectangle((screenWidth / 2) - (644 / 2), (screenHeight / 2) - (128 / 2), 644, 128);
 
             mButtonList = new ButtonList();
 
             //Start Game Button
-            Texture2D startGameButtonTexture = tControllerInstance.CM().Load<Texture2D>("menu_play_white");
-            Texture2D startGameButtonTexturePressed = tControllerInstance.CM().Load<Texture2D>("menu_play_dark");
+            Texture2D startGameButtonTexture = tankControllerInstance.CM().Load<Texture2D>("menu_play_white");
+            Texture2D startGameButtonTexturePressed = tankControllerInstance.CM().Load<Texture2D>("menu_play_dark");
 
             Rectangle startGameButtonRectangle =
                 new Rectangle(
@@ -66,8 +56,8 @@ namespace Tankontroller.Scenes
 
 
             //Makes the exit game button
-            Texture2D exitGameButtonTexture = tControllerInstance.CM().Load<Texture2D>("menu_quit_white");
-            Texture2D exitGameButtonTexturePressed = tControllerInstance.CM().Load<Texture2D>("menu_quit_dark");
+            Texture2D exitGameButtonTexture = tankControllerInstance.CM().Load<Texture2D>("menu_quit_white");
+            Texture2D exitGameButtonTexturePressed = tankControllerInstance.CM().Load<Texture2D>("menu_quit_dark");
 
             Rectangle exitGameButtonRectangle =
                 new Rectangle((screenWidth - exitGameButtonTexture.Width) / 2 + (int)(startGameButtonTexture.Width * 0.75f),
@@ -77,8 +67,8 @@ namespace Tankontroller.Scenes
             Button exitGameButton = new Button(exitGameButtonTexture, exitGameButtonTexturePressed, exitGameButtonRectangle, Color.Red, ExitGame);
             exitGameButton.Selected = false;
             mButtonList.Add(exitGameButton);
-            mSecondsLeft = 0.1f;
-            tControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            secondsLeft = 0.1f;
+            tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
         }
 
         //Exits the game
@@ -86,13 +76,11 @@ namespace Tankontroller.Scenes
         {
             gameInstance.SM().Transition(null);
         }
-
         //Starts the game
         private void StartGame()
         {
             gameInstance.SM().Transition(new PlayerSelectionScene(), false);
         }
-
         public void Update(float pSeconds)
         {
             Escape();
@@ -101,63 +89,63 @@ namespace Tankontroller.Scenes
             foreach (IController controller in gameInstance.GetControllers())
             {
                 controller.UpdateController();
-                mSecondsLeft -= pSeconds;
+                secondsLeft -= pSeconds;
 
                 if (controller.IsPressedWithCharge(Control.LEFT_TRACK_FORWARDS) || controller.IsPressed(Control.TURRET_LEFT))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
-                        //mSoundEffects["Button_Push"].Play();
                         mButtonList.SelectPreviousButton();
-                        mSecondsLeft = 1.0f;
+                        secondsLeft = 1.0f;
                     }
                 }
                 if (controller.IsPressed(Control.LEFT_TRACK_BACKWARDS) || controller.IsPressed(Control.TURRET_RIGHT))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
-                        //mSoundEffects["Button_Push"].Play();
                         mButtonList.SelectNextButton();
-                        mSecondsLeft = 1.0f;
+                        secondsLeft = 1.0f;
                     }
                 }
 
-
                 if (controller.IsPressed(Control.FIRE))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
+                        SoundEffectInstance buttonPress = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Button_Push");
+                        buttonPress.Play();
                         mButtonList.PressSelectedButton();
-                        mSecondsLeft = 0.1f;
+                        secondsLeft = 0.1f;
                     }
                 }
                 if (controller.IsPressed(Control.RECHARGE))
                 {
-                    if (mSecondsLeft <= 0.0f)
+                    if (secondsLeft <= 0.0f)
                     {
+                        SoundEffectInstance buttonPress = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Button_Push");
+                        buttonPress.Play();
                         mButtonList.PressSelectedButton();
-                        mSecondsLeft = 0.1f;
+                        secondsLeft = 0.1f;
                     }
                 }
 
             }
         }
-
         //Draws the start screen and buttons
         public void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
-            mSpriteBatch.Begin();
+            spriteBatch.Begin();
             Color backColour = Color.White;
 
-            mSpriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
-            mSpriteBatch.Draw(mForgroundTexture, mBackgroundRectangle, backColour);
+            spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, backColour);
+            spriteBatch.Draw(mForgroundTexture, mBackgroundRectangle, backColour);
 
-            mSpriteBatch.Draw(mTitleTexture, mTitleRectangle, backColour);
+            spriteBatch.Draw(mTitleTexture, mTitleRectangle, backColour);
 
-            mButtonList.Draw(mSpriteBatch);
+            mButtonList.Draw(spriteBatch);
 
-            mSpriteBatch.End();
+            spriteBatch.End();
         }
         public void Escape()
         {
@@ -166,5 +154,6 @@ namespace Tankontroller.Scenes
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
+        public SpriteBatch spriteBatch { get; set; }
     }
 }
