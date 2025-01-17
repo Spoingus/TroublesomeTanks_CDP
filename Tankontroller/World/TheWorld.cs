@@ -9,11 +9,8 @@ using Tankontroller.World.Particles;
 
 namespace Tankontroller.World
 {
-    // this class is a container for the game state
     public class TheWorld
     {
-        private Random rand = new Random();
-
         private List<Tank> m_Tanks = new List<Tank>();
 
         public void AddTank(Tank pTank)

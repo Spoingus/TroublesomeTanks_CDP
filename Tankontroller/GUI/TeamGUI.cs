@@ -158,27 +158,9 @@ namespace Tankontroller.GUI
 
         public void DrawAvatar(SpriteBatch pSpriteBatch, int pHealth)
         {
-            int avatarIndex = 4;
-            if (pHealth == 5)
-            {
-                avatarIndex = 0;
-            }
-            else if (pHealth == 4)
-            {
-                avatarIndex = 1;
-            }
-            else if (pHealth == 3)
-            {
-                avatarIndex = 2;
-            }
-            else if (pHealth == 2)
-            {
-                avatarIndex = 3;
-            }
-            else if (pHealth == 1)
-            {
-                avatarIndex = 4;
-            }
+            //TODO - Set 5 to health constant and reconfigure avatar/health to take it into account
+            int avatarIndex = 5 - pHealth; // index 0 is full health, index 4 is no health
+            avatarIndex = Math.Clamp(avatarIndex, 0, 4); // in the case that health is 0
             m_Avatar.Draw(pSpriteBatch, pHealth > 0, avatarIndex);
         }
 
