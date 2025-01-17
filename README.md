@@ -59,7 +59,6 @@ classDiagram
 
     TeamGUI *-- Avatar
     TeamGUI *-- HealthBar
-    TeamGUI o-- Player
     class TeamGUI{
         +Avatar m_Avatar
         +HealthBar m_HealthBar
