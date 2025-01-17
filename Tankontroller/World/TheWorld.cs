@@ -41,18 +41,7 @@ namespace Tankontroller.World
             for (int i = 0; i < m_Tanks.Count; i++)
             {
                 m_Tanks[i].CollideWithPlayArea(pRectangle);
-            }
-
-            for (int tankIndex = 0; tankIndex < m_Tanks.Count; tankIndex++)
-            {
-                List<Bullet> bulletList = m_Tanks[tankIndex].GetBulletList();
-                for (int i = bulletList.Count - 1; i >= 0; --i)
-                {
-                    if (bulletList[i].CollideWithPlayArea(pRectangle))
-                    {
-                        bulletList.RemoveAt(i);
-                    }
-                }
+                m_Tanks[i].CheckBulletCollisionsWithPlayArea(pRectangle);
             }
         }
 
@@ -60,69 +49,31 @@ namespace Tankontroller.World
         {
             Particles.ParticleManager.Instance().Update(pSeconds);
 
-            // Check bullet collision
-            for (int listIndex = 0; listIndex < m_Tanks.Count; listIndex++)
+            // Check collisions for each tank
+            for (int tankIndex = 0; tankIndex < m_Tanks.Count; tankIndex++)
             {
-                List<Bullet> bulletList = m_Tanks[listIndex].GetBulletList();
-                for (int i = bulletList.Count - 1; i >= 0; --i)
+                m_Tanks[tankIndex].Update(pSeconds);
+
+                // Wall collisions
+                foreach (RectWall wall in Walls)
                 {
-                    bulletList[i].Update(pSeconds);
-
-                    bool collided = false;
-                    foreach (RectWall wall in Walls)
-                    {
-                        if (bulletList[i].Collide(wall))
-                        {
-                            collided = true;
-                            break;
-                        }
-                    }
-                    for (int tankIndex = 0; tankIndex < m_Tanks.Count && !collided; tankIndex++)
-                    {
-                        if (listIndex == tankIndex) // Skip collision with self
-                        {
-                            continue;
-                        }
-                        if (bulletList[i].Collide(m_Tanks[tankIndex]))
-                        {
-                            m_Tanks[tankIndex].TakeDamage();
-                            int clang = rand.Next(1, 4);
-                            string tankClang = "Sounds/Tank_Clang" + clang;
-                            Microsoft.Xna.Framework.Audio.SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
-                            tankClangSound.Play();
-                            collided = true;
-                            break;
-                        }
-
-                    }
-                    if (collided)
-                    {
-                        bulletList.RemoveAt(i);
-                    }
-
+                    // bullet collision
+                    m_Tanks[tankIndex].CheckBulletCollisions(wall);
+                    // tank collision
+                    m_Tanks[tankIndex].Collide(wall);
                 }
-            }
 
-            foreach (RectWall w in Walls)
-            {
-                foreach (Tank t in m_Tanks)
+                // Collisions with other tanks
+                for (int i = 0; i < m_Tanks.Count; i++)
                 {
-                    if (w.Collide(t))
+                    if (tankIndex == i) // Skip collision with self
                     {
-                        t.PutBack();
+                        continue;
                     }
-                }
-            }
-
-            for (int i = 0; i < m_Tanks.Count; i++)
-            {
-                for (int j = i + 1; j < m_Tanks.Count; j++)
-                {
-                    if (m_Tanks[i].Collide(m_Tanks[j]))
-                    {
-                        m_Tanks[i].PutBack();
-                        m_Tanks[j].PutBack();
-                    }
+                    // bullet collision
+                    m_Tanks[tankIndex].CheckBulletCollisions(m_Tanks[i]);
+                    // tank against tanks
+                    m_Tanks[tankIndex].Collide(m_Tanks[i]);
                 }
             }
         }

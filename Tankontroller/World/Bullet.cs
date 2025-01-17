@@ -49,12 +49,22 @@ namespace Tankontroller.World
             }
             return false;
         }
-
         public bool Collide(Tank pTank)
         {
             if (pTank.PointIsInTank(Position))
             {
                 CreateExplosion(Vector2.Normalize(Position - pTank.GetWorldPosition()));
+                return true;
+            }
+            return false;
+        }
+        public bool Collide(Bullet pBullet) // This is unused but I'm keeping it for potential implementation
+        {
+            if (Vector2.Distance(Position, pBullet.Position) < 2 * BULLET_RADIUS)
+            {
+                Vector2 collisionNormal = Vector2.Normalize(Velocity);
+                CreateExplosion(collisionNormal);
+                CreateExplosion(-collisionNormal);
                 return true;
             }
             return false;
@@ -87,13 +97,9 @@ namespace Tankontroller.World
             Particles.ParticleManager.Instance().InitialiseParticles(explosion, 100);
         }
 
-        public void DrawBackground(SpriteBatch pBatch, Texture2D pTexture)
+        public void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
             Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS"), Position, Color.Black);
-        }
-
-        public void DrawForeground(SpriteBatch pBatch, Texture2D pTexture)
-        {
             Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS, Position, Colour);
         }
     }

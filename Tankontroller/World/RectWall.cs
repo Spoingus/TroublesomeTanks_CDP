@@ -30,28 +30,5 @@ namespace Tankontroller.World
         {
             pSpriteBatch.Draw(m_Texture, m_OutlineRectangle, Color.Black);
         }
-
-        public bool Collide(Tank pTank)
-        {
-            Vector2[] tankCorners = new Vector2[4];
-            pTank.GetCorners(tankCorners);
-
-            foreach (Vector2 corner in tankCorners)
-            {
-                if (Rectangle.Contains(corner))
-                {
-                    return true;
-                }
-            }
-            // Check if any of the corners of the wall are within the tank
-            if (pTank.PointIsInTank(new Vector2(Rectangle.Left, Rectangle.Top)) ||
-               pTank.PointIsInTank(new Vector2(Rectangle.Right, Rectangle.Top)) ||
-               pTank.PointIsInTank(new Vector2(Rectangle.Left, Rectangle.Bottom)) ||
-               pTank.PointIsInTank(new Vector2(Rectangle.Right, Rectangle.Bottom)))
-            {
-                return true;
-            }
-            return false;
-        }
     }
 }

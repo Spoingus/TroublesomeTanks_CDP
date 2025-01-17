@@ -95,6 +95,7 @@ namespace Tankontroller.World.Particles
     /// </summary>
     public class ParticleManager
     {
+        private const int MAX_PARTICLES = 1000;
         private Particle[] m_Particles = null;
         private int m_LastParticleIndex = 0;
         private Texture2D m_Texture;
@@ -105,7 +106,12 @@ namespace Tankontroller.World.Particles
         {
             m_Texture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
             m_Rectangle = new Rectangle();
-            m_Particles = new Particle[1000];
+            m_Particles = new Particle[MAX_PARTICLES];
+            Reset();
+        }
+
+        public void Reset()
+        {
             for (int i = 0; i < m_Particles.Length; i++)
             {
                 m_Particles[i] = new Particle();
@@ -172,6 +178,8 @@ namespace Tankontroller.World.Particles
             m_LastParticleIndex += i;
             return particles;
         }
+
+
 
         /// <summary>
         /// Requests number of particles and initialises according to the ParticleInitialisationPolicy parameter
