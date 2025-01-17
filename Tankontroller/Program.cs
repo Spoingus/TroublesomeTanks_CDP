@@ -15,7 +15,6 @@ namespace Tankontroller
         {
             using (var game = (Tankontroller)Tankontroller.Instance())
             {
-                game.GDM().IsFullScreen = DGS.Instance.GetBool("FULLSCREEN");
                 game.Run();
                 game.TurnOffControllers();
             }
