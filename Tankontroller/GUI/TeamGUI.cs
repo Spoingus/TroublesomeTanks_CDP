@@ -22,7 +22,6 @@ namespace Tankontroller.GUI
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
         private static Texture2D[] m_PortNumbers = new Texture2D[8];
-        private int mHealth;
         private IController mController;
         private Vector2 Frame { get; set; }
         private Color m_Color { get; set; }
@@ -56,14 +55,12 @@ namespace Tankontroller.GUI
             Texture2D pAvatarColourLayer,
             Rectangle pRectangle,
             IController pController,
-            int pHealth,
             Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
             mController = pController;
-            mHealth = pHealth;
             PrepareAvatar(pAvatarBlackAndWhiteLayer, pAvatarColourLayer);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
 
@@ -93,14 +90,12 @@ namespace Tankontroller.GUI
            Avatar pAvatar,
            Rectangle pRectangle,
            IController pController,
-           int pHealth,
            Color pColor)
         {
             m_WhitePixel = pWhitePixel;
             m_Rectangle = pRectangle;
             m_Color = pColor;
             mController = pController;
-            mHealth = pHealth;
             PrepareAvatar(pAvatar);
             PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
 
@@ -146,12 +141,12 @@ namespace Tankontroller.GUI
             int healthBarLeft = m_Rectangle.Left + m_Rectangle.Width - healthBarWidth;
             int healthBarTop = m_Rectangle.Top + m_Rectangle.Height - healthBarHeight;
             Rectangle healthBarRectangle = new Rectangle(healthBarLeft, healthBarTop, healthBarWidth, healthBarHeight);
-            m_HealthBar = new HealthBar(m_WhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, healthBarRectangle, mHealth);
+            m_HealthBar = new HealthBar(m_WhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, healthBarRectangle);
         }
 
-        public void DrawHealthBar(SpriteBatch pSpriteBatch)
+        public void DrawHealthBar(SpriteBatch pSpriteBatch, int pHealth)
         {
-            m_HealthBar.Draw(pSpriteBatch);
+            m_HealthBar.Draw(pSpriteBatch, pHealth);
         }
 
         public void Reposition(Rectangle pRectangle)
@@ -161,36 +156,36 @@ namespace Tankontroller.GUI
             m_Avatar.Reposition(pRectangle);
         }
 
-        public void DrawAvatar(SpriteBatch pSpriteBatch)
+        public void DrawAvatar(SpriteBatch pSpriteBatch, int pHealth)
         {
             int avatarIndex = 4;
-            if (mHealth == 5)
+            if (pHealth == 5)
             {
                 avatarIndex = 0;
             }
-            else if (mHealth == 4)
+            else if (pHealth == 4)
             {
                 avatarIndex = 1;
             }
-            else if (mHealth == 3)
+            else if (pHealth == 3)
             {
                 avatarIndex = 2;
             }
-            else if (mHealth == 2)
+            else if (pHealth == 2)
             {
                 avatarIndex = 3;
             }
-            else if (mHealth == 1)
+            else if (pHealth == 1)
             {
                 avatarIndex = 4;
             }
-            m_Avatar.Draw(pSpriteBatch, mHealth > 0, avatarIndex);
+            m_Avatar.Draw(pSpriteBatch, pHealth > 0, avatarIndex);
         }
 
-        public void Draw(SpriteBatch pSpriteBatch)
+        public void Draw(SpriteBatch pSpriteBatch, int pHealth)
         {
-            DrawAvatar(pSpriteBatch);
-            DrawHealthBar(pSpriteBatch);
+            DrawAvatar(pSpriteBatch, pHealth);
+            DrawHealthBar(pSpriteBatch, pHealth);
             for (int j = 0; j < 7; j++)
             {
                 if (mController.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
