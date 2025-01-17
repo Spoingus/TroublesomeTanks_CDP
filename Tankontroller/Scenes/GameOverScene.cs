@@ -82,8 +82,8 @@ namespace Tankontroller.Scenes
             spriteBatch.Draw(mBackgroundTexture, mRectangle, Color.White);
             for (int i = 0; i < mPlayers.Count; i++)
             {
-                mPlayers[i].GUI.DrawAvatar(spriteBatch);
-                mPlayers[i].GUI.DrawHealthBar(spriteBatch);
+                mPlayers[i].GUI.DrawAvatar(spriteBatch, mPlayers[i].Tank.Health());
+                mPlayers[i].GUI.DrawHealthBar(spriteBatch, mPlayers[i].Tank.Health());
             }
             spriteBatch.End();
         }

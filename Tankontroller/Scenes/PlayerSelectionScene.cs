@@ -111,14 +111,6 @@ namespace Tankontroller.Scenes
             game.SM().Transition(new GameScene(getReadyPlayers()), true);
         }
 
-        public void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
-
         private AvatarPicker getEmptyAvatarPicker()
         {
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
