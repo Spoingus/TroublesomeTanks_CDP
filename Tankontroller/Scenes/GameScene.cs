@@ -287,26 +287,12 @@ namespace Tankontroller.Scenes
 
             TrackSystem.GetInstance().Draw(spriteBatch);
 
-            //Draw the background of the bullets
-            foreach (Player p in m_Teams)
-            {
-                List<Bullet> bullets = p.Tank.GetBulletList();
-                foreach (Bullet b in bullets)
-                {
-                    b.DrawBackground(spriteBatch, m_BulletTexture);
-                }
-            }
-
             World.Particles.ParticleManager.Instance().Draw(spriteBatch);
 
-            //Draw the foreground of the bullets
+            //Draws the bullets
             foreach (Player p in m_Teams)
             {
-                List<Bullet> bullets = p.Tank.GetBulletList();
-                foreach (Bullet b in bullets)
-                {
-                    b.DrawForeground(spriteBatch, m_BulletTexture);
-                }
+                p.Tank.DrawBullets(spriteBatch, m_BulletTexture);
             }
 
             //Draws the tanks
@@ -361,7 +347,8 @@ namespace Tankontroller.Scenes
                 bool tankMoved = false;
                 foreach (Player p in m_Teams)
                 {
-                    tankMoved = tankMoved | p.DoTankControls(pSeconds);
+                    bool result = p.DoTankControls(pSeconds);
+                    tankMoved = tankMoved | result;
                 }
 
                 //Checks for tank collisons between the play area and the walls
@@ -443,6 +430,7 @@ namespace Tankontroller.Scenes
             {
                 p.Reset();
             }
+            ParticleManager.Instance().Reset();
         }
 
         //Checks the health of all players and returns a list of tanks with more that 0 health

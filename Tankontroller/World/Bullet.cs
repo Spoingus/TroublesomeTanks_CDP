@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.World.Particles;
@@ -30,47 +26,80 @@ namespace Tankontroller.World
             ParticleManager.Instance().InitialiseParticles(bulletParticles, 2);
         }
 
-        public bool Collide(Rectangle pRectangle, out Vector2 pCollisionNormal)
+        public bool CollideWithPlayArea(Rectangle pRectangle)
         {
             if (!pRectangle.Contains(Position))
             {
-                float difference = Math.Abs(Position.X - pRectangle.Left);
-                pCollisionNormal = new Vector2(1, 0);
-                if (difference > Math.Abs(Position.X - pRectangle.Right))
-                {
-                    difference = Math.Abs(Position.X - pRectangle.Right);
-                    pCollisionNormal = new Vector2(-1, 0);
-                }
-                if (difference > Math.Abs(Position.Y - pRectangle.Top))
-                {
-                    difference = Math.Abs(Position.Y - pRectangle.Top);
-                    pCollisionNormal = new Vector2(0, 1);
-                }
-                if (difference > Math.Abs(Position.Y - pRectangle.Bottom))
-                {
-                    pCollisionNormal = new Vector2(0, -1);
-                }
+                Vector2 collisionNormal = GetCollisionNormal(pRectangle);
+                collisionNormal = -collisionNormal;
+                CreateExplosion(collisionNormal);
                 return true;
-            }
-            else
-            {
-                pCollisionNormal = Vector2.Zero;
             }
             return false;
         }
-        public bool Collide(Tank pTank, out Vector2 pCollisionNormal)
+
+        public bool Collide(RectWall pWall)
         {
-            pCollisionNormal = Vector2.Normalize(Position - pTank.GetWorldPosition());
-            return pTank.PointIsInTank(Position);
+            Rectangle rectangle = pWall.Rectangle;
+            if (rectangle.Contains(Position))
+            {
+                Vector2 collisionNormal = GetCollisionNormal(rectangle);
+                CreateExplosion(collisionNormal);
+                return true;
+            }
+            return false;
+        }
+        public bool Collide(Tank pTank)
+        {
+            if (pTank.PointIsInTank(Position))
+            {
+                CreateExplosion(Vector2.Normalize(Position - pTank.GetWorldPosition()));
+                return true;
+            }
+            return false;
+        }
+        public bool Collide(Bullet pBullet) // This is unused but I'm keeping it for potential implementation
+        {
+            if (Vector2.Distance(Position, pBullet.Position) < 2 * BULLET_RADIUS)
+            {
+                Vector2 collisionNormal = Vector2.Normalize(Velocity);
+                CreateExplosion(collisionNormal);
+                CreateExplosion(-collisionNormal);
+                return true;
+            }
+            return false;
         }
 
-        public void DrawBackground(SpriteBatch pBatch, Texture2D pTexture)
+        private Vector2 GetCollisionNormal(Rectangle pRect)
+        {
+            float difference = Math.Abs(Position.X - pRect.Left);
+            Vector2 collisionNormal = new Vector2(-1, 0);
+            if (difference > Math.Abs(Position.X - pRect.Right))
+            {
+                difference = Math.Abs(Position.X - pRect.Right);
+                collisionNormal = new Vector2(1, 0);
+            }
+            if (difference > Math.Abs(Position.Y - pRect.Top))
+            {
+                difference = Math.Abs(Position.Y - pRect.Top);
+                collisionNormal = new Vector2(0, -1);
+            }
+            if (difference > Math.Abs(Position.Y - pRect.Bottom))
+            {
+                collisionNormal = new Vector2(0, 1);
+            }
+            return collisionNormal;
+        }
+
+        private void CreateExplosion(Vector2 pCollisionNormal)
+        {
+            ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position, pCollisionNormal, Colour);
+            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 100);
+        }
+
+        public void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
             Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS"), Position, Color.Black);
-        }
-
-        public void DrawForeground(SpriteBatch pBatch, Texture2D pTexture)
-        {
             Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS, Position, Colour);
         }
     }

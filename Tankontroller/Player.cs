@@ -165,7 +165,6 @@ namespace Tankontroller
                 {
                     if (Tank.IsFirePrimed())
                     {
-                        Tank.ResetPrime();
                         if (Controller.DepleteCharge(Control.FIRE, DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION")))
                         {
                             Tank.Fire();
@@ -188,14 +187,6 @@ namespace Tankontroller
                 {
                     Tank.ChargeReleased();
                 }
-
-
-
-
-            }
-            if (Tank.Fired() > 0)
-            {
-                Tank.DecFired();
             }
             return tankMoved;
         }
