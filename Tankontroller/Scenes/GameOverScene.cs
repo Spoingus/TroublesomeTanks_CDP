@@ -65,7 +65,7 @@ namespace Tankontroller.Scenes
                 }
             }
         }
-        public void Update(float pSeconds)
+        public override void Update(float pSeconds)
         {
             secondsLeft -= pSeconds;
             if (secondsLeft <= 0.0f)
@@ -74,7 +74,7 @@ namespace Tankontroller.Scenes
                 game.SM().Transition(null);
             }
         }
-        public void Draw(float pSeconds)
+        public override void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
@@ -87,13 +87,12 @@ namespace Tankontroller.Scenes
             }
             spriteBatch.End();
         }
-        public void Escape()
+        public override void Escape()
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
-        public SpriteBatch spriteBatch { get; set; }
     }
 }

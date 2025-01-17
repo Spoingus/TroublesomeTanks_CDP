@@ -171,7 +171,7 @@ namespace Tankontroller.Scenes
             }
         }
 
-        public void Update(float pSeconds)
+        public override void Update(float pSeconds)
         {
             IGame game = Tankontroller.Instance();
             game.DetectControllers();
@@ -241,6 +241,13 @@ namespace Tankontroller.Scenes
                 mPlayersWereReady = false;
             }
         }
+        public override void Escape()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Tankontroller.Instance().SM().Transition(null);
+            }
+        }
 
         private void DrawAvatarPickers(SpriteBatch pSpriteBatch)
         {
@@ -283,7 +290,7 @@ namespace Tankontroller.Scenes
                 spriteBatch.Draw(texture, rectangle, Color.White);
             }
         }
-        public void Draw(float pSeconds)
+        public override void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();

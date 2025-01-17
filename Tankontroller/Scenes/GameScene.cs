@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
 using Tankontroller.World;
@@ -47,9 +48,6 @@ namespace Tankontroller.Scenes
         public Rectangle PlayArea { get { return mPlayAreaRectangle; } }
 
         private bool mControllersConnected = true;
-
-        
-
         public GameScene(List<Player> pPlayers)
         {
             Tank.SetupStaticTextures(
@@ -250,8 +248,6 @@ namespace Tankontroller.Scenes
 
             setupPlayers(pPlayArea);
         }
-
-
         private void setupPlayers(Rectangle pPlayArea)
         {
             float tankScale = (float)pPlayArea.Width / (50 * 40);
@@ -269,7 +265,7 @@ namespace Tankontroller.Scenes
 
         }
 
-        public void Draw(float pSeconds)
+        public override void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.CornflowerBlue);
 
@@ -344,7 +340,7 @@ namespace Tankontroller.Scenes
             spriteBatch.End();
         }
 
-        public void Update(float pSeconds)
+        public override void Update(float pSeconds)
         {
             Escape();
             if (introMusicInstance.State == SoundState.Stopped)
@@ -434,14 +430,13 @@ namespace Tankontroller.Scenes
                 }
             }
         }
-        public void Escape()
+        public override void Escape()
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
-
         private void Reset()
         {
             foreach (Player p in m_Teams)
@@ -465,8 +460,6 @@ namespace Tankontroller.Scenes
             }
             return remaining;
         }
-
-        public SpriteBatch spriteBatch { get; set; }
 
     }
 }

@@ -58,7 +58,7 @@ namespace Tankontroller.Scenes
             graphicsDevice.SetRenderTarget(null);
         }
 
-        public void Update(float pSeconds)
+        public override void Update(float pSeconds)
         {
             mVelocity += mAcceleration;
             mNextPosition += mVelocity;
@@ -74,7 +74,7 @@ namespace Tankontroller.Scenes
 
             }
         }
-        public void Draw(float pSeconds)
+        public override void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
@@ -83,14 +83,5 @@ namespace Tankontroller.Scenes
             spriteBatch.Draw(mNextTexture, mNextPosition, mRectangle, Color.White);
             spriteBatch.End();
         }
-        public void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
-        public SpriteBatch spriteBatch { get; set; }
-
     }
 }
