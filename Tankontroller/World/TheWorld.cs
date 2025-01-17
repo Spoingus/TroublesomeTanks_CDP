@@ -14,7 +14,7 @@ namespace Tankontroller.World
     {
         private Random rand = new Random();
 
-        private List<Tank> m_Tanks = new List<Tank>(); 
+        private List<Tank> m_Tanks = new List<Tank>();
 
         public void AddTank(Tank pTank)
         {
@@ -22,7 +22,7 @@ namespace Tankontroller.World
         }
         public Tank GetTank(int pTankIndex)
         {
-            if(m_Tanks.Count > pTankIndex)
+            if (m_Tanks.Count > pTankIndex)
             {
                 return m_Tanks[pTankIndex];
             }
@@ -43,20 +43,16 @@ namespace Tankontroller.World
                 m_Tanks[i].CollideWithPlayArea(pRectangle);
             }
 
-            Vector2 collisionNormal;
-
             for (int tankIndex = 0; tankIndex < m_Tanks.Count; tankIndex++)
             {
                 List<Bullet> bulletList = m_Tanks[tankIndex].GetBulletList();
                 for (int i = bulletList.Count - 1; i >= 0; --i)
                 {
-                    if (bulletList[i].Collide(pRectangle, out collisionNormal))
+                    if (bulletList[i].CollideWithPlayArea(pRectangle))
                     {
-                        ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(bulletList[i].Position, collisionNormal, m_Tanks[tankIndex].Colour());
-                        ParticleManager.Instance().InitialiseParticles(explosion, 100);
                         bulletList.RemoveAt(i);
                     }
-                }            
+                }
             }
         }
 
@@ -64,26 +60,32 @@ namespace Tankontroller.World
         {
             Particles.ParticleManager.Instance().Update(pSeconds);
 
-            Vector2 collisionNormal;
-
-            for (int tankIndex = 0; tankIndex < m_Tanks.Count; tankIndex++)
+            // Check bullet collision
+            for (int listIndex = 0; listIndex < m_Tanks.Count; listIndex++)
             {
-                List<Bullet> bulletList = m_Tanks[tankIndex].GetBulletList();
+                List<Bullet> bulletList = m_Tanks[listIndex].GetBulletList();
                 for (int i = bulletList.Count - 1; i >= 0; --i)
                 {
-                    bool collided = false;
                     bulletList[i].Update(pSeconds);
-                    for (int tankIndex2 = 0; tankIndex2 < m_Tanks.Count; tankIndex2++)
+
+                    bool collided = false;
+                    foreach (RectWall wall in Walls)
                     {
-                        if(tankIndex == tankIndex2)
+                        if (bulletList[i].Collide(wall))
+                        {
+                            collided = true;
+                            break;
+                        }
+                    }
+                    for (int tankIndex = 0; tankIndex < m_Tanks.Count && !collided; tankIndex++)
+                    {
+                        if (listIndex == tankIndex) // Skip collision with self
                         {
                             continue;
                         }
-                        if (bulletList[i].Collide(m_Tanks[tankIndex2], out collisionNormal))
+                        if (bulletList[i].Collide(m_Tanks[tankIndex]))
                         {
-                            ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(bulletList[i].Position, collisionNormal, m_Tanks[tankIndex].Colour());
-                            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 100);
-                            m_Tanks[tankIndex2].TakeDamage();
+                            m_Tanks[tankIndex].TakeDamage();
                             int clang = rand.Next(1, 4);
                             string tankClang = "Sounds/Tank_Clang" + clang;
                             Microsoft.Xna.Framework.Audio.SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
@@ -91,28 +93,19 @@ namespace Tankontroller.World
                             collided = true;
                             break;
                         }
-                        
-                    }
-                    foreach (RectWall wall in Walls)
-                    {
-                        if (wall.Collide(bulletList[i], out collisionNormal))
-                        {
-                            ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(bulletList[i].Position, collisionNormal, m_Tanks[tankIndex].Colour());
-                            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 100);
-                            collided = true;
-                            break;
-                        }
+
                     }
                     if (collided)
                     {
                         bulletList.RemoveAt(i);
                     }
+
                 }
             }
 
-            foreach(RectWall w in Walls)
+            foreach (RectWall w in Walls)
             {
-                foreach(Tank t in m_Tanks)
+                foreach (Tank t in m_Tanks)
                 {
                     if (w.Collide(t))
                     {
@@ -121,11 +114,11 @@ namespace Tankontroller.World
                 }
             }
 
-            for(int i = 0; i < m_Tanks.Count; i++)
+            for (int i = 0; i < m_Tanks.Count; i++)
             {
-                for(int j = i+1; j < m_Tanks.Count; j++)
+                for (int j = i + 1; j < m_Tanks.Count; j++)
                 {
-                    if(m_Tanks[i].Collide(m_Tanks[j]))
+                    if (m_Tanks[i].Collide(m_Tanks[j]))
                     {
                         m_Tanks[i].PutBack();
                         m_Tanks[j].PutBack();

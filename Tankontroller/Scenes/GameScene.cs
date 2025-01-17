@@ -365,7 +365,8 @@ namespace Tankontroller.Scenes
                 bool tankMoved = false;
                 foreach (Player p in m_Teams)
                 {
-                    tankMoved = tankMoved | p.DoTankControls(pSeconds);
+                    bool result = p.DoTankControls(pSeconds);
+                    tankMoved = tankMoved | result;
                 }
 
                 //Checks for tank collisons between the play area and the walls

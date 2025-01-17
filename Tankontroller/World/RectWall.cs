@@ -10,55 +10,25 @@ namespace Tankontroller.World
 {
     public class RectWall
     {
-        private Rectangle m_Rectangle;
+        public Rectangle Rectangle { get; private set; }
         private Rectangle m_OutlineRectangle;
         private Texture2D m_Texture;
 
         public RectWall(Texture2D pTexture, Rectangle pRectangle)
         {
-            m_Rectangle = pRectangle;
+            Rectangle = pRectangle;
             m_OutlineRectangle = new Rectangle(pRectangle.X - 2, pRectangle.Y - 2, pRectangle.Width + 4, pRectangle.Height + 4);
             m_Texture = pTexture;
         }
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
-            pSpriteBatch.Draw(m_Texture, m_Rectangle, DGS.Instance.GetColour("COLOUR_WALLS"));
+            pSpriteBatch.Draw(m_Texture, Rectangle, DGS.Instance.GetColour("COLOUR_WALLS"));
         }
 
         public void DrawOutlines(SpriteBatch pSpriteBatch)
         {
             pSpriteBatch.Draw(m_Texture, m_OutlineRectangle, Color.Black);
-        }
-
-        public bool Collide(Bullet pBullet, out Vector2 pCollisionNormal)
-        {
-            Vector2 bulletPos = pBullet.Position;
-            if ((bulletPos.X >= m_Rectangle.Left) &&
-                (bulletPos.X <= m_Rectangle.Right) &&
-                (bulletPos.Y <= m_Rectangle.Bottom) &&
-                (bulletPos.Y >= m_Rectangle.Top))
-            {
-                float difference = Math.Abs(bulletPos.X - m_Rectangle.Left);
-                pCollisionNormal = new Vector2(-1, 0);
-                if (difference > Math.Abs(bulletPos.X - m_Rectangle.Right))
-                {
-                    difference = Math.Abs(bulletPos.X - m_Rectangle.Right);
-                    pCollisionNormal = new Vector2(1, 0);
-                }
-                if (difference > Math.Abs(bulletPos.Y - m_Rectangle.Top))
-                {
-                    difference = Math.Abs(bulletPos.Y - m_Rectangle.Top);
-                    pCollisionNormal = new Vector2(0, -1);
-                }
-                if (difference > Math.Abs(bulletPos.Y - m_Rectangle.Bottom))
-                {
-                    pCollisionNormal = new Vector2(0, 1);
-                }
-                return true;
-            }
-            pCollisionNormal = Vector2.Zero;
-            return false;
         }
 
         public bool Collide(Tank pTank)
@@ -68,16 +38,16 @@ namespace Tankontroller.World
 
             foreach (Vector2 corner in tankCorners)
             {
-                if (m_Rectangle.Contains(corner))
+                if (Rectangle.Contains(corner))
                 {
                     return true;
                 }
             }
             // Check if any of the corners of the wall are within the tank
-            if (pTank.PointIsInTank(new Vector2(m_Rectangle.Left, m_Rectangle.Top)) ||
-               pTank.PointIsInTank(new Vector2(m_Rectangle.Right, m_Rectangle.Top)) ||
-               pTank.PointIsInTank(new Vector2(m_Rectangle.Left, m_Rectangle.Bottom)) ||
-               pTank.PointIsInTank(new Vector2(m_Rectangle.Right, m_Rectangle.Bottom)))
+            if (pTank.PointIsInTank(new Vector2(Rectangle.Left, Rectangle.Top)) ||
+               pTank.PointIsInTank(new Vector2(Rectangle.Right, Rectangle.Top)) ||
+               pTank.PointIsInTank(new Vector2(Rectangle.Left, Rectangle.Bottom)) ||
+               pTank.PointIsInTank(new Vector2(Rectangle.Right, Rectangle.Bottom)))
             {
                 return true;
             }
