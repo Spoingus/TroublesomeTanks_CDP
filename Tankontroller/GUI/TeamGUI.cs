@@ -15,14 +15,15 @@ namespace Tankontroller.GUI
     public class TeamGUI
     {
         private Texture2D m_WhitePixel;
-        private Rectangle m_Rectangle;
         private HealthBar m_HealthBar;
         private Avatar m_Avatar;
+        private Texture2D m_HealthBarBlackAndWhiteLayer;
+        private Texture2D m_HealthBarColourLayer;
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
         private static Texture2D[] m_PortNumbers = new Texture2D[8];
-        private IController mController;
+        private IController m_Controller;
         private Vector2 Frame { get; set; }
         private Color m_Color { get; set; }
 
@@ -47,99 +48,30 @@ namespace Tankontroller.GUI
             m_PortNumbers[7] = pPortNumber8;
         }
 
-        public TeamGUI(
-            Texture2D pWhitePixel,
-            Texture2D pHealthBarBlackAndWhiteLayer,
-            Texture2D pHealthBarColourLayer,
-            Texture2D pAvatarBlackAndWhiteLayer,
-            Texture2D pAvatarColourLayer,
-            Rectangle pRectangle,
-            IController pController,
-            Color pColor)
+        public TeamGUI(Texture2D pWhitePixel, Texture2D pHealthBarBlackAndWhiteLayer, Texture2D pHealthBarColourLayer,
+            Avatar pAvatar, IController pController, Color pColor)
         {
             m_WhitePixel = pWhitePixel;
-            m_Rectangle = pRectangle;
+            m_HealthBarBlackAndWhiteLayer = pHealthBarBlackAndWhiteLayer;
+            m_HealthBarColourLayer = pHealthBarColourLayer;
+            m_Avatar = pAvatar;
             m_Color = pColor;
-            mController = pController;
-            PrepareAvatar(pAvatarBlackAndWhiteLayer, pAvatarColourLayer);
-            PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
-
-            int powerBarWidth = DGS.Instance.GetInt("SCREENWIDTH") / 4 /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
-            int powerBarHeight = DGS.Instance.GetInt("SCREENHEIGHT") / 100 * 12;
-
-            int powerBar_yValueOffset = -10 + DGS.Instance.GetInt("SCREENWIDTH") / 100 * 2;
-            int jackIcons_yValueOffset = powerBar_yValueOffset + (int)(powerBarHeight * 1.01f) - powerBarWidth;
-            int labels_yValueOffset = powerBar_yValueOffset + (int)(powerBarWidth * 1.01f);
-
-            bool isOnLeft = true;
-            int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
-            int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
-            int xOffset = isOnLeft ? pRectangle.X + pRectangle.Width - 8 * xIncrement - powerBarWidth : pRectangle.X;
-            for (int j = 0; j < 7; j++)
-            {
-                m_PowerBars[j] = new PowerBar(new Vector2(xOffset + xValue, powerBar_yValueOffset), powerBarWidth, powerBarHeight);
-                m_JackIcons[j] = new JackIcon(new Vector2(xOffset + xValue, jackIcons_yValueOffset), powerBarWidth, powerBarWidth);
-                m_PortNumLabels[j] = new PortNumLabel(m_PortNumbers, new Vector2(xOffset + xValue, labels_yValueOffset), powerBarWidth, powerBarWidth);
-                xValue += xIncrement;
-            }
+            m_Controller = pController;
         }
-        public TeamGUI(
-           Texture2D pWhitePixel,
-           Texture2D pHealthBarBlackAndWhiteLayer,
-           Texture2D pHealthBarColourLayer,
-           Avatar pAvatar,
-           Rectangle pRectangle,
-           IController pController,
-           Color pColor)
+        private void PrepareAvatar(Avatar pAvatar, Rectangle pRectangle)
         {
-            m_WhitePixel = pWhitePixel;
-            m_Rectangle = pRectangle;
-            m_Color = pColor;
-            mController = pController;
-            PrepareAvatar(pAvatar);
-            PrepareHealthBar(pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer);
-
-            int powerBarWidth = DGS.Instance.GetInt("SCREENWIDTH") / 4 /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
-            int powerBarHeight = DGS.Instance.GetInt("SCREENHEIGHT") / 100 * 12;
-
-            int powerBar_yValueOffset = -10 + DGS.Instance.GetInt("SCREENWIDTH") / 100 * 2;
-            int jackIcons_yValueOffset = powerBar_yValueOffset + (int)(powerBarHeight * 1.01f) - powerBarWidth;
-            int labels_yValueOffset = powerBar_yValueOffset + (int)(powerBarWidth * 1.01f);
-
-            bool isOnLeft = true;
-            int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
-            int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
-            int xOffset = isOnLeft ? pRectangle.X + pRectangle.Width - 8 * xIncrement - powerBarWidth : pRectangle.X;
-            for (int j = 0; j < 7; j++)
-            {
-                m_PowerBars[j] = new PowerBar(new Vector2(xOffset + xValue, powerBar_yValueOffset), powerBarWidth, powerBarHeight);
-                m_JackIcons[j] = new JackIcon(new Vector2(xOffset + xValue, jackIcons_yValueOffset), powerBarWidth, powerBarWidth);
-                m_PortNumLabels[j] = new PortNumLabel(m_PortNumbers, new Vector2(xOffset + xValue, labels_yValueOffset), powerBarWidth, powerBarWidth);
-                xValue += xIncrement;
-            }
-        }
-
-        private void PrepareAvatar(Texture2D pAvatarBlackAndWhiteLayer, Texture2D pAvatarColourLayer)
-        {
-            int avatarWidth = (int)(m_Rectangle.Width * 0.4);
-            int avatarHeight = m_Rectangle.Height;
-            Rectangle avatarRectangle = new Rectangle(m_Rectangle.X, m_Rectangle.Y, avatarWidth, avatarHeight);
-            m_Avatar = new Avatar(m_WhitePixel, pAvatarBlackAndWhiteLayer, pAvatarColourLayer, avatarRectangle, m_Color);
-        }
-        private void PrepareAvatar(Avatar pAvatar)
-        {
-            int avatarWidth = (int)(m_Rectangle.Width * 0.4);
-            int avatarHeight = m_Rectangle.Height;
-            Rectangle avatarRectangle = new Rectangle(m_Rectangle.X, m_Rectangle.Y, avatarWidth, avatarHeight);
+            int avatarWidth = (int)(pRectangle.Width * 0.4);
+            int avatarHeight = pRectangle.Height;
+            Rectangle avatarRectangle = new Rectangle(pRectangle.X, pRectangle.Y, avatarWidth, avatarHeight);
             m_Avatar = pAvatar;
             m_Avatar.Reposition(avatarRectangle);
         }
-        private void PrepareHealthBar(Texture2D pHealthBarBlackAndWhiteLayer, Texture2D pHealthBarColourLayer)
+        private void PrepareHealthBar(Texture2D pHealthBarBlackAndWhiteLayer, Texture2D pHealthBarColourLayer, Rectangle pRectangle)
         {
-            int healthBarWidth = (int)(m_Rectangle.Width * 0.6);
-            int healthBarHeight = (int)(m_Rectangle.Height * 0.25);
-            int healthBarLeft = m_Rectangle.Left + m_Rectangle.Width - healthBarWidth;
-            int healthBarTop = m_Rectangle.Top + m_Rectangle.Height - healthBarHeight;
+            int healthBarWidth = (int)(pRectangle.Width * 0.6);
+            int healthBarHeight = (int)(pRectangle.Height * 0.25);
+            int healthBarLeft = pRectangle.Left + pRectangle.Width - healthBarWidth;
+            int healthBarTop = pRectangle.Top + pRectangle.Height - healthBarHeight;
             Rectangle healthBarRectangle = new Rectangle(healthBarLeft, healthBarTop, healthBarWidth, healthBarHeight);
             m_HealthBar = new HealthBar(m_WhitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, healthBarRectangle);
         }
@@ -148,8 +80,32 @@ namespace Tankontroller.GUI
         {
             m_HealthBar.Draw(pSpriteBatch, pHealth);
         }
-
         public void Reposition(Rectangle pRectangle)
+        {
+            PrepareAvatar(m_Avatar, pRectangle);
+            PrepareHealthBar(m_HealthBarBlackAndWhiteLayer, m_HealthBarColourLayer, pRectangle);
+
+            int powerBarWidth = DGS.Instance.GetInt("SCREENWIDTH") / 4 /* 25% of screen width */ * 9 / 19 /* Just Under Three quarters */ / 8; // This is also used as BOTH width and height for square icon and label textures
+            int powerBarHeight = DGS.Instance.GetInt("SCREENHEIGHT") / 100 * 12;
+
+            int powerBar_yValueOffset = -10 + DGS.Instance.GetInt("SCREENWIDTH") / 100 * 2;
+            int jackIcons_yValueOffset = powerBar_yValueOffset + (int)(powerBarHeight * 1.01f) - powerBarWidth;
+            int labels_yValueOffset = powerBar_yValueOffset + (int)(powerBarWidth * 1.01f);
+
+            bool isOnLeft = true;
+            int xValue = DGS.Instance.GetInt("SCREENWIDTH") / 100 * 1;
+            int xIncrement = Convert.ToInt32(powerBarWidth * 1.2);
+            int xOffset = isOnLeft ? pRectangle.X + pRectangle.Width - 8 * xIncrement - powerBarWidth : pRectangle.X;
+            for (int j = 0; j < 7; j++)
+            {
+                m_PowerBars[j] = new PowerBar(new Vector2(xOffset + xValue, powerBar_yValueOffset), powerBarWidth, powerBarHeight);
+                m_JackIcons[j] = new JackIcon(new Vector2(xOffset + xValue, jackIcons_yValueOffset), powerBarWidth, powerBarWidth);
+                m_PortNumLabels[j] = new PortNumLabel(m_PortNumbers, new Vector2(xOffset + xValue, labels_yValueOffset), powerBarWidth, powerBarWidth);
+                xValue += xIncrement;
+            }
+        }
+
+        public void RepositionGameOver(Rectangle pRectangle)
         {
             Rectangle healthRect = new Rectangle(new Point(pRectangle.X + (pRectangle.Height / 3), pRectangle.Y + (pRectangle.Height - 15)), new Point(pRectangle.Width, pRectangle.Height / 4));
             m_HealthBar.Reposition(healthRect);
@@ -188,22 +144,22 @@ namespace Tankontroller.GUI
             DrawHealthBar(pSpriteBatch, pHealth);
             for (int j = 0; j < 7; j++)
             {
-                if (mController.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
+                if (m_Controller.GetJackControl(PortMapping.GetPortForPlayer(j)) == Control.FIRE)
                 {
-                    if (mController.GetJackCharge(PortMapping.GetPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
+                    if (m_Controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION"))
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, mController.GetJackCharge(PortMapping.GetPortForPlayer(j)), true);
+                        m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), true);
                     }
                     else
                     {
-                        m_PowerBars[j].Draw(pSpriteBatch, mController.GetJackCharge(PortMapping.GetPortForPlayer(j)), false);
+                        m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), false);
                     }
                 }
                 else
                 {
-                    m_PowerBars[j].Draw(pSpriteBatch, mController.GetJackCharge(PortMapping.GetPortForPlayer(j)), mController.GetJackCharge(PortMapping.GetPortForPlayer(j)) > 0);
+                    m_PowerBars[j].Draw(pSpriteBatch, m_Controller.GetJackCharge(PortMapping.GetPortForPlayer(j)), m_Controller.GetJackCharge(PortMapping.GetPortForPlayer(j)) > 0);
                 }
-                m_JackIcons[j].Draw(pSpriteBatch, mController.GetJackControl(PortMapping.GetPortForPlayer(j)));
+                m_JackIcons[j].Draw(pSpriteBatch, m_Controller.GetJackControl(PortMapping.GetPortForPlayer(j)));
                 m_PortNumLabels[j].Draw(pSpriteBatch, j, m_Color);
             }
         }

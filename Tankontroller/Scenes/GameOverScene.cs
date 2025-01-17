@@ -53,7 +53,7 @@ namespace Tankontroller.Scenes
                     int loserTextureWidth = textureWidth / mPlayers.Count;
                     int loserTextureHeight = (int)(loserTextureWidth * ((float)254 / (float)540));
                     Rectangle newRectangle = new Rectangle(centreXOffset, centreY, loserTextureWidth, loserTextureHeight);
-                    mPlayers[i].GUI.Reposition(newRectangle);
+                    mPlayers[i].GUI.RepositionGameOver(newRectangle);
                     centreXOffset += loserTextureWidth;
                 }
                 else //Reposition the winner
@@ -61,7 +61,7 @@ namespace Tankontroller.Scenes
                     int centreX = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width / 2 - textureWidth / 2;
                     int centreY = textureHeight / 2;
                     Rectangle newRectangle = new Rectangle(centreX, centreY, textureWidth, textureHeight);
-                    mPlayers[mWinner].GUI.Reposition(newRectangle);
+                    mPlayers[mWinner].GUI.RepositionGameOver(newRectangle);
                 }
             }
         }
