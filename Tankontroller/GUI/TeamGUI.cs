@@ -14,37 +14,27 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     public class TeamGUI
     {
+        private static readonly Texture2D[] m_PortNumbers = new Texture2D[]
+        {
+            Tankontroller.Instance().CM().Load<Texture2D>("port1"),
+            Tankontroller.Instance().CM().Load<Texture2D>("port2"),
+            Tankontroller.Instance().CM().Load<Texture2D>("port3"),
+            Tankontroller.Instance().CM().Load<Texture2D>("port4"),
+            Tankontroller.Instance().CM().Load<Texture2D>("port5"),
+            Tankontroller.Instance().CM().Load<Texture2D>("port6"),
+            Tankontroller.Instance().CM().Load<Texture2D>("port7"),
+            Tankontroller.Instance().CM().Load<Texture2D>("port8"),
+        };
+
         private Rectangle m_Rectangle;
         private HealthBar m_HealthBar;
         private Avatar m_Avatar;
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
-        private static Texture2D[] m_PortNumbers = new Texture2D[8];
         private IController mController;
         private Vector2 Frame { get; set; }
         private Color m_Color { get; set; }
-
-        public static void SetupStaticTextures(
-                Texture2D pPortNumber1,
-                Texture2D pPortNumber2,
-                Texture2D pPortNumber3,
-                Texture2D pPortNumber4,
-                Texture2D pPortNumber5,
-                Texture2D pPortNumber6,
-                Texture2D pPortNumber7,
-                Texture2D pPortNumber8
-            )
-        {
-            m_PortNumbers[0] = pPortNumber1;
-            m_PortNumbers[1] = pPortNumber2;
-            m_PortNumbers[2] = pPortNumber3;
-            m_PortNumbers[3] = pPortNumber4;
-            m_PortNumbers[4] = pPortNumber5;
-            m_PortNumbers[5] = pPortNumber6;
-            m_PortNumbers[6] = pPortNumber7;
-            m_PortNumbers[7] = pPortNumber8;
-        }
 
         public TeamGUI(
            Avatar pAvatar,

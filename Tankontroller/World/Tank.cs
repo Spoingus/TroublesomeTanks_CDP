@@ -24,23 +24,12 @@ namespace Tankontroller.World
         public static readonly float BASE_TANK_ROTATION_ANGLE = DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE");
         public static readonly float TRACK_OFFSET = DGS.Instance.GetFloat("TRACK_OFFSET");
 
-
-        static private Texture2D mBaseTexture;
-        static private Texture2D mBrokenTexture;
-        static private Texture2D mRightTrackTexture;
-        static private Texture2D mLeftTrackTexture;
-        static private Texture2D mCannonTexture;
-        static private Texture2D mCannonFireTexture;
-
-        public static void SetupStaticTextures(Texture2D pBase, Texture2D brokenTexture, Texture2D pRightTrack, Texture2D pLeftTrack, Texture2D pCannon, Texture2D pCannonFire)
-        {
-            mBaseTexture = pBase;
-            mBrokenTexture = brokenTexture;
-            mRightTrackTexture = pRightTrack;
-            mLeftTrackTexture = pLeftTrack;
-            mCannonTexture = pCannon;
-            mCannonFireTexture = pCannonFire;
-        }
+        static private readonly Texture2D mBaseTexture = Tankontroller.Instance().CM().Load<Texture2D>("Tank-B-05");
+        static private readonly Texture2D mBrokenTexture = Tankontroller.Instance().CM().Load<Texture2D>("BrokenTank");
+        static private readonly Texture2D mRightTrackTexture = Tankontroller.Instance().CM().Load<Texture2D>("Tank track B-R");
+        static private readonly Texture2D mLeftTrackTexture = Tankontroller.Instance().CM().Load<Texture2D>("Tank track B-L");
+        static private readonly Texture2D mCannonTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannon");
+        static private readonly Texture2D mCannonFireTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannonFire");
 
         private Vector2[] TANK_CORNERS = { new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, TANK_WIDTH / 2), new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, TANK_WIDTH / 2) };
 

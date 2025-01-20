@@ -63,7 +63,7 @@ namespace Tankontroller
                 if (tankMoved)
                 {
                     // Move the tank
-                    if(leftTrackForward && rightTrackForward)
+                    if (leftTrackForward && rightTrackForward)
                     {
                         Tank.BothTracksForward();
                     }
@@ -98,9 +98,9 @@ namespace Tankontroller
 
                     // Deplete the charge for the tracks
                     Control control = leftTrackForward ? Control.LEFT_TRACK_FORWARDS : Control.LEFT_TRACK_BACKWARDS;
-                    Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    if (leftMoved) Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
                     control = rightTrackForward ? Control.RIGHT_TRACK_FORWARDS : Control.RIGHT_TRACK_BACKWARDS;
-                    Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    if (rightMoved) Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
                 }
 
                 if (Controller.IsPressedWithCharge(Control.TURRET_LEFT))
