@@ -18,7 +18,7 @@ namespace Tankontroller.Controller
     {
         bool IsPressedWithCharge(Control pControl);
         bool DepleteCharge(Control pControl, float amount);
-        void AddCharge(Control pControl, float amount);
+        bool AddCharge(Control pControl, float amount);
         float GetJackCharge(int pJackIndex);
         Control GetJackControl(int pJackIndex);
         void TransferJackCharge(IController pController);
@@ -137,7 +137,22 @@ namespace Tankontroller.Controller
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || (pControl != Control.FIRE && mJacks[i].charge > 0)));
+                    bool hasCharge = pControl == Control.FIRE ? mJacks[i].charge >= Player.BULLET_CHARGE_DEPLETION : mJacks[i].charge > 0;
+                    return mJacks[i].IsDown && hasCharge;
+                }
+            }
+            return false;
+        }
+
+        public bool AddCharge(Control pControl, float pAmount)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                if (mJacks[i].Control == pControl)
+                {
+                    mJacks[i].charge += pAmount;
+                    mJacks[i].charge = MathHelper.Clamp(mJacks[i].charge, 0, MAX_CHARGE);
+                    return true;
                 }
             }
             return false;
@@ -145,38 +160,7 @@ namespace Tankontroller.Controller
 
         public bool DepleteCharge(Control pControl, float amount)
         {
-            for (int i = 0; i < 7; ++i)
-            {
-                if (mJacks[i].Control == pControl)
-                {
-                    if (mJacks[i].charge > amount)
-                    {
-
-                        mJacks[i].charge -= amount;
-                    }
-                    else
-                        mJacks[i].charge = 0;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void AddCharge(Control pControl, float amount)
-        {
-            for (int i = 0; i < 7; ++i)
-            {
-                if (mJacks[i].Control == pControl)
-                {
-                    if (mJacks[i].charge < DGS.Instance.GetFloat("MAX_CHARGE") - amount)
-                    {
-
-                        mJacks[i].charge += amount;
-                    }
-                    else
-                        mJacks[i].charge = DGS.Instance.GetFloat("MAX_CHARGE");
-                }
-            }
+            return AddCharge(pControl, -amount);
         }
 
         public void TransferJackCharge(IController pController)
@@ -336,7 +320,7 @@ namespace Tankontroller.Controller
                     // J.charge should be between 0 and DGS.MAX_CHARGE
                     //int FullByte = 50;
                     float brightness = 0.2f;
-                    float decimalCharge = J.charge / DGS.Instance.GetFloat("MAX_CHARGE");
+                    float decimalCharge = J.charge / MAX_CHARGE;
                     float remainingCharge = 8 * decimalCharge;
                     foreach (int i in J.LED_IDS)
                     {
@@ -389,7 +373,7 @@ namespace Tankontroller.Controller
                 }
                 for (int i = 0; i < ports.Length; ++i)
                 {
-                    switch(ports[i])
+                    switch (ports[i])
                     {
                         case ControllerState.NOT_CONNECTED:
                             mJacks[i].Control = Control.NONE;
@@ -439,7 +423,7 @@ namespace Tankontroller.Controller
                             break;
                     }
 
-                    switch(ports[i])
+                    switch (ports[i])
                     {
                         case ControllerState.LEFT_TRACK_FORWARDS_PRESSED:
                         case ControllerState.LEFT_TRACK_BACKWARDS_PRESSED:

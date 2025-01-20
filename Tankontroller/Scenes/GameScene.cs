@@ -23,6 +23,7 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class GameScene : IScene
     {
+        private static readonly Color GROUND_COLOUR = DGS.Instance.GetColour("COLOUR_GROUND");
         IGame gameInstance = Tankontroller.Instance();
         Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
         private TheWorld m_World;
@@ -281,7 +282,7 @@ namespace Tankontroller.Scenes
             }
 
             spriteBatch.Draw(mPixelTexture, mPlayAreaOutlineRectangle, Color.Black);
-            spriteBatch.Draw(mPixelTexture, mPlayAreaRectangle, DGS.Instance.GetColour("COLOUR_GROUND"));
+            spriteBatch.Draw(mPixelTexture, mPlayAreaRectangle, GROUND_COLOUR);
 
             TrackSystem.GetInstance().Draw(spriteBatch);
 

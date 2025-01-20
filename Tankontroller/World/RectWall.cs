@@ -10,6 +10,7 @@ namespace Tankontroller.World
 {
     public class RectWall
     {
+        private static readonly Color COLOUR = DGS.Instance.GetColour("COLOUR_WALLS");
         public Rectangle Rectangle { get; private set; }
         private Rectangle m_OutlineRectangle;
         private Texture2D m_Texture;
@@ -23,7 +24,7 @@ namespace Tankontroller.World
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
-            pSpriteBatch.Draw(m_Texture, Rectangle, DGS.Instance.GetColour("COLOUR_WALLS"));
+            pSpriteBatch.Draw(m_Texture, Rectangle, COLOUR);
         }
 
         public void DrawOutlines(SpriteBatch pSpriteBatch)

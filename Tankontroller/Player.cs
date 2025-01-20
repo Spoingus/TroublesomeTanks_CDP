@@ -34,7 +34,6 @@ namespace Tankontroller
 
         public void GamePreparation(float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale, Rectangle pRectangle)
         {
-            Tankontroller game = (Tankontroller)Tankontroller.Instance();
             Controller.SetColour(Colour);
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
