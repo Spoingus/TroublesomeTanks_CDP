@@ -211,7 +211,7 @@ namespace Tankontroller.Controller
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }

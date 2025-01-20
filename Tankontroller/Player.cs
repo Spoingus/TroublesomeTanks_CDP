@@ -28,18 +28,13 @@ namespace Tankontroller
             Controller = pController;
         }
 
-        public void GamePreparation(
-            float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale,
-            Texture2D pHealthBarBlackAndWhiteLayer,
-            Texture2D pHealthBarColourLayer,
-            Rectangle pRectangle)
+        public void GamePreparation(float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale, Rectangle pRectangle)
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             Controller.SetColour(Colour);
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
-            Texture2D whitePixel = game.CM().Load<Texture2D>("white_pixel");
-            GUI = new TeamGUI(whitePixel, pHealthBarBlackAndWhiteLayer, pHealthBarColourLayer, Avatar, pRectangle, Controller, Colour);
+            GUI = new TeamGUI(Avatar, pRectangle, Controller, Colour);
         }
 
         public void Reset()

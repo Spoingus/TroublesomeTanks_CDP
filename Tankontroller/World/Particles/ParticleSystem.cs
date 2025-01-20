@@ -11,6 +11,7 @@ namespace Tankontroller.World.Particles
 {
     public class Particle
     {
+        public static readonly int EDGE_THICKNESS = DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS");
         public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
         public float Radius { get; private set; }
@@ -74,7 +75,7 @@ namespace Tankontroller.World.Particles
         /// <param name="pTexture"></param>
         public void DrawBackground(SpriteBatch pBatch, Texture2D pTexture)
         {
-            DrawCircle(pBatch, pTexture, (int)Radius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS"), Position, Color.Black);
+            DrawCircle(pBatch, pTexture, (int)Radius + 2 * EDGE_THICKNESS, Position, Color.Black);
         }
 
         /// <summary>
@@ -96,16 +97,13 @@ namespace Tankontroller.World.Particles
     public class ParticleManager
     {
         private const int MAX_PARTICLES = 1000;
+        private static readonly Texture2D m_Texture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
         private Particle[] m_Particles = null;
         private int m_LastParticleIndex = 0;
-        private Texture2D m_Texture;
-        private Rectangle m_Rectangle;
 
         private static ParticleManager m_Instance = null;
         private ParticleManager()
         {
-            m_Texture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
-            m_Rectangle = new Rectangle();
             m_Particles = new Particle[MAX_PARTICLES];
             Reset();
         }

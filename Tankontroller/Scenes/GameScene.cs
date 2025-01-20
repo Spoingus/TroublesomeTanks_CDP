@@ -104,7 +104,7 @@ namespace Tankontroller.Scenes
                 IController controller = Tankontroller.Instance().GetController(i);
                 controller.ResetJacks();
             }
-            tankMoveSound = tankControllerInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks"); 
+            tankMoveSound = tankControllerInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks");
 
             if (numberOfPlayers < 4)
             {
@@ -258,8 +258,6 @@ namespace Tankontroller.Scenes
             {
                 m_Teams[i].GamePreparation(
                 m_TankPositions[i].X, m_TankPositions[i].Y, m_TankRotations[i], tankScale,
-                tankControllerInstance.CM().Load<Texture2D>("healthbars/heart_bw"),
-                tankControllerInstance.CM().Load<Texture2D>("healthbars/heart_colour"),
                 new Rectangle((int)(i * spacePerPlayer + (spacePerPlayer - textureWidth) * 0.5f), 0, textureWidth, textureHeight));
             }
 

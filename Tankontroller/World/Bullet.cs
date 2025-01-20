@@ -99,7 +99,7 @@ namespace Tankontroller.World
 
         public void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
-            Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS"), Position, Color.Black);
+            Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
             Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS, Position, Colour);
         }
     }

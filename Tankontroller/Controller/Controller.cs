@@ -53,6 +53,10 @@ namespace Tankontroller.Controller
     //---------------------------------------------------------------------------------------------------
     public abstract class Controller : IController
     {
+        public static readonly float MAX_CHARGE = DGS.Instance.GetFloat("MAX_CHARGE");
+        public static readonly float TRACK_DEPLETION_RATE = DGS.Instance.GetFloat("TRACK_DEPLETION_RATE");
+        public static readonly float BULLET_CHARGE_DEPLETION = DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION");
+
         protected class Jack
         {
             private bool mIsDown;
@@ -332,7 +336,7 @@ namespace Tankontroller.Controller
                 {
                     // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
                     // J.charge should be between 0 and DGS.MAX_CHARGE
-                    int FullByte = 50;
+                    //int FullByte = 50;
                     float brightness = 0.2f;
                     float decimalCharge = J.charge / DGS.Instance.GetFloat("MAX_CHARGE");
                     float remainingCharge = 8 * decimalCharge;

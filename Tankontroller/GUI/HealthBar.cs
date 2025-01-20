@@ -4,33 +4,27 @@ using Tankontroller.World;
 
 namespace Tankontroller.GUI
 {
-    //-------------------------------------------------------------------------------------------------
-    // HealthBar
-    //
-    // Draws a health bar for the player.
-    //-------------------------------------------------------------------------------------------------
     public class HealthBar
     {
-        private Texture2D mHeartBlackAndWhite;
-        private Texture2D mHeartColour;
-        private Texture2D mWhitePixel;
+        private static readonly Texture2D mHeartEmpty = Tankontroller.Instance().CM().Load<Texture2D>("healthbars/heart_bw");
+        private static readonly Texture2D mHeartFull = Tankontroller.Instance().CM().Load<Texture2D>("healthbars/heart_colour");
         private Rectangle mBoundsRectangle;
-        private Rectangle[] mRectangles = new Rectangle[DGS.Instance.GetInt("MAX_TANK_HEALTH")];
+        private Rectangle[] mRectangles;
+        private int mMaxHealth;
 
-        public HealthBar(Texture2D pWhitePixel, Texture2D pHeartBlackAndWhite, Texture2D pHeartColour, Rectangle pRectangle)
+        public HealthBar(int pMaxHealth, Rectangle pRectangle)
         {
-            mHeartBlackAndWhite = pHeartBlackAndWhite;
-            mHeartColour = pHeartColour;
-            mWhitePixel = pWhitePixel;
             mBoundsRectangle = pRectangle;
+            mMaxHealth = pMaxHealth;
+            mRectangles = new Rectangle[mMaxHealth];
             PrepareRectangles();
         }
 
         private void PrepareRectangles()
         {
             int paddingWidth = 5;
-            int width = (mBoundsRectangle.Width - paddingWidth * (DGS.Instance.GetInt("MAX_TANK_HEALTH") + 1)) / DGS.Instance.GetInt("MAX_TANK_HEALTH");
-            float heightRatio = (float)mHeartBlackAndWhite.Height / mHeartBlackAndWhite.Width;
+            int width = (mBoundsRectangle.Width - paddingWidth * (mMaxHealth + 1)) / mMaxHealth;
+            float heightRatio = (float)mHeartEmpty.Height / mHeartEmpty.Width;
             int height = (int)(width * heightRatio);
             if (height > mBoundsRectangle.Height)
             {
@@ -43,7 +37,7 @@ namespace Tankontroller.GUI
             {
                 top += (mBoundsRectangle.Height - height) / 2;
             }
-            for (int i = 0; i < DGS.Instance.GetInt("MAX_TANK_HEALTH"); i++)
+            for (int i = 0; i < mMaxHealth; i++)
             {
                 Rectangle rectangle = new Rectangle(left, top, width, height);
                 mRectangles[i] = rectangle;
@@ -57,25 +51,16 @@ namespace Tankontroller.GUI
             PrepareRectangles();
         }
 
-        public void DrawBounds(SpriteBatch pSpriteBatch)
-        {
-            Color boundColour = Color.White;
-            boundColour.A = (byte)0.5f;
-            pSpriteBatch.Draw(mWhitePixel, mBoundsRectangle, boundColour);
-        }
-
         public void Draw(SpriteBatch pSpriteBatch, int health)
         {
-            //DrawBounds(pSpriteBatch);
-            for (int i = 0; i < DGS.Instance.GetInt("MAX_TANK_HEALTH"); i++)
+            for (int i = 0; i < mMaxHealth; i++)
             {
-                pSpriteBatch.Draw(mHeartBlackAndWhite, mRectangles[i], Color.White);
+                pSpriteBatch.Draw(mHeartEmpty, mRectangles[i], Color.White);
                 if (i < health)
                 {
-                    pSpriteBatch.Draw(mHeartColour, mRectangles[i], Color.Red);
+                    pSpriteBatch.Draw(mHeartFull, mRectangles[i], Color.Red);
                 }
             }
-
         }
     }
 }

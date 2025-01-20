@@ -12,6 +12,8 @@ namespace Tankontroller.World
 {
     public class Tank
     {
+        public static readonly int MAX_HEALTH = DGS.Instance.GetInt("MAX_TANK_HEALTH");
+
         static private Texture2D mBaseTexture;
         static private Texture2D mBrokenTexture;
         static private Texture2D mRightTrackTexture;
@@ -285,7 +287,7 @@ namespace Tankontroller.World
             return result;
         }
 
-    
+
         public void PrimingWeapon(float pSeconds)
         {
             m_TimePrimed += pSeconds;

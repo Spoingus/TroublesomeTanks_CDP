@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace Tankontroller.GUI
 {
@@ -23,23 +24,21 @@ namespace Tankontroller.GUI
     {
         private Texture2D[] m_BlackAndWhiteLayer = new Texture2D[5];
         private Texture2D[] m_ColourLayer = new Texture2D[5];
-        private Texture2D m_WhitePixel;
         private Rectangle m_Rectangle;
         private Rectangle[] m_DrawRectangles = new Rectangle[5];
         private Color m_Colour;
         private string m_Name;
 
-        public Avatar(Texture2D pWhitePixel, Texture2D pBlackAndWhiteLayer, Texture2D pColourLayer, Rectangle pRectangle, Color pColour)
+        public Avatar(Texture2D pBlackAndWhiteLayer, Texture2D pColourLayer, Rectangle pRectangle, Color pColour)
         {
             m_BlackAndWhiteLayer[0] = pBlackAndWhiteLayer;
             m_ColourLayer[0] = pColourLayer;
             m_Rectangle = pRectangle;
             m_Colour = pColour;
-            m_WhitePixel = pWhitePixel;
             PrepareDrawRectangles();
         }
 
-        public Avatar(Texture2D pWhitePixel, string pName, Rectangle pRectangle, Color pColour)
+        public Avatar(string pName, Rectangle pRectangle, Color pColour)
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             for (int i = 0; i < m_BlackAndWhiteLayer.Length; i++)
@@ -51,7 +50,6 @@ namespace Tankontroller.GUI
             }
             m_Rectangle = pRectangle;
             m_Colour = pColour;
-            m_WhitePixel = pWhitePixel;
             m_Name = pName;
             PrepareDrawRectangles();
         }
@@ -89,16 +87,9 @@ namespace Tankontroller.GUI
             PrepareDrawRectangles();
         }
 
-        public void DrawBounds(SpriteBatch pSpriteBatch)
-        {
-            Color boundColour = m_Colour;
-            boundColour.A = (byte)0.5f;
-            pSpriteBatch.Draw(m_WhitePixel, m_Rectangle, boundColour);
-        }
-
         public void Draw(SpriteBatch pSpriteBatch, bool pAlive, int pIndex)
         {
-            //DrawBounds(pSpriteBatch);
+            pIndex = Math.Clamp(pIndex, 0, 4); // in the case that health is 0
             if (pAlive)
             {
                 pSpriteBatch.Draw(m_BlackAndWhiteLayer[pIndex], m_DrawRectangles[pIndex], Color.White);
