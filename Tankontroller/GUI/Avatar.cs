@@ -22,10 +22,11 @@ namespace Tankontroller.GUI
 
     public class Avatar
     {
-        private Texture2D[] m_BlackAndWhiteLayer = new Texture2D[5];
-        private Texture2D[] m_ColourLayer = new Texture2D[5];
+        private const int LAYER_COUNT = 5;
+        private Texture2D[] m_BlackAndWhiteLayer = new Texture2D[LAYER_COUNT];
+        private Texture2D[] m_ColourLayer = new Texture2D[LAYER_COUNT];
         private Rectangle m_Rectangle;
-        private Rectangle[] m_DrawRectangles = new Rectangle[5];
+        private Rectangle[] m_DrawRectangles = new Rectangle[LAYER_COUNT];
         private Color m_Colour;
         private string m_Name;
 
@@ -89,7 +90,7 @@ namespace Tankontroller.GUI
 
         public void Draw(SpriteBatch pSpriteBatch, bool pAlive, int pIndex)
         {
-            pIndex = Math.Clamp(pIndex, 0, 4); // in the case that health is 0
+            pIndex = Math.Clamp(pIndex, 0, LAYER_COUNT - 1); // ensure that pIndex is within the range of the array
             if (pAlive)
             {
                 pSpriteBatch.Draw(m_BlackAndWhiteLayer[pIndex], m_DrawRectangles[pIndex], Color.White);

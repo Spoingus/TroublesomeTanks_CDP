@@ -131,7 +131,7 @@ namespace Tankontroller.GUI
                 int port = PortMapping.GetPortForPlayer(j);
                 float currentCharge = mController.GetJackCharge(port);
                 Control currentControl = mController.GetJackControl(port);
-                float requiredCharge = currentControl == Control.FIRE ? Controller.Controller.BULLET_CHARGE_DEPLETION : 0.01f;
+                float requiredCharge = currentControl == Control.FIRE ? Player.BULLET_CHARGE_DEPLETION : 0.01f;
 
                 m_PowerBars[j].Draw(pSpriteBatch, currentCharge, currentCharge >= requiredCharge);
                 m_JackIcons[j].Draw(pSpriteBatch, currentControl);

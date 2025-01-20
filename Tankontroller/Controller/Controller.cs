@@ -54,8 +54,6 @@ namespace Tankontroller.Controller
     public abstract class Controller : IController
     {
         public static readonly float MAX_CHARGE = DGS.Instance.GetFloat("MAX_CHARGE");
-        public static readonly float TRACK_DEPLETION_RATE = DGS.Instance.GetFloat("TRACK_DEPLETION_RATE");
-        public static readonly float BULLET_CHARGE_DEPLETION = DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION");
 
         protected class Jack
         {
@@ -82,7 +80,7 @@ namespace Tankontroller.Controller
             }
             public void ResetCharge()
             {
-                charge = DGS.Instance.GetFloat("STARTING_CHARGE");
+                charge = MAX_CHARGE;
             }
         };
         protected Color mColour;
@@ -238,7 +236,7 @@ namespace Tankontroller.Controller
             m_KeyMap = pKeyMap;
             m_PortMap = pPortMap;
 
-            mJacks[0].Control = Control.RECHARGE;
+            mJacks[0].Control = Control.LEFT_TRACK_BACKWARDS;
             mJacks[1].Control = Control.LEFT_TRACK_FORWARDS;
             mJacks[2].Control = Control.RIGHT_TRACK_FORWARDS;
             mJacks[3].Control = Control.RIGHT_TRACK_BACKWARDS;

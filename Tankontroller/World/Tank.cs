@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.World.Particles;
 
@@ -13,6 +14,16 @@ namespace Tankontroller.World
     public class Tank
     {
         public static readonly int MAX_HEALTH = DGS.Instance.GetInt("MAX_TANK_HEALTH");
+        public static readonly float TANK_SPEED = DGS.Instance.GetFloat("TANK_SPEED");
+        public static readonly float BULLET_SPEED = DGS.Instance.GetFloat("BULLET_SPEED");
+        public static readonly int BLAST_DELAY = DGS.Instance.GetInt("BLAST_DELAY");
+        public static readonly int TANK_HEIGHT = DGS.Instance.GetInt("TANK_HEIGHT");
+        public static readonly int TANK_WIDTH = DGS.Instance.GetInt("TANK_WIDTH");
+        public static readonly int TANK_FRONT_BUFFER = DGS.Instance.GetInt("TANK_FRONT_BUFFER");
+        public static readonly float BASE_TURRET_ROTATION_ANGLE = DGS.Instance.GetFloat("BASE_TURRET_ROTATION_ANGLE");
+        public static readonly float BASE_TANK_ROTATION_ANGLE = DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE");
+        public static readonly float TRACK_OFFSET = DGS.Instance.GetFloat("TRACK_OFFSET");
+
 
         static private Texture2D mBaseTexture;
         static private Texture2D mBrokenTexture;
@@ -31,7 +42,7 @@ namespace Tankontroller.World
             mCannonFireTexture = pCannonFire;
         }
 
-        private Vector2[] TANK_CORNERS = { new Vector2(DGS.Instance.GetInt("TANK_HEIGHT") / 2 - DGS.Instance.GetInt("TANK_FRONT_BUFFER"), -DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(-DGS.Instance.GetInt("TANK_HEIGHT") / 2, -DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(-DGS.Instance.GetInt("TANK_HEIGHT") / 2, DGS.Instance.GetInt("TANK_WIDTH") / 2), new Vector2(DGS.Instance.GetInt("TANK_HEIGHT") / 2 - DGS.Instance.GetInt("TANK_FRONT_BUFFER"), DGS.Instance.GetInt("TANK_WIDTH") / 2) };
+        private Vector2[] TANK_CORNERS = { new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, TANK_WIDTH / 2), new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, TANK_WIDTH / 2) };
 
         private List<Bullet> m_Bullets;
 
@@ -65,7 +76,6 @@ namespace Tankontroller.World
             m_Health = 5;
             mFired = 0;
             mColour = pColour;
-            ChargeDown = false;
             m_LeftTrackFrame = 1;
             m_RightTrackFrame = 1;
         }
@@ -86,8 +96,6 @@ namespace Tankontroller.World
             ParticleManager.Instance().InitialiseParticles(dust, 4);
         }
 
-        public bool ChargeDown { get; private set; }
-
         public int Health()
         {
             return m_Health;
@@ -95,10 +103,6 @@ namespace Tankontroller.World
         public Color Colour()
         {
             return mColour;
-        }
-        public void SetFired(int pDelay)
-        {
-            mFired = pDelay;
         }
 
         public void Rotate(float pRotate)
@@ -184,84 +188,64 @@ namespace Tankontroller.World
             }
         }
 
-        public void ChargePressed()
-        {
-            ChargeDown = true;
-        }
-
-        public void ChargeReleased()
-        {
-            ChargeDown = false;
-        }
-
         public float GetCannonWorldRotation() { return mCannonRotation; }
         public Vector2 GetCannonWorldPosition() { return GetWorldPosition(); }
 
-        public void CannonLeft() { mCannonRotation -= DGS.Instance.GetFloat("BASE_TURRET_ROTATION_ANGLE"); }
-        public void CannonRight() { mCannonRotation += DGS.Instance.GetFloat("BASE_TURRET_ROTATION_ANGLE"); }
+        public void CannonLeft() { mCannonRotation -= BASE_TURRET_ROTATION_ANGLE; }
+        public void CannonRight() { mCannonRotation += BASE_TURRET_ROTATION_ANGLE; }
 
 
         public void LeftTrackForward()
         {
-            Rotate(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"));
+            Rotate(BASE_TANK_ROTATION_ANGLE);
             ChangeLeftTrackFrame(1);
-            AdvancedTrackRotation(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), true);
+            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE, true);
         }
         public void RightTrackForward()
         {
-            Rotate(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"));
-            AdvancedTrackRotation(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), true);
+            Rotate(-BASE_TANK_ROTATION_ANGLE);
+            AdvancedTrackRotation(-BASE_TANK_ROTATION_ANGLE, true);
             ChangeRightTrackFrame(1);
         }
         public void LeftTrackBackward()
         {
-            Rotate(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"));
+            Rotate(-BASE_TANK_ROTATION_ANGLE);
             ChangeLeftTrackFrame(-1);
-            AdvancedTrackRotation(-DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), false);
+            AdvancedTrackRotation(-BASE_TANK_ROTATION_ANGLE, false);
         }
         public void RightTrackBackward()
         {
-            Rotate(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"));
+            Rotate(BASE_TANK_ROTATION_ANGLE);
             ChangeRightTrackFrame(-1);
-            AdvancedTrackRotation(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), false);
+            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE, false);
         }
         public void BothTracksForward()
         {
-            Translate(DGS.Instance.GetFloat("TANK_SPEED"));
+            Translate(TANK_SPEED);
             ChangeLeftTrackFrame(1);
             ChangeRightTrackFrame(1);
         }
         public void BothTracksBackward()
         {
-            Translate(-DGS.Instance.GetFloat("TANK_SPEED"));
+            Translate(-TANK_SPEED);
             ChangeLeftTrackFrame(-1);
             ChangeRightTrackFrame(-1);
         }
         public void BothTracksOpposite(bool clockwise)
         {
-            float angle = 2 * DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE");
-            if (!clockwise)
-            {
-                angle *= -1;
-            }
+            float angle = 2 * BASE_TANK_ROTATION_ANGLE;
+            angle = clockwise ? angle : -angle;
             Rotate(angle);
 
-            if (clockwise)
-            {
-                ChangeLeftTrackFrame(1);
-                ChangeRightTrackFrame(-1);
-            }
-            else
-            {
-                ChangeLeftTrackFrame(-1);
-                ChangeRightTrackFrame(1);
-            }
-            AdvancedTrackRotation(DGS.Instance.GetFloat("BASE_TANK_ROTATION_ANGLE"), false);
+            ChangeLeftTrackFrame(clockwise ? 1 : -1);
+            ChangeRightTrackFrame(clockwise ? -1 : 1);
+            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE, false);
         }
 
         private void AdvancedTrackRotation(float pAngle, bool pForwards)
         {
-            float arcLength = (float)Math.Sqrt(2 * DGS.Instance.GetFloat("TRACK_OFFSET_SQRD") - 2 * DGS.Instance.GetFloat("TRACK_OFFSET_SQRD") * Math.Cos(pAngle));
+            float offsetSqrd = TRACK_OFFSET * TRACK_OFFSET;
+            float arcLength = (float)Math.Sqrt(2 * offsetSqrd - 2 * offsetSqrd * Math.Cos(pAngle));
             arcLength = pForwards ? arcLength : arcLength * -1;
             Vector3 translationVector = new Vector3(arcLength, 0, 0);
             translationVector = Vector3.Transform(translationVector, Matrix.CreateRotationZ(mRotation));
@@ -301,10 +285,11 @@ namespace Tankontroller.World
         public void Fire()
         {
             m_TimePrimed = 0;
+            mFired = BLAST_DELAY;
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-            m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * DGS.Instance.GetFloat("BULLET_SPEED"), Colour()));
+            m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * BULLET_SPEED, Colour()));
         }
 
         public void PutBack()
@@ -363,7 +348,7 @@ namespace Tankontroller.World
                 Random rand = new Random();
                 int clang = rand.Next(1, 4);
                 string tankClang = "Sounds/Tank_Clang" + clang;
-                Microsoft.Xna.Framework.Audio.SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
+                SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
                 tankClangSound.Play();
                 return true;
             }
