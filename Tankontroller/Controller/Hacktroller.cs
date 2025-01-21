@@ -141,11 +141,11 @@ namespace Tankontroller.Controller
             new stateMap(ControllerState.FIRE, 11),
             new stateMap(ControllerState.FIRE_PRESSED, 12),
 
-            new stateMap(ControllerState.TURRET_RIGHT, 13),
-            new stateMap(ControllerState.TURRET_RIGHT_PRESSED, 14),
+            new stateMap(ControllerState.TURRET_LEFT, 13),
+            new stateMap(ControllerState.TURRET_LEFT_PRESSED, 14),
 
-            new stateMap(ControllerState.TURRET_LEFT, 15),
-            new stateMap(ControllerState.TURRET_LEFT_PRESSED, 16),
+            new stateMap(ControllerState.TURRET_RIGHT, 15),
+            new stateMap(ControllerState.TURRET_RIGHT_PRESSED, 16),
 
             new stateMap(ControllerState.NOT_CONNECTED, 0)
         };
