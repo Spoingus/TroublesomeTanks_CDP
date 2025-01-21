@@ -18,12 +18,15 @@ namespace Tankontroller
         public Tank Tank { get; private set; }
         public IController Controller { get; private set; }
         public Color Colour { get; private set; }
-        public Avatar Avatar { get; private set; }
         public List<Bullet> Bullets { get; private set; }
         public Player(IController pController, Avatar pAvatar)
         {
             Controller = pController;
-            Avatar = pAvatar;
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
+            Texture2D whitePixel = game.CM().Load<Texture2D>("white_pixel");
+            Texture2D healthBarBW = game.CM().Load<Texture2D>("healthbars/heart_bw");
+            Texture2D healthBarColour = game.CM().Load<Texture2D>("healthbars/heart_colour");
+            GUI = new TeamGUI(whitePixel, healthBarBW, healthBarColour, pAvatar, Controller, Colour);
             Colour = pAvatar.GetColour();
         }
 
@@ -37,7 +40,7 @@ namespace Tankontroller
             Controller.SetColour(Colour);
             Bullets = new List<Bullet>();
             Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, Bullets, pTankScale);
-            GUI = new TeamGUI(Avatar, pRectangle, Controller, Colour);
+            GUI.Reposition(pRectangle);
         }
 
         public void Reset()

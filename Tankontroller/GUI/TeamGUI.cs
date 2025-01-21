@@ -29,6 +29,8 @@ namespace Tankontroller.GUI
         private Rectangle m_Rectangle;
         private HealthBar m_HealthBar;
         private Avatar m_Avatar;
+        private Texture2D m_HealthBarBlackAndWhiteLayer;
+        private Texture2D m_HealthBarColourLayer;
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
