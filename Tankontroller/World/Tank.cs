@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,22 +48,21 @@ namespace Tankontroller.World
         private int m_LeftTrackFrame;
         private int m_RightTrackFrame;
 
-        public Tank(float pXPosition, float pYPosition, float pRotation, Color pColour, List<Bullet> pBullets, float pScale)
+        public Tank(float pXPosition, float pYPosition, float pRotation, Color pColour, float pScale)
         {
-            m_Scale = pScale;
-            m_Bullets = pBullets;
-            mRotation = pRotation;
-            mOldRotation = mRotation;
-            int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
-            mPosition = new Vector3(pXPosition, pYPosition, 0);
-            mOldPosition = mPosition;
-            mCannonRotation = pRotation;
-            m_Health = 5;
-            mFired = 0;
+            m_Health = MAX_HEALTH;
             mColour = pColour;
+            m_Bullets = new List<Bullet>();
+            mFired = 0;
             m_LeftTrackFrame = 1;
             m_RightTrackFrame = 1;
+
+            m_Scale = pScale;
+            mPosition = new Vector3(pXPosition, pYPosition, 0);
+            mRotation = pRotation;
+            mCannonRotation = pRotation;
+            mOldPosition = mPosition;
+            mOldRotation = mRotation;
         }
 
         private void ChangeLeftTrackFrame(int pAmount)

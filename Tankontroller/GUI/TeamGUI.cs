@@ -14,43 +14,26 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     public class TeamGUI
     {
-        private static readonly Texture2D[] m_PortNumbers = new Texture2D[]
-        {
-            Tankontroller.Instance().CM().Load<Texture2D>("port1"),
-            Tankontroller.Instance().CM().Load<Texture2D>("port2"),
-            Tankontroller.Instance().CM().Load<Texture2D>("port3"),
-            Tankontroller.Instance().CM().Load<Texture2D>("port4"),
-            Tankontroller.Instance().CM().Load<Texture2D>("port5"),
-            Tankontroller.Instance().CM().Load<Texture2D>("port6"),
-            Tankontroller.Instance().CM().Load<Texture2D>("port7"),
-            Tankontroller.Instance().CM().Load<Texture2D>("port8"),
-        };
-
-        private Rectangle m_Rectangle;
         private HealthBar m_HealthBar;
         private Avatar m_Avatar;
-        private Texture2D m_HealthBarBlackAndWhiteLayer;
-        private Texture2D m_HealthBarColourLayer;
         private PowerBar[] m_PowerBars = new PowerBar[8];
         private JackIcon[] m_JackIcons = new JackIcon[8];
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
         private IController mController;
-        private Vector2 Frame { get; set; }
         private Color m_Color { get; set; }
 
-        public TeamGUI(
-           Avatar pAvatar,
-           Rectangle pRectangle,
-           IController pController,
-           Color pColor)
+        public TeamGUI(Avatar pAvatar,Rectangle pRectangle,IController pController)
         {
-            m_Rectangle = pRectangle;
-            m_Color = pColor;
             mController = pController;
             m_Avatar = pAvatar;
-            m_Avatar.Reposition(GetAvatarRect());
-            m_HealthBar = new HealthBar(Tank.MAX_HEALTH, GetHealthBarRect());
+            m_Color = pAvatar.GetColour();
+            m_Avatar.Reposition(GetAvatarRect(pRectangle));
+            m_HealthBar = new HealthBar(Tank.MAX_HEALTH, GetHealthBarRect(pRectangle));
+            RepositionPowerBar(pRectangle);
+        }
 
+        private void RepositionPowerBar(Rectangle pRectangle)
+        {
             int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
 
@@ -70,23 +53,23 @@ namespace Tankontroller.GUI
             {
                 m_PowerBars[j] = new PowerBar(new Vector2(xOffset + xValue, powerBar_yValueOffset), powerBarWidth, powerBarHeight);
                 m_JackIcons[j] = new JackIcon(new Vector2(xOffset + xValue, jackIcons_yValueOffset), powerBarWidth, powerBarWidth);
-                m_PortNumLabels[j] = new PortNumLabel(m_PortNumbers, new Vector2(xOffset + xValue, labels_yValueOffset), powerBarWidth, powerBarWidth);
+                m_PortNumLabels[j] = new PortNumLabel(new Vector2(xOffset + xValue, labels_yValueOffset), powerBarWidth, powerBarWidth);
                 xValue += xIncrement;
             }
         }
 
-        private Rectangle GetAvatarRect()
+        private Rectangle GetAvatarRect(Rectangle pRectangle)
         {
-            int avatarWidth = (int)(m_Rectangle.Width * 0.4);
-            int avatarHeight = m_Rectangle.Height;
-            return new Rectangle(m_Rectangle.X, m_Rectangle.Y, avatarWidth, avatarHeight);
+            int avatarWidth = (int)(pRectangle.Width * 0.4);
+            int avatarHeight = pRectangle.Height;
+            return new Rectangle(pRectangle.X, pRectangle.Y, avatarWidth, avatarHeight);
         }
-        private Rectangle GetHealthBarRect()
+        private Rectangle GetHealthBarRect(Rectangle pRectangle)
         {
-            int healthBarWidth = (int)(m_Rectangle.Width * 0.6);
-            int healthBarHeight = (int)(m_Rectangle.Height * 0.25);
-            int healthBarLeft = m_Rectangle.Left + m_Rectangle.Width - healthBarWidth;
-            int healthBarTop = m_Rectangle.Top + m_Rectangle.Height - healthBarHeight;
+            int healthBarWidth = (int)(pRectangle.Width * 0.6);
+            int healthBarHeight = (int)(pRectangle.Height * 0.25);
+            int healthBarLeft = pRectangle.Left + pRectangle.Width - healthBarWidth;
+            int healthBarTop = pRectangle.Top + pRectangle.Height - healthBarHeight;
             return new Rectangle(healthBarLeft, healthBarTop, healthBarWidth, healthBarHeight);
         }
 
@@ -97,8 +80,9 @@ namespace Tankontroller.GUI
 
         public void Reposition(Rectangle pRectangle)
         {
-            m_Avatar.Reposition(GetAvatarRect());
-            m_HealthBar.Reposition(GetHealthBarRect());
+            m_Avatar.Reposition(GetAvatarRect(pRectangle));
+            m_HealthBar.Reposition(GetHealthBarRect(pRectangle));
+            RepositionPowerBar(pRectangle);
         }
 
         public void RepositionForGameOver(Rectangle pRectangle)
