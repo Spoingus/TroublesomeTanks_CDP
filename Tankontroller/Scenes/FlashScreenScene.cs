@@ -10,6 +10,7 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class FlashScreenScene : IScene
     {
+        private static readonly float DISPLAY_TIME = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_FLASH_SCREEN");
         private readonly Texture2D mLogoTexture = null;
         private readonly Rectangle mRectangle;
         private float secondsLeft;
@@ -29,7 +30,7 @@ namespace Tankontroller.Scenes
             int y = (screenHeight - height) / 2;
 
             mRectangle = new Rectangle(x, y, width, height);
-            secondsLeft = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_FLASH_SCREEN");
+            secondsLeft = DISPLAY_TIME;
         }
 
         public override void Update(float pSeconds)
@@ -51,7 +52,7 @@ namespace Tankontroller.Scenes
 
             spriteBatch.End();
         }
-        
+
 
     }
 }

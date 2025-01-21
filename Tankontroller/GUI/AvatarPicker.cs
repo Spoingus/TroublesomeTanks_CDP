@@ -34,7 +34,6 @@ namespace Tankontroller.GUI
         private float mAvatarRadius;
 
         // Textures and Bounds
-        private Texture2D mWhitePixel;
         private Texture2D mCircle;
         private Texture2D mJoinButtonTexture;
         private Texture2D mBackButtonTexture;
@@ -53,7 +52,6 @@ namespace Tankontroller.GUI
 
             // Load Textures
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
-            mWhitePixel = game.CM().Load<Texture2D>("white_pixel");
             mCircle = game.CM().Load<Texture2D>("circle");
             mJoinButtonTexture = game.CM().Load<Texture2D>("fire");
             mBackButtonTexture = game.CM().Load<Texture2D>("charge");
@@ -120,7 +118,7 @@ namespace Tankontroller.GUI
 
             Color color = mAvatarSet ? mColours[mSelectionIndex].GetColour() : Color.White;
 
-            mCentreAvatar = new Avatar(mWhitePixel, name, avatarRect, color);
+            mCentreAvatar = new Avatar(name, avatarRect, color);
         }
 
         private void PrepareButtons()
@@ -183,7 +181,7 @@ namespace Tankontroller.GUI
             var rectangles = GetSelectionRectangles(avatarStrings.Count);
             for (int i = 0; i < avatarStrings.Count; i++)
             {
-                Avatar avatar = new Avatar(mWhitePixel, avatarStrings[i], rectangles[i], Color.White);
+                Avatar avatar = new Avatar(avatarStrings[i], rectangles[i], Color.White);
                 mAvatars.Add(avatar);
             }
         }
@@ -211,7 +209,7 @@ namespace Tankontroller.GUI
             var rectangles = GetSelectionRectangles(colours.Count);
             for (int i = 0; i < colours.Count; i++)
             {
-                Avatar avatar = new Avatar(mWhitePixel, pAvatarString, rectangles[i], colours[i]);
+                Avatar avatar = new Avatar(pAvatarString, rectangles[i], colours[i]);
                 mColours.Add(avatar);
             }
         }

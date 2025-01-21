@@ -76,7 +76,7 @@ namespace Tankontroller
                         port = new SerialPort(portName, 19200); //, Parity.None, 8, StopBits.One);
                         port.Open();
                     }
-                    catch (Exception e)
+                    catch
                     {
                         continue;
                     }
@@ -109,7 +109,7 @@ namespace Tankontroller
                                 port.Close();
                             }
                         }
-                        catch(Exception e)
+                        catch
                         {
                             //possible timeout - ignore
                         }

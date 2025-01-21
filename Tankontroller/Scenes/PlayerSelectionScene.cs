@@ -21,7 +21,6 @@ namespace Tankontroller.Scenes
         Rectangle mBackgroundRectangle;
         Texture2D[] mCountDownTextures = new Texture2D[6];
         Rectangle[] mCountDownRectangles = new Rectangle[6];
-        public SpriteBatch spriteBatch { get; set; }
 
         List<AvatarPicker> mAvatarPickers;
         float mCountdown;

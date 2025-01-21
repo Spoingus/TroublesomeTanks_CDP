@@ -11,6 +11,7 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class GameOverScene : IScene
     {
+        private static readonly float DISPLAY_TIME = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_GAMEOVER_SCREEN");
         Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
         private List<Player> mPlayers;
         Texture2D mBackgroundTexture = null;
@@ -28,7 +29,7 @@ namespace Tankontroller.Scenes
             int x = (screenWidth - width) / 2;
             int y = (screenHeight - height) / 2;
             mRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
-            secondsLeft = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_GAMEOVER_SCREEN");
+            secondsLeft = DISPLAY_TIME;
             tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
             mPlayers = pPlayers;
             mWinner = pWinner;
@@ -53,7 +54,7 @@ namespace Tankontroller.Scenes
                     int loserTextureWidth = textureWidth / mPlayers.Count;
                     int loserTextureHeight = (int)(loserTextureWidth * ((float)254 / (float)540));
                     Rectangle newRectangle = new Rectangle(centreXOffset, centreY, loserTextureWidth, loserTextureHeight);
-                    mPlayers[i].GUI.RepositionGameOver(newRectangle);
+                    mPlayers[i].GUI.RepositionForGameOver(newRectangle);
                     centreXOffset += loserTextureWidth;
                 }
                 else //Reposition the winner
@@ -61,7 +62,7 @@ namespace Tankontroller.Scenes
                     int centreX = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width / 2 - textureWidth / 2;
                     int centreY = textureHeight / 2;
                     Rectangle newRectangle = new Rectangle(centreX, centreY, textureWidth, textureHeight);
-                    mPlayers[mWinner].GUI.RepositionGameOver(newRectangle);
+                    mPlayers[mWinner].GUI.RepositionForGameOver(newRectangle);
                 }
             }
         }

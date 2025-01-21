@@ -23,25 +23,25 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class GameScene : IScene
     {
-        IGame gameInstance = Tankontroller.Instance();
-        Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
-        private TheWorld m_World;
-        private Texture2D m_BulletTexture;
-        private Texture2D m_ErrorBGTexture;
+        private static readonly Color GROUND_COLOUR = DGS.Instance.GetColour("COLOUR_GROUND");
+
+
+        private static readonly SpriteFont m_SpriteFont = Tankontroller.Instance().CM().Load<SpriteFont>("handwritingfont");
+        private static readonly Texture2D m_BulletTexture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
+        private static readonly Texture2D mPixelTexture = Tankontroller.Instance().CM().Load<Texture2D>("block");
+        private static readonly Texture2D mBackgroundTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_01");
+        private static readonly Texture2D m_ErrorBGTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_err");
         private SoundEffectInstance introMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
-        private SpriteFont m_SpriteFont;
 
-        private List<Vector2> m_TankPositions = new List<Vector2>();
-        private List<float> m_TankRotations = new List<float>();
+        Tankontroller mGameInstance = (Tankontroller)Tankontroller.Instance();
 
         private const float SECONDS_BETWEEN_TRACKS_ADDED = 0.2f;
         private float m_SecondsTillTracksAdded = SECONDS_BETWEEN_TRACKS_ADDED;
 
+        private TheWorld m_World;
         private List<Player> m_Teams;
 
-        Texture2D mBackgroundTexture = null;
-        Texture2D mPixelTexture = null;
         Rectangle mBackgroundRectangle;
         Rectangle mPlayAreaRectangle;
         Rectangle mPlayAreaOutlineRectangle;
@@ -50,74 +50,35 @@ namespace Tankontroller.Scenes
         private bool mControllersConnected = true;
         public GameScene(List<Player> pPlayers)
         {
-            Tank.SetupStaticTextures(
-                tankControllerInstance.CM().Load<Texture2D>("Tank-B-05"),
-                tankControllerInstance.CM().Load<Texture2D>("BrokenTank"),
-                tankControllerInstance.CM().Load<Texture2D>("Tank track B-R"),
-                tankControllerInstance.CM().Load<Texture2D>("Tank track B-L"),
-                tankControllerInstance.CM().Load<Texture2D>("cannon"),
-                tankControllerInstance.CM().Load<Texture2D>("cannonFire"));
-            m_BulletTexture = tankControllerInstance.CM().Load<Texture2D>("circle");
-            mPixelTexture = tankControllerInstance.CM().Load<Texture2D>("block");
-            m_ErrorBGTexture = tankControllerInstance.CM().Load<Texture2D>("background_err");
-            TrackSystem.SetupStaticMembers(tankControllerInstance.CM().Load<Texture2D>("track"));
-            TeamGUI.SetupStaticTextures(
-                tankControllerInstance.CM().Load<Texture2D>("port1"),
-                tankControllerInstance.CM().Load<Texture2D>("port2"),
-                tankControllerInstance.CM().Load<Texture2D>("port3"),
-                tankControllerInstance.CM().Load<Texture2D>("port4"),
-                tankControllerInstance.CM().Load<Texture2D>("port5"),
-                tankControllerInstance.CM().Load<Texture2D>("port6"),
-                tankControllerInstance.CM().Load<Texture2D>("port7"),
-                tankControllerInstance.CM().Load<Texture2D>("port8"));
+            spriteBatch = new SpriteBatch(mGameInstance.GDM().GraphicsDevice);
 
-            JackIcon.SetupStaticTextures(
-                tankControllerInstance.CM().Load<Texture2D>("leftTrackForward"),
-                tankControllerInstance.CM().Load<Texture2D>("leftTrackBackwards"),
-                tankControllerInstance.CM().Load<Texture2D>("rightTrackForward"),
-                tankControllerInstance.CM().Load<Texture2D>("rightTrackBackwards"),
-                tankControllerInstance.CM().Load<Texture2D>("fire"),
-                tankControllerInstance.CM().Load<Texture2D>("charge"),
-                tankControllerInstance.CM().Load<Texture2D>("none"),
-                tankControllerInstance.CM().Load<Texture2D>("turretLeft"),
-                tankControllerInstance.CM().Load<Texture2D>("turretRight"));
-            PowerBar.SetupStaticTextures(tankControllerInstance.CM().Load<Texture2D>("powerBar_border"),
-                tankControllerInstance.CM().Load<Texture2D>("powerBar_power"));
+            introMusicInstance = mGameInstance.ReplaceCurrentMusicInstance("Music/Music_intro", false);
+            tankMoveSound = mGameInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks");
 
-            m_SpriteFont = tankControllerInstance.CM().Load<SpriteFont>("handwritingfont");
-
-            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
-
-            mBackgroundTexture = tankControllerInstance.CM().Load<Texture2D>("background_01");
-            mBackgroundRectangle = new Rectangle(0, 0, tankControllerInstance.GDM().GraphicsDevice.Viewport.Width, tankControllerInstance.GDM().GraphicsDevice.Viewport.Height);
-            mPlayAreaRectangle = new Rectangle(tankControllerInstance.GDM().GraphicsDevice.Viewport.Width * 2 / 100, tankControllerInstance.GDM().GraphicsDevice.Viewport.Height * 25 / 100, tankControllerInstance.GDM().GraphicsDevice.Viewport.Width * 96 / 100, tankControllerInstance.GDM().GraphicsDevice.Viewport.Height * 73 / 100);
+            int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
+            mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
+            mPlayAreaRectangle = new Rectangle(screenWidth * 2 / 100, screenHeight * 25 / 100, screenWidth * 96 / 100, screenHeight * 73 / 100);
             mPlayAreaOutlineRectangle = new Rectangle(mPlayAreaRectangle.X - 5, mPlayAreaRectangle.Y - 5, mPlayAreaRectangle.Width + 10, mPlayAreaRectangle.Height + 10);
-            introMusicInstance = tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_intro", false);
-
 
             m_Teams = pPlayers;
 
-            int numberOfPlayers = m_Teams.Count;
-
-            for (int i = 0; i < numberOfPlayers; i++)
+            if (m_Teams.Count < 4)
             {
-                IController controller = Tankontroller.Instance().GetController(i);
-                controller.ResetJacks();
-            }
-            tankMoveSound = tankControllerInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks"); 
-
-            if (numberOfPlayers < 4)
-            {
-                setupNot4Player(mPlayAreaRectangle, numberOfPlayers);
+                setupNot4Player(mPlayAreaRectangle, m_Teams.Count);
             }
             else
             {
                 setup4Player(mPlayAreaRectangle);
             }
+
             foreach (Player p in m_Teams)
             {
+                p.Controller.ResetJacks();
                 m_World.AddTank(p.Tank);
             }
+
+            Reset();
         }
 
         //The game set up for 4 players
@@ -147,34 +108,35 @@ namespace Tankontroller.Scenes
 
             //Creates a list of tank positions and rotations for each of the 4 players
             List<Vector2> tankPositions = new List<Vector2>();
+            List<float> rotations = new List<float>();
 
             float xPosition = pPlayArea.X + outerBlockXOffset / 2;
             float yPosition = pPlayArea.Y + outerBlockXOffset / 2;
             Vector2 tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)(-Math.PI + Math.PI / 4));
+            tankPositions.Add(tankPosition);
+            rotations.Add((float)(-Math.PI + Math.PI / 4));
 
             xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
             yPosition = pPlayArea.Y + outerBlockXOffset / 2;
             tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)-Math.PI / 4);
+            tankPositions.Add(tankPosition);
+            rotations.Add((float)-Math.PI / 4);
 
             xPosition = pPlayArea.X + outerBlockXOffset / 2;
             yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
             tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
+            tankPositions.Add(tankPosition);
+            rotations.Add((float)(Math.PI / 2 + Math.PI / 4));
 
             xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
             yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
             tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)Math.PI / 4);
+            tankPositions.Add(tankPosition);
+            rotations.Add((float)Math.PI / 4);
 
             m_World = new TheWorld(pPlayArea, Walls);
 
-            setupPlayers(pPlayArea);
+            setupPlayers(pPlayArea, tankPositions, rotations);
         }
 
         //The game set up for 1 to 3 players
@@ -219,45 +181,47 @@ namespace Tankontroller.Scenes
             };
 
             //Creates a list of tank positions and rotations for each of the players, ranging from 1 to 3 players
+            List<Vector2> positions = new List<Vector2>();
+            List<float> rotations = new List<float>();
             if (pNumOfPlayers >= 1)
             {
                 float xPosition = pPlayArea.X + outerBlockXOffset;
                 float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
                 Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                m_TankPositions.Add(tankPosition);
-                m_TankRotations.Add(0);
+                positions.Add(tankPosition);
+                rotations.Add(0);
                 if (pNumOfPlayers >= 2)
                 {
                     xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
                     yPosition = pPlayArea.Y + pPlayArea.Height / 2;
                     tankPosition = new Vector2(xPosition, yPosition);
-                    m_TankPositions.Add(tankPosition);
-                    m_TankRotations.Add((float)Math.PI);
+                    positions.Add(tankPosition);
+                    rotations.Add((float)Math.PI);
                     if (pNumOfPlayers >= 3)
                     {
                         xPosition = pPlayArea.Width / 2 + 35;
                         yPosition = pPlayArea.Y + pPlayArea.Height / 2;
                         tankPosition = new Vector2(xPosition, yPosition);
-                        m_TankPositions.Add(tankPosition);
-                        m_TankRotations.Add((float)Math.PI / 2);
+                        positions.Add(tankPosition);
+                        rotations.Add((float)Math.PI / 2);
                     }
                 }
             }
 
             m_World = new TheWorld(pPlayArea, Walls);
 
-            setupPlayers(pPlayArea);
+            setupPlayers(pPlayArea, positions, rotations);
         }
-        private void setupPlayers(Rectangle pPlayArea)
+        private void setupPlayers(Rectangle pPlayArea, List<Vector2> pPositions, List<float> pRotations)
         {
             float tankScale = (float)pPlayArea.Width / (50 * 40);
-            int textureWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width / 4;
-            int spacePerPlayer = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width / m_Teams.Count;
-            int textureHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height * 24 / 100;
+            int textureWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width / 4;
+            int spacePerPlayer = mGameInstance.GDM().GraphicsDevice.Viewport.Width / m_Teams.Count;
+            int textureHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height * 24 / 100;
             for (int i = 0; i < m_Teams.Count; i++)
             {
                 m_Teams[i].GamePreparation(
-                m_TankPositions[i].X, m_TankPositions[i].Y, m_TankRotations[i], tankScale,
+                pPositions[i].X, pPositions[i].Y, pRotations[i], tankScale,
                 new Rectangle((int)(i * spacePerPlayer + (spacePerPlayer - textureWidth) * 0.5f), 0, textureWidth, textureHeight));
             }
 
@@ -281,30 +245,16 @@ namespace Tankontroller.Scenes
             }
 
             spriteBatch.Draw(mPixelTexture, mPlayAreaOutlineRectangle, Color.Black);
-            spriteBatch.Draw(mPixelTexture, mPlayAreaRectangle, DGS.Instance.GetColour("COLOUR_GROUND"));
+            spriteBatch.Draw(mPixelTexture, mPlayAreaRectangle, GROUND_COLOUR);
 
             TrackSystem.GetInstance().Draw(spriteBatch);
 
-            //Draw the background of the bullets
-            foreach (Player p in m_Teams)
-            {
-                List<Bullet> bullets = p.Tank.GetBulletList();
-                foreach (Bullet b in bullets)
-                {
-                    b.DrawBackground(spriteBatch, m_BulletTexture);
-                }
-            }
-
             World.Particles.ParticleManager.Instance().Draw(spriteBatch);
 
-            //Draw the foreground of the bullets
+            //Draws the bullets
             foreach (Player p in m_Teams)
             {
-                List<Bullet> bullets = p.Tank.GetBulletList();
-                foreach (Bullet b in bullets)
-                {
-                    b.DrawForeground(spriteBatch, m_BulletTexture);
-                }
+                p.Tank.DrawBullets(spriteBatch, m_BulletTexture);
             }
 
             //Draws the tanks
@@ -343,7 +293,7 @@ namespace Tankontroller.Scenes
             Escape();
             if (introMusicInstance.State == SoundState.Stopped)
             {
-                tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_loopable", true);
+                mGameInstance.ReplaceCurrentMusicInstance("Music/Music_loopable", true);
             }
 
             if (mControllersConnected) // Game should pause in the event of controller disconnect
@@ -359,7 +309,8 @@ namespace Tankontroller.Scenes
                 bool tankMoved = false;
                 foreach (Player p in m_Teams)
                 {
-                    tankMoved = tankMoved | p.DoTankControls(pSeconds);
+                    bool result = p.DoTankControls(pSeconds);
+                    tankMoved = tankMoved | result;
                 }
 
                 //Checks for tank collisons between the play area and the walls
@@ -384,9 +335,7 @@ namespace Tankontroller.Scenes
                     {
                         winner = remainingTeamsList[0];
                     }
-                    Reset();
                     Tankontroller.Instance().SM().Transition(new GameOverScene(mBackgroundTexture, m_Teams, winner));
-
                 }
 
                 //Updates the track particles for each tank
@@ -403,7 +352,7 @@ namespace Tankontroller.Scenes
             }
             else // At least one controller is disconnected
             {
-                gameInstance.DetectControllers();
+                mGameInstance.DetectControllers();
 
                 mControllersConnected = true;
                 foreach (Player p in m_Teams)
@@ -411,7 +360,7 @@ namespace Tankontroller.Scenes
                     if (!p.Controller.IsConnected())
                     {
                         // Check to see if there is a connected controller not yet associated to a player
-                        foreach (IController controller in gameInstance.GetControllers())
+                        foreach (IController controller in mGameInstance.GetControllers())
                         {
                             if (!m_Teams.Any(player => player.Controller == controller))
                             {
@@ -435,12 +384,15 @@ namespace Tankontroller.Scenes
                 Tankontroller.Instance().SM().Transition(null);
             }
         }
+
         private void Reset()
         {
             foreach (Player p in m_Teams)
             {
                 p.Reset();
             }
+            ParticleManager.Instance().Reset();
+            TrackSystem.GetInstance().Reset();
         }
 
         //Checks the health of all players and returns a list of tanks with more that 0 health
