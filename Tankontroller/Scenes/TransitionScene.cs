@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Tankontroller.Scenes
 {
@@ -12,11 +11,10 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class TransitionScene : IScene
     {
-        IGame gameInstance = Tankontroller.Instance();
+        GraphicsDevice mGraphicsDevice;
         RenderTarget2D mPreviousTexture = null;
         RenderTarget2D mNextTexture = null;
         Rectangle mRectangle;
-        IScene mPreviousScene;
         IScene mNextScene;
         Vector2 mNextPosition = new Vector2(0, -(Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height));
         Vector2 mVelocity = new Vector2(0, 0);
@@ -24,42 +22,30 @@ namespace Tankontroller.Scenes
 
         public TransitionScene(IScene pPreviousScene, IScene pNextScene)
         {
-            mPreviousScene = pPreviousScene;
+            mGraphicsDevice = Tankontroller.Instance().GDM().GraphicsDevice;
             mNextScene = pNextScene;
-            spriteBatch = new SpriteBatch(gameInstance.GDM().GraphicsDevice);
+            spriteBatch = new SpriteBatch(mGraphicsDevice);
             mRectangle = new Rectangle(0, 0, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
-            GeneratePreviousTexture();
-            GenerateNextTexture();
+            mPreviousTexture = GenerateSceneTexture(pPreviousScene);
+            mNextTexture = GenerateSceneTexture(pNextScene);
         }
 
-        public void GeneratePreviousTexture()
+        public RenderTarget2D GenerateSceneTexture(IScene pScene)
         {
-            GraphicsDevice graphicsDevice = gameInstance.GDM().GraphicsDevice;
-            mPreviousTexture = new RenderTarget2D(graphicsDevice, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
-            graphicsDevice.SetRenderTarget(mPreviousTexture);
-            graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+            RenderTarget2D output = new RenderTarget2D(mGraphicsDevice, mGraphicsDevice.PresentationParameters.BackBufferWidth, mGraphicsDevice.PresentationParameters.BackBufferHeight, false, mGraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+            mGraphicsDevice.SetRenderTarget(output);
+            mGraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp,
                 DepthStencilState.None, RasterizerState.CullCounterClockwise);
-            mPreviousScene.Draw(0);
+            pScene.Draw(0);
             spriteBatch.End();
-            graphicsDevice.SetRenderTarget(null);
-        }
-
-        public void GenerateNextTexture()
-        {
-            GraphicsDevice graphicsDevice = gameInstance.GDM().GraphicsDevice;
-            mNextTexture = new RenderTarget2D(graphicsDevice, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
-            graphicsDevice.SetRenderTarget(mNextTexture);
-            graphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp,
-                DepthStencilState.None, RasterizerState.CullCounterClockwise);
-            mNextScene.Draw(0);
-            spriteBatch.End();
-            graphicsDevice.SetRenderTarget(null);
+            mGraphicsDevice.SetRenderTarget(null);
+            return output;
         }
 
         public override void Update(float pSeconds)
         {
+            IGame gameInstance = Tankontroller.Instance();
             mVelocity += mAcceleration;
             mNextPosition += mVelocity;
             if (mNextPosition.Y > 0)
@@ -70,14 +56,13 @@ namespace Tankontroller.Scenes
                 {
                     gameInstance.SM().Push(mNextScene);
                 }
-
             }
         }
+
         public override void Draw(float pSeconds)
         {
-            Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
+            mGraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
-
             spriteBatch.Draw(mPreviousTexture, mRectangle, Color.White);
             spriteBatch.Draw(mNextTexture, mNextPosition, mRectangle, Color.White);
             spriteBatch.End();
