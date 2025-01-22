@@ -5,12 +5,12 @@ using Tankontroller.World.Particles;
 
 namespace Tankontroller.World
 {
-    public class Bullet
+    public abstract class Bullet
     {
-        const int BULLET_RADIUS = 10;
+        private int BULLET_RADIUS = 10;
         public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
-        public Color Colour { get; private set; }
+        public  Color Colour { get; private set; }
 
         public Bullet(Vector2 pPosition, Vector2 pVelocity, Color pColour)
         {
@@ -26,51 +26,52 @@ namespace Tankontroller.World
             ParticleManager.Instance().InitialiseParticles(bulletParticles, 2);
         }
 
-        public bool CollideWithPlayArea(Rectangle pRectangle)
+        public virtual bool CollideWithPlayArea(Rectangle pRectangle)
         {
             if (!pRectangle.Contains(Position))
             {
                 Vector2 collisionNormal = GetCollisionNormal(pRectangle);
                 collisionNormal = -collisionNormal;
-                CreateExplosion(collisionNormal);
+                DoCollision(pRectangle);
                 return true;
             }
             return false;
         }
 
-        public bool Collide(RectWall pWall)
+        public virtual bool Collide(RectWall pWall)
         {
             Rectangle rectangle = pWall.Rectangle;
             if (rectangle.Contains(Position))
             {
                 Vector2 collisionNormal = GetCollisionNormal(rectangle);
-                CreateExplosion(collisionNormal);
-                return true;
-            }
-            return false;
-        }
-        public bool Collide(Tank pTank)
-        {
-            if (pTank.PointIsInTank(Position))
-            {
-                CreateExplosion(Vector2.Normalize(Position - pTank.GetWorldPosition()));
-                return true;
-            }
-            return false;
-        }
-        public bool Collide(Bullet pBullet) // This is unused but I'm keeping it for potential implementation
-        {
-            if (Vector2.Distance(Position, pBullet.Position) < 2 * BULLET_RADIUS)
-            {
-                Vector2 collisionNormal = Vector2.Normalize(Velocity);
-                CreateExplosion(collisionNormal);
-                CreateExplosion(-collisionNormal);
+                DoCollision(pWall);
                 return true;
             }
             return false;
         }
 
-        private Vector2 GetCollisionNormal(Rectangle pRect)
+        public virtual bool Collide(Tank pTank)
+        {
+            if (pTank.PointIsInTank(Position))
+            {
+                DoCollision(pTank);
+                return true;
+            }
+            return false;
+        }
+
+        public virtual bool Collide(Bullet pBullet) // This is unused but I'm keeping it for potential implementation
+        {
+            if (Vector2.Distance(Position, pBullet.Position) < 2 * BULLET_RADIUS)
+            {
+                Vector2 collisionNormal = Vector2.Normalize(Velocity);
+                DoCollision(pBullet);
+                return true;
+            }
+            return false;
+        }
+
+        protected Vector2 GetCollisionNormal(Rectangle pRect)
         {
             float difference = Math.Abs(Position.X - pRect.Left);
             Vector2 collisionNormal = new Vector2(-1, 0);
@@ -91,13 +92,13 @@ namespace Tankontroller.World
             return collisionNormal;
         }
 
-        private void CreateExplosion(Vector2 pCollisionNormal)
-        {
-            ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position, pCollisionNormal, Colour);
-            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 100);
-        }
+        public abstract void DoCollision(Tank pTank);
+        public abstract void DoCollision(Rectangle pRectangle);
+        public abstract void DoCollision(RectWall pWall);
+        public abstract void DoCollision(Bullet pBullet);
 
-        public void Draw(SpriteBatch pBatch, Texture2D pTexture)
+
+        public virtual void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
             Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
             Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS, Position, Colour);

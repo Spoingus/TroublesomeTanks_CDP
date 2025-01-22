@@ -274,7 +274,7 @@ namespace Tankontroller.World
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-            m_Bullets.Add(new Bullet(endOfCannon, cannonDirection * BULLET_SPEED, Colour()));
+            m_Bullets.Add(new DefaultBullet(endOfCannon, cannonDirection * BULLET_SPEED, Colour()));
         }
 
         public void PutBack()
