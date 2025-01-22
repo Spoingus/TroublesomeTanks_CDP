@@ -9,6 +9,7 @@ using Tankontroller.Controller;
 using Tankontroller.GUI;
 using Tankontroller.World;
 using Tankontroller.World.Particles;
+using static Tankontroller.MapManager;
 
 namespace Tankontroller.Scenes
 {
@@ -33,6 +34,7 @@ namespace Tankontroller.Scenes
 
         private List<Vector2> m_TankPositions = new List<Vector2>();
         private List<float> m_TankRotations = new List<float>();
+        private List<PlayerData> m_Tanks = new List<PlayerData>();
 
         private const float SECONDS_BETWEEN_TRACKS_ADDED = 0.2f;
         private float m_SecondsTillTracksAdded = SECONDS_BETWEEN_TRACKS_ADDED;
@@ -125,54 +127,10 @@ namespace Tankontroller.Scenes
         //The game set up for 4 players
         private void setup4Player(Rectangle pPlayArea)
         {
-            int middleBlockHeight = pPlayArea.Height / 3;
-            int outerBlockHeight = pPlayArea.Height / 5;
-            int blockThickness = pPlayArea.Width / 50;
-            int outerBlockXOffset = pPlayArea.Width / 8;
-
-            //Creates a list of walls for a 4 player map
-            List<RectWall> Walls = new List<RectWall>();
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, (pPlayArea.X + pPlayArea.Width) - (pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness), blockThickness)));
-
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)));
-            Walls.Add(new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight)));
-
-            //Creates a list of tank positions and rotations for each of the 4 players
-            List<Vector2> tankPositions = new List<Vector2>();
-
-            float xPosition = pPlayArea.X + outerBlockXOffset / 2;
-            float yPosition = pPlayArea.Y + outerBlockXOffset / 2;
-            Vector2 tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)(-Math.PI + Math.PI / 4));
-
-            xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
-            yPosition = pPlayArea.Y + outerBlockXOffset / 2;
-            tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)-Math.PI / 4);
-
-            xPosition = pPlayArea.X + outerBlockXOffset / 2;
-            yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
-            tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)(Math.PI / 2 + Math.PI / 4));
-
-            xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset / 2;
-            yPosition = pPlayArea.Y + pPlayArea.Height - outerBlockXOffset / 2;
-            tankPosition = new Vector2(xPosition, yPosition);
-            m_TankPositions.Add(tankPosition);
-            m_TankRotations.Add((float)Math.PI / 4);
+            MapManager mapManager = MapManager.Instance;
+            mapManager.LoadMap("Maps/4_player_map_config.txt");
+            List<RectWall> Walls = mapManager.GetWalls();
+            m_Tanks = mapManager.GetPlayerData();
 
             m_World = new TheWorld(pPlayArea, Walls);
 
@@ -182,69 +140,10 @@ namespace Tankontroller.Scenes
         //The game set up for 1 to 3 players
         private void setupNot4Player(Rectangle pPlayArea, int pNumOfPlayers)
         {
-            int middleBlockHeight = pPlayArea.Height / 3;
-            int outerBlockHeight = pPlayArea.Height / 5;
-            int blockThickness = pPlayArea.Width / 50;
-            int outerBlockXOffset = pPlayArea.Width / 8;
-
-            //Creates a list of walls for 1 to 3 player map
-            List<RectWall> Walls = new List<RectWall> //Simplified initialisation of the list
-            {
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + outerBlockXOffset, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + outerBlockHeight, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - blockThickness, pPlayArea.Y + 3 * outerBlockHeight, blockThickness, outerBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - outerBlockXOffset - outerBlockHeight, pPlayArea.Y + 4 * outerBlockHeight - blockThickness, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - 2 * blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + blockThickness, pPlayArea.Y + middleBlockHeight, blockThickness, middleBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + pPlayArea.Width - 3 * outerBlockXOffset + 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + 3 * outerBlockXOffset - outerBlockHeight - 2 * blockThickness, pPlayArea.Y + (pPlayArea.Height - blockThickness) / 2, outerBlockHeight, blockThickness)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y, blockThickness, middleBlockHeight)),
-                new RectWall(Tankontroller.Instance().CM().Load<Texture2D>("block"),
-                new Rectangle(pPlayArea.X + (pPlayArea.Width - blockThickness) / 2, pPlayArea.Y + pPlayArea.Height - middleBlockHeight, blockThickness, middleBlockHeight))
-            };
-
-            //Creates a list of tank positions and rotations for each of the players, ranging from 1 to 3 players
-            if (pNumOfPlayers >= 1)
-            {
-                float xPosition = pPlayArea.X + outerBlockXOffset;
-                float yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                Vector2 tankPosition = new Vector2(xPosition, yPosition);
-                m_TankPositions.Add(tankPosition);
-                m_TankRotations.Add(0);
-                if (pNumOfPlayers >= 2)
-                {
-                    xPosition = pPlayArea.X + pPlayArea.Width - outerBlockXOffset;
-                    yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                    tankPosition = new Vector2(xPosition, yPosition);
-                    m_TankPositions.Add(tankPosition);
-                    m_TankRotations.Add((float)Math.PI);
-                    if (pNumOfPlayers >= 3)
-                    {
-                        xPosition = pPlayArea.Width / 2 + 35;
-                        yPosition = pPlayArea.Y + pPlayArea.Height / 2;
-                        tankPosition = new Vector2(xPosition, yPosition);
-                        m_TankPositions.Add(tankPosition);
-                        m_TankRotations.Add((float)Math.PI / 2);
-                    }
-                }
-            }
+            MapManager mapManager = MapManager.Instance;
+            mapManager.LoadMap("Maps/1-3_player_map_config.txt");
+            List<RectWall> Walls = mapManager.GetWalls();
+            m_Tanks = mapManager.GetPlayerData();
 
             m_World = new TheWorld(pPlayArea, Walls);
 
@@ -261,7 +160,7 @@ namespace Tankontroller.Scenes
             for (int i = 0; i < m_Teams.Count; i++)
             {
                 m_Teams[i].GamePreparation(
-                m_TankPositions[i].X, m_TankPositions[i].Y, m_TankRotations[i], tankScale,
+                m_Tanks[i].position.X, m_Tanks[i].position.Y, m_Tanks[i].rotation, tankScale,
                 tankControllerInstance.CM().Load<Texture2D>("healthbars/heart_bw"),
                 tankControllerInstance.CM().Load<Texture2D>("healthbars/heart_colour"),
                 new Rectangle((int)(i * spacePerPlayer + (spacePerPlayer - textureWidth) * 0.5f), 0, textureWidth, textureHeight));

@@ -33,9 +33,14 @@ namespace Tankontroller
             Walls.Clear();
             Tanks.Clear();
 
-            string[] lines = File.ReadAllLines(filePath);
+            string workingDirectory = Environment.CurrentDirectory;
+            string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
+            string fullPath = Path.Combine(projectDirectory, filePath);
+
+            string[] lines = File.ReadAllLines(fullPath);
             ParseLines(lines);
         }
+
 
         private void ParseLines(string[] lines)
         {
@@ -69,20 +74,24 @@ namespace Tankontroller
                 else if (line.Contains("texture"))
                 {
                     texture = line.Split('=')[1].Trim().Trim('"');
+                    continue;
                 }
                 else if (line.Contains("position"))
                 {
                     string[] components = line.Split('=')[1].Trim().Split(',');
                     position = new Vector2(float.Parse(components[0]), float.Parse(components[1]));
+                    continue;
                 }
                 else if (line.Contains("size"))
                 {
                     string[] components = line.Split('=')[1].Trim().Split(',');
                     size = new Vector2(float.Parse(components[0]), float.Parse(components[1]));
+                    continue;
                 }
                 else if (line.Contains("rotation"))
                 {
                     rotation = float.Parse(line.Split('=')[1].Trim());
+                    continue;
                 }
 
                 //check if the current object is a wall or a tank
