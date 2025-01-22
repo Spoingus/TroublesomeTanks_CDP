@@ -11,6 +11,7 @@ namespace Tankontroller.World.Particles
 {
     public class Particle
     {
+        public static readonly int EDGE_THICKNESS = DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS");
         public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
         public float Radius { get; private set; }
@@ -74,7 +75,7 @@ namespace Tankontroller.World.Particles
         /// <param name="pTexture"></param>
         public void DrawBackground(SpriteBatch pBatch, Texture2D pTexture)
         {
-            DrawCircle(pBatch, pTexture, (int)Radius + 2 * DGS.Instance.GetInt("PARTICLE_EDGE_THICKNESS"), Position, Color.Black);
+            DrawCircle(pBatch, pTexture, (int)Radius + 2 * EDGE_THICKNESS, Position, Color.Black);
         }
 
         /// <summary>
@@ -95,17 +96,20 @@ namespace Tankontroller.World.Particles
     /// </summary>
     public class ParticleManager
     {
+        private const int MAX_PARTICLES = 1000;
+        private static readonly Texture2D m_Texture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
         private Particle[] m_Particles = null;
         private int m_LastParticleIndex = 0;
-        private Texture2D m_Texture;
-        private Rectangle m_Rectangle;
 
         private static ParticleManager m_Instance = null;
         private ParticleManager()
         {
-            m_Texture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
-            m_Rectangle = new Rectangle();
-            m_Particles = new Particle[1000];
+            m_Particles = new Particle[MAX_PARTICLES];
+            Reset();
+        }
+
+        public void Reset()
+        {
             for (int i = 0; i < m_Particles.Length; i++)
             {
                 m_Particles[i] = new Particle();
@@ -172,6 +176,8 @@ namespace Tankontroller.World.Particles
             m_LastParticleIndex += i;
             return particles;
         }
+
+
 
         /// <summary>
         /// Requests number of particles and initialises according to the ParticleInitialisationPolicy parameter
@@ -242,6 +248,7 @@ namespace Tankontroller.World.Particles
 
     public class DustInitialisationPolicy : IParticleInitialisationPolicy
     {
+        private static readonly Color COLOUR_DUST = DGS.Instance.GetColour("COLOUR_DUST");
         private Vector2 m_Point1;
         private Vector2 m_Point2;
         private Random m_Rng = new Random();
@@ -263,7 +270,7 @@ namespace Tankontroller.World.Particles
             {
                 Vector2 position = m_Point1 + (m_Point2 - m_Point1) * (float)m_Rng.NextDouble();
                 float lifetime = m_Rng.Next(250, 751) * 0.001f;
-                pParticles[i].Initiate(position, Vector2.Zero, 1, m_Rng.Next(5, 15), DGS.Instance.GetColour("COLOUR_DUST"), lifetime);
+                pParticles[i].Initiate(position, Vector2.Zero, 1, m_Rng.Next(5, 15), COLOUR_DUST, lifetime);
             }
         }
     }

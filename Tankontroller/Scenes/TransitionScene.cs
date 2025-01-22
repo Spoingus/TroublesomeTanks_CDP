@@ -18,7 +18,7 @@ namespace Tankontroller.Scenes
         Rectangle mRectangle;
         IScene mPreviousScene;
         IScene mNextScene;
-        Vector2 mNextPosition = new Vector2(0, -DGS.Instance.GetInt("SCREENHEIGHT"));
+        Vector2 mNextPosition = new Vector2(0, -(Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height));
         Vector2 mVelocity = new Vector2(0, 0);
         Vector2 mAcceleration = new Vector2(0, 1);
 
@@ -58,13 +58,12 @@ namespace Tankontroller.Scenes
             graphicsDevice.SetRenderTarget(null);
         }
 
-        public void Update(float pSeconds)
+        public override void Update(float pSeconds)
         {
             mVelocity += mAcceleration;
             mNextPosition += mVelocity;
             if (mNextPosition.Y > 0)
             {
-                IGame gameInstance = Tankontroller.Instance();
                 gameInstance.SM().Pop();
 
                 if (mNextScene != gameInstance.SM().Top)
@@ -74,7 +73,7 @@ namespace Tankontroller.Scenes
 
             }
         }
-        public void Draw(float pSeconds)
+        public override void Draw(float pSeconds)
         {
             Tankontroller.Instance().GDM().GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
@@ -83,14 +82,5 @@ namespace Tankontroller.Scenes
             spriteBatch.Draw(mNextTexture, mNextPosition, mRectangle, Color.White);
             spriteBatch.End();
         }
-        public void Escape()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Tankontroller.Instance().SM().Transition(null);
-            }
-        }
-        public SpriteBatch spriteBatch { get; set; }
-
     }
 }

@@ -16,14 +16,14 @@ namespace Tankontroller.Controller
     //---------------------------------------------------------------------------------------------------
     public interface IController
     {
-
         bool IsPressedWithCharge(Control pControl);
         bool DepleteCharge(Control pControl, float amount);
-        void AddCharge(Control pControl, float amount);
+        bool AddCharge(Control pControl, float amount);
         float GetJackCharge(int pJackIndex);
         Control GetJackControl(int pJackIndex);
         void TransferJackCharge(IController pController);
         bool IsPressed(Control pControl);
+        bool WasPressed(Control pControl);
         void ResetJacks();
         void TurnOffLights();
         void TurnOnLights();
@@ -53,41 +53,46 @@ namespace Tankontroller.Controller
     //---------------------------------------------------------------------------------------------------
     public abstract class Controller : IController
     {
-        protected class LEDArray
-        {
-            public int[] LED_IDS = new int[4];
-            public LEDArray()
-            {
+        public static readonly float MAX_CHARGE = DGS.Instance.GetFloat("MAX_CHARGE");
 
-            }
-        }
         protected class Jack
         {
+            private bool mIsDown;
+
             public Control Control;
-            public bool IsDown;
             public int[] LED_IDS = new int[4];
             public float charge;
-
+            public bool WasDown { get; private set; }
+            public bool IsDown
+            {
+                get { return mIsDown; }
+                set
+                {
+                    WasDown = mIsDown;
+                    mIsDown = value;
+                }
+            }
 
             public Jack()
             {
+                mIsDown = WasDown = false;
                 ResetCharge();
             }
             public void ResetCharge()
             {
-                charge = DGS.Instance.GetFloat("STARTING_CHARGE");
+                charge = MAX_CHARGE;
             }
         };
         protected Color mColour;
         protected Jack[] mJacks;
-        protected LEDArray mLeds;
+        protected int[] mLedArray;
         protected bool mLightsOn;
         protected bool mConnected;
 
         protected Controller()
         {
             mJacks = new Jack[7] { new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack() };
-            mLeds = new LEDArray();
+            mLedArray = new int[4];
             mLightsOn = true;
             mConnected = true;
         }
@@ -132,7 +137,22 @@ namespace Tankontroller.Controller
             {
                 if (mJacks[i].Control == pControl)
                 {
-                    return mJacks[i].IsDown && ((pControl == Control.FIRE && mJacks[i].charge >= DGS.Instance.GetFloat("BULLET_CHARGE_DEPLETION") || (pControl != Control.FIRE && mJacks[i].charge > 0)));
+                    bool hasCharge = pControl == Control.FIRE ? mJacks[i].charge >= Player.BULLET_CHARGE_DEPLETION : mJacks[i].charge > 0;
+                    return mJacks[i].IsDown && hasCharge;
+                }
+            }
+            return false;
+        }
+
+        public bool AddCharge(Control pControl, float pAmount)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                if (mJacks[i].Control == pControl)
+                {
+                    mJacks[i].charge += pAmount;
+                    mJacks[i].charge = MathHelper.Clamp(mJacks[i].charge, 0, MAX_CHARGE);
+                    return true;
                 }
             }
             return false;
@@ -140,39 +160,7 @@ namespace Tankontroller.Controller
 
         public bool DepleteCharge(Control pControl, float amount)
         {
-            //return; //TESTING ONLY
-            for (int i = 0; i < 7; ++i)
-            {
-                if (mJacks[i].Control == pControl)
-                {
-                    if (mJacks[i].charge > amount)
-                    {
-
-                        mJacks[i].charge -= amount;
-                    }
-                    else
-                        mJacks[i].charge = 0;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void AddCharge(Control pControl, float amount)
-        {
-            for (int i = 0; i < 7; ++i)
-            {
-                if (mJacks[i].Control == pControl)
-                {
-                    if (mJacks[i].charge < DGS.Instance.GetFloat("MAX_CHARGE") - amount)
-                    {
-
-                        mJacks[i].charge += amount;
-                    }
-                    else
-                        mJacks[i].charge = DGS.Instance.GetFloat("MAX_CHARGE");
-                }
-            }
+            return AddCharge(pControl, -amount);
         }
 
         public void TransferJackCharge(IController pController)
@@ -190,6 +178,18 @@ namespace Tankontroller.Controller
                 if (mJacks[i].Control == pControl)
                 {
                     return mJacks[i].IsDown;
+                }
+            }
+            return false;
+        }
+
+        public bool WasPressed(Control pControl)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                if (mJacks[i].Control == pControl)
+                {
+                    return mJacks[i].WasDown;
                 }
             }
             return false;
@@ -220,8 +220,8 @@ namespace Tankontroller.Controller
             m_KeyMap = pKeyMap;
             m_PortMap = pPortMap;
 
-            mJacks[0].Control = Control.LEFT_TRACK_FORWARDS;
-            mJacks[1].Control = Control.LEFT_TRACK_BACKWARDS;
+            mJacks[0].Control = Control.LEFT_TRACK_BACKWARDS;
+            mJacks[1].Control = Control.LEFT_TRACK_FORWARDS;
             mJacks[2].Control = Control.RIGHT_TRACK_FORWARDS;
             mJacks[3].Control = Control.RIGHT_TRACK_BACKWARDS;
             mJacks[4].Control = Control.FIRE;
@@ -289,7 +289,7 @@ namespace Tankontroller.Controller
             mJacks[1].LED_IDS = new int[8] { 32, 33, 34, 35, 36, 37, 38, 39 };
             mJacks[0].LED_IDS = new int[8] { 40, 41, 42, 43, 44, 45, 46, 47 };
             mJacks[6].LED_IDS = new int[8] { 48, 49, 50, 51, 52, 53, 54, 55 };
-            mLeds.LED_IDS = new int[5] { 56, 57, 58, 59, 60 };
+            mLedArray = new int[5] { 56, 57, 58, 59, 60 };
             mHacktroller = pHackTroller;
 
             PullDataThread();
@@ -318,9 +318,9 @@ namespace Tankontroller.Controller
                 {
                     // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
                     // J.charge should be between 0 and DGS.MAX_CHARGE
-                    int FullByte = 50;
+                    //int FullByte = 50;
                     float brightness = 0.2f;
-                    float decimalCharge = J.charge / DGS.Instance.GetFloat("MAX_CHARGE");
+                    float decimalCharge = J.charge / MAX_CHARGE;
                     float remainingCharge = 8 * decimalCharge;
                     foreach (int i in J.LED_IDS)
                     {
@@ -338,7 +338,7 @@ namespace Tankontroller.Controller
                         }
                         remainingCharge--;
                     }
-                    foreach (int i in mLeds.LED_IDS)
+                    foreach (int i in mLedArray)
                     {
                         result[i].R = 30;
                         result[i].G = 30;
@@ -363,7 +363,7 @@ namespace Tankontroller.Controller
         {
             while (mLightsOn && mConnected)
             {
-                PortState[] ports = mHacktroller.GetPorts();
+                ControllerState[] ports = mHacktroller.GetPorts();
 
                 if (ports == null)
                 {
@@ -373,103 +373,71 @@ namespace Tankontroller.Controller
                 }
                 for (int i = 0; i < ports.Length; ++i)
                 {
-                    mJacks[i].IsDown = ports[i].FirePressed;
-
-                    if (ports[i].Controller == ControllerState.NOT_CONNECTED)
+                    switch (ports[i])
                     {
-                        mJacks[i].Control = Control.NONE;
+                        case ControllerState.NOT_CONNECTED:
+                            mJacks[i].Control = Control.NONE;
+                            break;
+
+                        case ControllerState.LEFT_TRACK_FORWARDS:
+                        case ControllerState.LEFT_TRACK_FORWARDS_PRESSED:
+                            mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
+                            break;
+
+                        case ControllerState.LEFT_TRACK_BACKWARDS:
+                        case ControllerState.LEFT_TRACK_BACKWARDS_PRESSED:
+                            mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
+                            break;
+
+                        case ControllerState.RIGHT_TRACK_FORWARDS:
+                        case ControllerState.RIGHT_TRACK_FORWARDS_PRESSED:
+                            mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
+                            break;
+
+                        case ControllerState.RIGHT_TRACK_BACKWARDS:
+                        case ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED:
+                            mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
+                            break;
+
+                        case ControllerState.TURRET_LEFT:
+                        case ControllerState.TURRET_LEFT_PRESSED:
+                            mJacks[i].Control = Control.TURRET_LEFT;
+                            break;
+
+                        case ControllerState.TURRET_RIGHT:
+                        case ControllerState.TURRET_RIGHT_PRESSED:
+                            mJacks[i].Control = Control.TURRET_RIGHT;
+                            break;
+
+                        case ControllerState.CHARGE:
+                        case ControllerState.CHARGE_PRESSED:
+                            mJacks[i].Control = Control.RECHARGE;
+                            break;
+
+                        case ControllerState.FIRE:
+                        case ControllerState.FIRE_PRESSED:
+                            mJacks[i].Control = Control.FIRE;
+                            break;
+
+                        case ControllerState.NO_MATCH:
+                            break;
                     }
 
-
-                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_FORWARDS)
+                    switch (ports[i])
                     {
-                        mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
-                    }
-                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_FORWARDS_PRESSED)
-                    {
-                        mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
-                        mJacks[i].IsDown = true;
-                    }
-
-
-                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_BACKWARDS)
-                    {
-                        mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
-                    }
-                    else if (ports[i].Controller == ControllerState.LEFT_TRACK_BACKWARDS_PRESSED)
-                    {
-                        mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
-                        mJacks[i].IsDown = true;
-                    }
-
-
-                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_FORWARDS)
-                    {
-                        mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
-                    }
-                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_FORWARDS_PRESSED)
-                    {
-                        mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
-                        mJacks[i].IsDown = true;
-                    }
-
-
-                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_BACKWARDS)
-                    {
-                        mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
-                    }
-                    else if (ports[i].Controller == ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED)
-                    {
-                        mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
-                        mJacks[i].IsDown = true;
-                    }
-
-
-                    else if (ports[i].Controller == ControllerState.TURRET_LEFT)
-                    {
-                        mJacks[i].Control = Control.TURRET_LEFT;
-                    }
-                    else if (ports[i].Controller == ControllerState.TURRET_LEFT_PRESSED)
-                    {
-                        mJacks[i].Control = Control.TURRET_LEFT;
-                        mJacks[i].IsDown = true;
-                    }
-
-                    else if (ports[i].Controller == ControllerState.TURRET_RIGHT)
-                    {
-                        mJacks[i].Control = Control.TURRET_RIGHT;
-                    }
-                    else if (ports[i].Controller == ControllerState.TURRET_RIGHT_PRESSED)
-                    {
-                        mJacks[i].Control = Control.TURRET_RIGHT;
-                        mJacks[i].IsDown = true;
-                    }
-
-
-                    else if (ports[i].Controller == ControllerState.CHARGE)
-                    {
-                        mJacks[i].Control = Control.RECHARGE;
-                    }
-                    else if (ports[i].Controller == ControllerState.CHARGE_PRESSED)
-                    {
-                        mJacks[i].Control = Control.RECHARGE;
-                        mJacks[i].IsDown = true;
-                    }
-
-
-                    else if (ports[i].Controller == ControllerState.FIRE)
-                    {
-                        mJacks[i].Control = Control.FIRE;
-                    }
-                    else if (ports[i].Controller == ControllerState.FIRE_PRESSED)
-                    {
-                        mJacks[i].Control = Control.FIRE;
-                        mJacks[i].IsDown = true;
-                    }
-
-
-                    else if (ports[i].Controller == ControllerState.NO_MATCH)
-                    {
+                        case ControllerState.LEFT_TRACK_FORWARDS_PRESSED:
+                        case ControllerState.LEFT_TRACK_BACKWARDS_PRESSED:
+                        case ControllerState.RIGHT_TRACK_FORWARDS_PRESSED:
+                        case ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED:
+                        case ControllerState.FIRE_PRESSED:
+                        case ControllerState.CHARGE_PRESSED:
+                        case ControllerState.TURRET_LEFT_PRESSED:
+                        case ControllerState.TURRET_RIGHT_PRESSED:
+                            mJacks[i].IsDown = true;
+                            break;
+                        default:
+                            mJacks[i].IsDown = false;
+                            break;
                     }
                 }
             }

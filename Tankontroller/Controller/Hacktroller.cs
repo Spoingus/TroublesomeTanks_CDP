@@ -37,15 +37,6 @@ namespace Tankontroller.Controller
             B = inB;
         }
     }
-    //-----------------------------------------------------------------------------------------------
-    // PinState
-    //
-    // This struct is used to store the state of a pin on the Hacktroller device.
-    //-----------------------------------------------------------------------------------------------
-    public struct PinState
-    {
-        public int RawValue;
-    }
 
     //-----------------------------------------------------------------------------------------------
     // ControllerState
@@ -102,23 +93,6 @@ namespace Tankontroller.Controller
     }
 
     //-----------------------------------------------------------------------------------------------
-    // PortState
-    //
-    // This struct is used to store the state of a pin on the Hacktroller device.
-    // It contains the following:
-    // - A ControllerState to store the state of the pin
-    // - A bool to store whether the fire button is pressed
-    //-----------------------------------------------------------------------------------------------
-    public struct PortState
-    {
-        public ControllerState Controller;
-        public bool FirePressed;
-        public override string ToString()
-        {
-            return Controller.ToString() + FirePressed.ToString();
-        }
-    }
-    //-----------------------------------------------------------------------------------------------
     // Hacktroller
     //
     // This class is used to interface with the Hacktroller device.
@@ -137,22 +111,18 @@ namespace Tankontroller.Controller
     {
         SerialPort port;
 
-        Random rand = new Random(1);
-
         static int numPins = 7;
-        static byte[] dCommand = new[] { (byte)'D' };
-        static byte[] pCommand = new[] { (byte)'P' };
+        static byte[] SetColorCommand = new byte[] { (byte)'P', 0 };
+        static byte[] GetPortCommand = new byte[] { (byte)'R' };
 
         static byte[] frameBuffer = new byte[61 * 3];
 
         static int tolerance = 0;
 
-        PortState[] portStates = new PortState[numPins];
+        ControllerState[] portStates = new ControllerState[numPins];
 
         static stateMap[] stateMapping = new stateMap[]
         {
-
-
             new stateMap(ControllerState.RIGHT_TRACK_FORWARDS, 3),
             new stateMap(ControllerState.RIGHT_TRACK_FORWARDS_PRESSED, 4),
 
@@ -191,27 +161,19 @@ namespace Tankontroller.Controller
             return ControllerState.NO_MATCH;
         }
 
-        static PinState[] pinStates;
-
         public Hacktroller(string portName)
         {
             port = new SerialPort(portName, 19200);//, Parity.None, 8, StopBits.One);
-
             port.Open();
 
             port.DtrEnable = true;
-
             port.ReadTimeout = 10;
             port.WriteTimeout = 10;
-
-
         }
 
         public Hacktroller(SerialPort pPort)
         {
             port = pPort;
-            pinStates = new PinState[numPins];
-            portStates = new PortState[numPins];
 
             for (int i = 0; i < frameBuffer.Length; i++)
             {
@@ -219,12 +181,12 @@ namespace Tankontroller.Controller
             }
         }
 
-        public PortState[] GetPorts()
+        public ControllerState[] GetPorts()
         {
             try
             {
                 port.DiscardInBuffer();
-                port.Write(new byte[] { (byte)'R' }, 0, 1);
+                port.Write(GetPortCommand, 0, 1);
 
                 System.Threading.Thread.Sleep(10);
 
@@ -242,22 +204,14 @@ namespace Tankontroller.Controller
                     port.Read(buffer, 0, buffer.Length);
 
                     for (int i = 0; i < numPins; i++)
-                    //for (int i = 0; i < 1; i++)
                     {
                         int reading = buffer[i + 1];
                         ControllerState readingState = DecodeState(reading);
-                        if (readingState == ControllerState.FIRE_PRESSED)
-                        {
-                            portStates[i].Controller = ControllerState.FIRE_PRESSED;
-                        }
-                        else
-                        {
-                            portStates[i].Controller = readingState;
-                        }
+                        portStates[i] = readingState;
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -267,7 +221,7 @@ namespace Tankontroller.Controller
 
         public async Task<bool> SetColor(ControllerColor[] colourArray)
         {
-            byte[] colourWriteCommand = new byte[] { (byte)'P', 0 };
+            byte[] colourWriteCommand = SetColorCommand;
             byte[] writeColour = new byte[3];
 
 
