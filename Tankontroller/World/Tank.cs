@@ -274,7 +274,7 @@ namespace Tankontroller.World
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-            m_Bullets.Add(new DefaultBullet(endOfCannon, cannonDirection * BULLET_SPEED, Colour()));
+            m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED, Colour()));
         }
 
         public void PutBack()
@@ -327,6 +327,10 @@ namespace Tankontroller.World
         }
         public bool Collide(Bullet pBullet)
         {
+            if (pBullet is BouncyEMPBullet)
+            {
+                return true;
+            }
             if (pBullet.Collide(this))
             {
                 TakeDamage();
@@ -346,6 +350,11 @@ namespace Tankontroller.World
             {
                 if (pTank.Collide(m_Bullets[i]))
                 {
+                    m_Bullets[i].DoCollision(pTank);
+                    if (m_Bullets[i] is BouncyEMPBullet)
+                    {
+                        return true;
+                    }
                     m_Bullets.RemoveAt(i);
                     return true;
                 }
@@ -358,6 +367,11 @@ namespace Tankontroller.World
             {
                 if (m_Bullets[i].Collide(pWall))
                 {
+                    m_Bullets[i].DoCollision(pWall);
+                    if (m_Bullets[i] is BouncyEMPBullet)
+                    {
+                        return true;
+                    }
                     m_Bullets.RemoveAt(i);
                     return true;
                 }
@@ -370,6 +384,11 @@ namespace Tankontroller.World
             {
                 if (m_Bullets[i].CollideWithPlayArea(pRect))
                 {
+                    m_Bullets[i].DoCollision(pRect);
+                    if (m_Bullets[i] is BouncyEMPBullet)
+                    {
+                        return true;
+                    }
                     m_Bullets.RemoveAt(i);
                     return true;
                 }

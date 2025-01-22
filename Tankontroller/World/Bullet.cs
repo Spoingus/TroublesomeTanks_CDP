@@ -7,9 +7,9 @@ namespace Tankontroller.World
 {
     public abstract class Bullet
     {
-        private int BULLET_RADIUS = 10;
-        public Vector2 Position { get; private set; }
-        public Vector2 Velocity { get; private set; }
+        public float BULLET_RADIUS { get; protected set; }
+        public Vector2 Position { get; protected set; }
+        public Vector2 Velocity { get; protected set; }
         public  Color Colour { get; private set; }
 
         public Bullet(Vector2 pPosition, Vector2 pVelocity, Color pColour)
@@ -17,6 +17,7 @@ namespace Tankontroller.World
             Position = pPosition;
             Velocity = pVelocity;
             Colour = pColour;
+            BULLET_RADIUS = 10.0f;
         }
 
         public void Update(float pSeconds)
@@ -30,9 +31,6 @@ namespace Tankontroller.World
         {
             if (!pRectangle.Contains(Position))
             {
-                Vector2 collisionNormal = GetCollisionNormal(pRectangle);
-                collisionNormal = -collisionNormal;
-                DoCollision(pRectangle);
                 return true;
             }
             return false;
@@ -43,8 +41,6 @@ namespace Tankontroller.World
             Rectangle rectangle = pWall.Rectangle;
             if (rectangle.Contains(Position))
             {
-                Vector2 collisionNormal = GetCollisionNormal(rectangle);
-                DoCollision(pWall);
                 return true;
             }
             return false;
@@ -54,7 +50,6 @@ namespace Tankontroller.World
         {
             if (pTank.PointIsInTank(Position))
             {
-                DoCollision(pTank);
                 return true;
             }
             return false;
@@ -64,8 +59,6 @@ namespace Tankontroller.World
         {
             if (Vector2.Distance(Position, pBullet.Position) < 2 * BULLET_RADIUS)
             {
-                Vector2 collisionNormal = Vector2.Normalize(Velocity);
-                DoCollision(pBullet);
                 return true;
             }
             return false;
@@ -100,8 +93,8 @@ namespace Tankontroller.World
 
         public virtual void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
-            Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
-            Particle.DrawCircle(pBatch, pTexture, BULLET_RADIUS, Position, Colour);
+            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
+            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS, Position, Colour);
         }
     }
 }
