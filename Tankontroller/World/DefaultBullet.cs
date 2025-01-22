@@ -10,8 +10,13 @@ namespace Tankontroller.World
 {
     class DefaultBullet : Bullet
     {
-        public DefaultBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour) : base(pPosition, pVelocity, pColour)
+        public DefaultBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour) : base(pPosition, pVelocity, pColour) { }
+
+        public override void Update(float pSeconds)
         {
+            BulletInitialisationPolicy bulletParticles = new BulletInitialisationPolicy(Position, Colour);
+            ParticleManager.Instance().InitialiseParticles(bulletParticles, 2);
+            base.Update(pSeconds);
         }
 
         public override void DoCollision(Rectangle pRectangle)

@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
 using Tankontroller.World;
@@ -24,7 +23,6 @@ namespace Tankontroller.Scenes
     public class GameScene : IScene
     {
         private static readonly Color GROUND_COLOUR = DGS.Instance.GetColour("COLOUR_GROUND");
-
 
         private static readonly SpriteFont m_SpriteFont = Tankontroller.Instance().CM().Load<SpriteFont>("handwritingfont");
         private static readonly Texture2D m_BulletTexture = Tankontroller.Instance().CM().Load<Texture2D>("circle");

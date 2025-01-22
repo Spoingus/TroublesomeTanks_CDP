@@ -20,11 +20,9 @@ namespace Tankontroller.World
             BULLET_RADIUS = 10.0f;
         }
 
-        public void Update(float pSeconds)
+        public virtual void Update(float pSeconds)
         {
             Position = Position + Velocity * pSeconds;
-            BulletInitialisationPolicy bulletParticles = new BulletInitialisationPolicy(Position, Colour);
-            ParticleManager.Instance().InitialiseParticles(bulletParticles, 2);
         }
 
         public virtual bool CollideWithPlayArea(Rectangle pRectangle)

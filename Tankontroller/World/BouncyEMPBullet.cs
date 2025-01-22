@@ -4,13 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tankontroller.World.Particles;
 
 namespace Tankontroller.World
 {
     class BouncyEMPBullet : Bullet
     {
-        public BouncyEMPBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour) : base(pPosition, pVelocity, pColour)
+        public BouncyEMPBullet(Vector2 pPosition, Vector2 pVelocity) : base(pPosition, pVelocity, Color.Yellow) { }
+
+        public override void Update(float pSeconds)
         {
+            Random rand = new Random();
+            EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 0.1f);
+            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 1);
+            base.Update(pSeconds);
         }
 
         public override void DoCollision(Rectangle pRectangle)
@@ -27,8 +34,7 @@ namespace Tankontroller.World
 
         public override void DoCollision(Tank pTank)
         {
-            
-            IncreaseRadius();
+            CreateBlast();
         }
 
         public override void DoCollision(Bullet pBullet)
@@ -36,9 +42,10 @@ namespace Tankontroller.World
             Vector2 collisionNormal = Vector2.Normalize(Velocity);
         }
 
-        public void IncreaseRadius()
+        private void CreateBlast()
         {
-            BULLET_RADIUS += 0.05f;
+            EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 3.0f);
+            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 200);
         }
     }
 }
