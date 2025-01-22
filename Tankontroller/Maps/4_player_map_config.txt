@@ -1,0 +1,54 @@
+# Map Configuration for 4 Player Map
+
+# Wall Definitions
+wall {
+    texture = "block"
+    position = 656, 493
+    size = 36, 243
+} 
+wall {
+	texture = "block"
+	position = 1227, 493
+	size = 36, 243
+} 
+wall {
+	texture = "block"
+	position = 1263, 597
+	size = 618, 36
+} 
+wall {
+	texture = "block"
+	position = 38, 597
+	size = 618, 36
+}
+wall {
+	texture = "block"
+	position = 941, 250
+	size = 36, 243
+}
+wall {
+	texture = "block"
+	position = 941, 737
+	size = 36, 243
+}
+
+# Tank Positions and Rotations
+tank {
+    position = 153, 365
+    rotation = 0
+}
+
+tank {
+    position = 1766, 365
+    rotation = 0
+}
+
+tank {
+    position = 153, 865
+    rotation = 0
+}
+
+tank {
+	position = 1766, 865
+	rotation = 0
+}
