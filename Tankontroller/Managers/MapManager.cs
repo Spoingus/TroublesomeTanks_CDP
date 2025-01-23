@@ -9,41 +9,27 @@ using static Tankontroller.Scenes.GameScene;
 
 namespace Tankontroller
 {
-    public class MapManager
+    public static class MapManager
     {
-        public List<RectWall> Walls { get; private set; }
-        public List<PlayerData> Tanks { get; private set; }
-
-        static MapManager mInstance = new MapManager()
+        public static TheWorld LoadMap(string filePath)
         {
-            Walls = new List<RectWall>(),
-            Tanks = new List<PlayerData>()
-        };
-
-        static MapManager() { }
-        private MapManager() { }
-
-        public static MapManager Instance
-        {
-            get { return mInstance; }
-        }
-
-        public void LoadMap(string filePath)
-        {
-            Walls.Clear();
-            Tanks.Clear();
-
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
             string fullPath = Path.Combine(projectDirectory, filePath);
 
             string[] lines = File.ReadAllLines(fullPath);
-            ParseLines(lines);
+            return ParseLines(lines);
         }
 
-
-        private void ParseLines(string[] lines)
+        private static TheWorld ParseLines(string[] lines)
         {
+            int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
+            Rectangle playArea = new Rectangle(screenWidth * 2 / 100, screenHeight * 25 / 100, screenWidth * 96 / 100, screenHeight * 73 / 100);
+            List<RectWall> Walls = new List<RectWall>();
+            List<Tank> Tanks = new List<Tank>();
+            float tankScale = (float)playArea.Width / (50 * 40);
+
             string texture = null;
             Vector2 position = Vector2.Zero;
             Vector2 size = Vector2.Zero;
@@ -80,17 +66,22 @@ namespace Tankontroller
                 {
                     string[] components = line.Split('=')[1].Trim().Split(',');
                     position = new Vector2(float.Parse(components[0]), float.Parse(components[1]));
+                    position.X = playArea.X + ((float)playArea.Width * (position.X / 100.0f));
+                    position.Y = playArea.Y + ((float)playArea.Height * (position.Y / 100.0f));
                     continue;
                 }
                 else if (line.Contains("size"))
                 {
                     string[] components = line.Split('=')[1].Trim().Split(',');
                     size = new Vector2(float.Parse(components[0]), float.Parse(components[1]));
+                    size.X = playArea.Width * (size.X / 100.0f);
+                    size.Y = playArea.Height * (size.Y / 100.0f);
                     continue;
                 }
                 else if (line.Contains("rotation"))
                 {
                     rotation = float.Parse(line.Split('=')[1].Trim());
+                    rotation = MathHelper.ToRadians(rotation);
                     continue;
                 }
 
@@ -105,29 +96,11 @@ namespace Tankontroller
                 }
                 else if (isTank)
                 {
-                    PlayerData currentTank = new();
-                    currentTank.position = position;
-                    currentTank.rotation = rotation;
-                    Tanks.Add(currentTank);
+                    Tanks.Add(new Tank(position, rotation, tankScale));
                     isTank = false;
                 }
             }
-        }
-
-        internal List<RectWall> GetWalls()
-        {
-            return Walls;
-        }
-
-        internal List<PlayerData> GetPlayerData()
-        {
-            return Tanks;
-        }
-
-        public class PlayerData
-        {
-            public Vector2 position;
-            public float rotation;
+            return new TheWorld(playArea, Walls, Tanks);
         }
     }
 }

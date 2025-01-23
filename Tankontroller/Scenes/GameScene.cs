@@ -24,20 +24,11 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class GameScene : IScene
     {
-        private static readonly Color GROUND_COLOUR = DGS.Instance.GetColour("COLOUR_GROUND");
-
-
         private static readonly SpriteFont m_SpriteFont = Tankontroller.Instance().CM().Load<SpriteFont>("handwritingfont");
-        private static readonly Texture2D m_BulletTexture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
-        private static readonly Texture2D mPixelTexture = Tankontroller.Instance().CM().Load<Texture2D>("block");
         private static readonly Texture2D mBackgroundTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_01");
         private static readonly Texture2D m_ErrorBGTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_err");
         private SoundEffectInstance introMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
-
-        private List<Vector2> m_TankPositions = new List<Vector2>();
-        private List<float> m_TankRotations = new List<float>();
-        private List<PlayerData> m_Tanks = new List<PlayerData>();
 
         Tankontroller mGameInstance = (Tankontroller)Tankontroller.Instance();
 
@@ -48,9 +39,6 @@ namespace Tankontroller.Scenes
         private List<Player> m_Teams;
 
         Rectangle mBackgroundRectangle;
-        Rectangle mPlayAreaRectangle;
-        Rectangle mPlayAreaOutlineRectangle;
-        public Rectangle PlayArea { get { return mPlayAreaRectangle; } }
 
         private bool mControllersConnected = true;
         public GameScene(List<Player> pPlayers)
@@ -60,72 +48,34 @@ namespace Tankontroller.Scenes
             introMusicInstance = mGameInstance.ReplaceCurrentMusicInstance("Music/Music_intro", false);
             tankMoveSound = mGameInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks");
 
-            int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
-            mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
-            mPlayAreaRectangle = new Rectangle(screenWidth * 2 / 100, screenHeight * 25 / 100, screenWidth * 96 / 100, screenHeight * 73 / 100);
-            mPlayAreaOutlineRectangle = new Rectangle(mPlayAreaRectangle.X - 5, mPlayAreaRectangle.Y - 5, mPlayAreaRectangle.Width + 10, mPlayAreaRectangle.Height + 10);
+            mBackgroundRectangle = new Rectangle(0, 0, mGameInstance.GDM().GraphicsDevice.Viewport.Width, mGameInstance.GDM().GraphicsDevice.Viewport.Height);
 
             m_Teams = pPlayers;
 
-            if (m_Teams.Count < 4)
+            string mapFileName = m_Teams.Count < 4 ? "1-3_player_map_config" : "4_player_map_config";
+            m_World = MapManager.LoadMap("Maps/" + mapFileName + ".txt");
+            if (m_World == null)
             {
-                setupNot4Player(mPlayAreaRectangle, m_Teams.Count);
-            }
-            else
-            {
-                setup4Player(mPlayAreaRectangle);
+                throw new Exception("Couldn't load map file: " + mapFileName); //TODO Handle map load error
             }
 
-            foreach (Player p in m_Teams)
+            List<Tank> tanks = m_World.GetTanksForPlayers(m_Teams.Count);
+            if (tanks == null || m_World == null)
             {
-                p.Controller.ResetJacks();
-                m_World.AddTank(p.Tank);
+                throw new Exception("Invalid number of players for map"); //TODO Handle map load error
+            }
+
+            // Calculate rectangle for the GUI of each player
+            int textureWidth = mBackgroundRectangle.Width / 4;
+            int spacePerPlayer = mBackgroundRectangle.Width / m_Teams.Count;
+            int textureHeight = mBackgroundRectangle.Height * 24 / 100;
+            for (int i = 0; i < m_Teams.Count; i++) // initialise players
+            {
+                m_Teams[i].Controller.ResetJacks();
+                m_Teams[i].GamePreparation(tanks[i], new Rectangle((int)(i * spacePerPlayer + (spacePerPlayer - textureWidth) * 0.5f), 0, textureWidth, textureHeight));
             }
 
             Reset();
-        }
-
-        //The game set up for 4 players
-        private void setup4Player(Rectangle pPlayArea)
-        {
-            MapManager mapManager = MapManager.Instance;
-            mapManager.LoadMap("Maps/4_player_map_config.txt");
-            List<RectWall> Walls = mapManager.GetWalls();
-            m_Tanks = mapManager.GetPlayerData();
-
-            m_World = new TheWorld(pPlayArea, Walls);
-
-            setupPlayers(pPlayArea, tankPositions, rotations);
-        }
-
-        //The game set up for 1 to 3 players
-        private void setupNot4Player(Rectangle pPlayArea, int pNumOfPlayers)
-        {
-            MapManager mapManager = MapManager.Instance;
-            mapManager.LoadMap("Maps/1-3_player_map_config.txt");
-            List<RectWall> Walls = mapManager.GetWalls();
-            m_Tanks = mapManager.GetPlayerData();
-
-            m_World = new TheWorld(pPlayArea, Walls);
-
-            setupPlayers(pPlayArea, positions, rotations);
-        }
-        
-        private void setupPlayers(Rectangle pPlayArea, List<Vector2> pPositions, List<float> pRotations)
-        {
-            float tankScale = (float)pPlayArea.Width / (50 * 40);
-            int textureWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width / 4;
-            int spacePerPlayer = mGameInstance.GDM().GraphicsDevice.Viewport.Width / m_Teams.Count;
-            int textureHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height * 24 / 100;
-            for (int i = 0; i < m_Teams.Count; i++)
-            {
-                m_Teams[i].GamePreparation(
-                m_Tanks[i].position.X, m_Tanks[i].position.Y, m_Tanks[i].rotation, tankScale,
-
-                new Rectangle((int)(i * spacePerPlayer + (spacePerPlayer - textureWidth) * 0.5f), 0, textureWidth, textureHeight));
-            }
-
         }
 
         public override void Draw(float pSeconds)
@@ -145,44 +95,16 @@ namespace Tankontroller.Scenes
                 }
             }
 
-            spriteBatch.Draw(mPixelTexture, mPlayAreaOutlineRectangle, Color.Black);
-            spriteBatch.Draw(mPixelTexture, mPlayAreaRectangle, GROUND_COLOUR);
-
-            TrackSystem.GetInstance().Draw(spriteBatch);
-
-            World.Particles.ParticleManager.Instance().Draw(spriteBatch);
-
-            //Draws the bullets
-            foreach (Player p in m_Teams)
-            {
-                p.Tank.DrawBullets(spriteBatch, m_BulletTexture);
-            }
-
-            //Draws the tanks
-            float tankScale = (float)mPlayAreaRectangle.Width / (50 * 40);
-            for (int i = 0; i < m_Teams.Count(); i++)
-            {
-                Tank t = m_World.GetTank(i);
-                t?.Draw(spriteBatch, tankScale);
-            }
-
-            //Draws the walls
-            foreach (RectWall w in m_World.Walls)
-            {
-                w.DrawOutlines(spriteBatch);
-            }
-
-            foreach (RectWall w in m_World.Walls)
-            {
-                w.Draw(spriteBatch);
-            }
+            // World draws play area, walls, tanks, bullets, and particle effects
+            m_World.Draw(spriteBatch);
 
             if (!mControllersConnected)
             {
+                Rectangle playArea = m_World.PlayArea;
                 string message = "A controller has been disconnected.\r\nPlease reconnect it to continue.\r\nSearching for controller...";
-                Vector2 centre = new Vector2(mPlayAreaRectangle.X + mPlayAreaRectangle.Width / 2, mPlayAreaRectangle.Y + mPlayAreaRectangle.Height / 2);
+                Vector2 centre = new Vector2(playArea.X + playArea.Width / 2, playArea.Y + playArea.Height / 2);
                 Vector2 fontSize = m_SpriteFont.MeasureString(message);
-                spriteBatch.Draw(m_ErrorBGTexture, PlayArea, Color.White);
+                spriteBatch.Draw(m_ErrorBGTexture, playArea, Color.White);
                 spriteBatch.DrawString(m_SpriteFont, message, new Vector2(centre.X - (fontSize.X / 2), centre.Y - (fontSize.Y / 2)), Color.Black);
             }
 
@@ -216,7 +138,6 @@ namespace Tankontroller.Scenes
 
                 //Checks for tank collisons between the play area and the walls
                 m_World.Update(pSeconds);
-                m_World.CollideAllTheThingsWithPlayArea(mPlayAreaRectangle);
 
                 if (tankMoved)
                 {

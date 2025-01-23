@@ -48,10 +48,12 @@ namespace Tankontroller.World
         private int m_LeftTrackFrame;
         private int m_RightTrackFrame;
 
-        public Tank(float pXPosition, float pYPosition, float pRotation, Color pColour, float pScale)
+        public Tank(Vector2 pPos, float pRotation, float pScale) : this(pPos.X, pPos.Y, pRotation, pScale) { }
+
+        public Tank(float pXPosition, float pYPosition, float pRotation, float pScale)
         {
             m_Health = MAX_HEALTH;
-            mColour = pColour;
+            mColour = Color.White;
             m_Bullets = new List<Bullet>();
             mFired = 0;
             m_LeftTrackFrame = 1;
@@ -63,6 +65,11 @@ namespace Tankontroller.World
             mCannonRotation = pRotation;
             mOldPosition = mPosition;
             mOldRotation = mRotation;
+        }
+
+        public void SetColour(Color pColour)
+        {
+            mColour = pColour;
         }
 
         private void ChangeLeftTrackFrame(int pAmount)
@@ -413,29 +420,29 @@ namespace Tankontroller.World
             }
         }
 
-        public void Draw(SpriteBatch pSpriteBatch, float pScale)
+        public void Draw(SpriteBatch pSpriteBatch)
         {
             Rectangle trackRect = new Rectangle(0, 0, mLeftTrackTexture.Width, mLeftTrackTexture.Height / 15);
 
             if (m_Health > 0)
             {
                 trackRect.Y = m_LeftTrackFrame * mLeftTrackTexture.Height / 15;
-                pSpriteBatch.Draw(mLeftTrackTexture, GetWorldPosition(), trackRect, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                pSpriteBatch.Draw(mLeftTrackTexture, GetWorldPosition(), trackRect, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
                 trackRect.Y = m_RightTrackFrame * mLeftTrackTexture.Height / 15;
-                pSpriteBatch.Draw(mRightTrackTexture, GetWorldPosition(), trackRect, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
-                pSpriteBatch.Draw(mBaseTexture, GetWorldPosition(), null, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                pSpriteBatch.Draw(mRightTrackTexture, GetWorldPosition(), trackRect, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
+                pSpriteBatch.Draw(mBaseTexture, GetWorldPosition(), null, mColour, mRotation, new Vector2(mBaseTexture.Width / 2, mBaseTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
                 if (mFired == 0)
                 {
-                    pSpriteBatch.Draw(mCannonTexture, GetCannonWorldPosition(), null, mColour, mCannonRotation, new Vector2(mCannonTexture.Width / 2, mCannonTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                    pSpriteBatch.Draw(mCannonTexture, GetCannonWorldPosition(), null, mColour, mCannonRotation, new Vector2(mCannonTexture.Width / 2, mCannonTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
                 }
                 else
                 {
-                    pSpriteBatch.Draw(mCannonFireTexture, GetCannonWorldPosition(), null, mColour, mCannonRotation, new Vector2(mCannonTexture.Width / 2, mCannonTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                    pSpriteBatch.Draw(mCannonFireTexture, GetCannonWorldPosition(), null, mColour, mCannonRotation, new Vector2(mCannonTexture.Width / 2, mCannonTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
                 }
             }
             else //If a tank has no health, its drawn as a destroyed tank
             {
-                pSpriteBatch.Draw(mBrokenTexture, GetWorldPosition(), null, Colour(), GetRotation(), new Vector2(mBrokenTexture.Width / 2, mBrokenTexture.Height / 2), pScale, SpriteEffects.None, 0.0f);
+                pSpriteBatch.Draw(mBrokenTexture, GetWorldPosition(), null, Colour(), GetRotation(), new Vector2(mBrokenTexture.Width / 2, mBrokenTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
             }
         }
 
