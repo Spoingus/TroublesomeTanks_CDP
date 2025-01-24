@@ -62,7 +62,7 @@ namespace Tankontroller.World
                 for (int i = 0; i < mTanks.Count; i++)
                 {
                     // bullet collision
-                    m_Tanks[tankIndex].CheckBulletCollisions(m_Tanks[i]);
+                    mTanks[tankIndex].CheckBulletCollisions(mTanks[i]);
 
                     if (tankIndex == i) // Skip collision with self
                     {
