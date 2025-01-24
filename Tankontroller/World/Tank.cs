@@ -274,7 +274,7 @@ namespace Tankontroller.World
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-            m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED));
+            m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED, 20.0f));
         }
 
         public void PutBack()
@@ -351,10 +351,16 @@ namespace Tankontroller.World
                 {
                     continue;
                 }
+                if (m_Bullets[i] is Shockwave)
+                {
+                    
+                }
                 if (pTank.Collide(m_Bullets[i]))
                 {
-                    m_Bullets[i].DoCollision(pTank);
-                    m_Bullets.RemoveAt(i);
+                    if (m_Bullets[i].DoCollision(pTank))
+                    {
+                        m_Bullets.RemoveAt(i);
+                    }
                     return true;
                 }
             }
@@ -366,8 +372,10 @@ namespace Tankontroller.World
             {
                 if (m_Bullets[i].Collide(pWall))
                 {
-                    m_Bullets[i].DoCollision(pWall);
-                    //m_Bullets.RemoveAt(i);
+                    if (m_Bullets[i].DoCollision(pWall))
+                    {
+                        m_Bullets.RemoveAt(i);
+                    }
                     return true;
                 }
             }
@@ -379,8 +387,10 @@ namespace Tankontroller.World
             {
                 if (m_Bullets[i].CollideWithPlayArea(pRect))
                 {
-                    m_Bullets[i].DoCollision(pRect);
-                    //m_Bullets.RemoveAt(i);
+                    if (m_Bullets[i].DoCollision(pRect))
+                    {
+                        m_Bullets.RemoveAt(i);
+                    }
                     return true;
                 }
             }
@@ -400,6 +410,21 @@ namespace Tankontroller.World
                 }
             }
             return false;
+        }
+
+        public void CheckBulletLifeTime()
+        {
+            for (int i = 0; i < m_Bullets.Count; ++i)
+            {
+                if (m_Bullets[i].LifeTimeExpired())
+                {
+                    if (m_Bullets[i] is BouncyEMPBullet)
+                    {
+                        m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 1.0f));
+                    }
+                    m_Bullets.RemoveAt(i);
+                }
+            }
         }
 
         public void TakeDamage()

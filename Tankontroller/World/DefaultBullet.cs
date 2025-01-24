@@ -10,7 +10,7 @@ namespace Tankontroller.World
 {
     class DefaultBullet : Bullet
     {
-        public DefaultBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour) : base(pPosition, pVelocity, pColour) { }
+        public DefaultBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour, float pLifeTime) : base(pPosition, pVelocity, pColour, pLifeTime) { }
 
         public override void Update(float pSeconds)
         {
@@ -19,34 +19,43 @@ namespace Tankontroller.World
             base.Update(pSeconds);
         }
 
-        public override void DoCollision(Rectangle pRectangle)
+        public override bool DoCollision(Rectangle pRectangle)
         {
             Vector2 collisonNormal = GetCollisionNormal(pRectangle);
             CreateExplosion(-collisonNormal);
+            return true;
         }
 
-        public override void DoCollision(RectWall pWall)
+        public override bool DoCollision(RectWall pWall)
         {
             Vector2 collisonNormal = GetCollisionNormal(pWall.Rectangle);
             CreateExplosion(collisonNormal);
+            return true;
         }
 
-        public override void DoCollision(Tank pTank)
+        public override bool DoCollision(Tank pTank)
         {
             CreateExplosion(Vector2.Normalize(Position - pTank.GetWorldPosition()));
+            return true;
         }
 
-        public override void DoCollision(Bullet pBullet)
+        public override bool DoCollision(Bullet pBullet)
         {
             Vector2 collisionNormal = Vector2.Normalize(Velocity);
             CreateExplosion(collisionNormal);
             CreateExplosion(-collisionNormal);
+            return true;
         }
 
         private void CreateExplosion(Vector2 pCollisionNormal)
         {
             ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position, pCollisionNormal, Colour);
             Particles.ParticleManager.Instance().InitialiseParticles(explosion, 100);
+        }
+
+        public override bool LifeTimeExpired()
+        {
+            return false;
         }
 
     }

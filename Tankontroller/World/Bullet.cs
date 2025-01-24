@@ -11,13 +11,15 @@ namespace Tankontroller.World
         public Vector2 Position { get; protected set; }
         public Vector2 Velocity { get; protected set; }
         public  Color Colour { get; private set; }
+        public float LifeTime { get; protected set; }
 
-        public Bullet(Vector2 pPosition, Vector2 pVelocity, Color pColour)
+        public Bullet(Vector2 pPosition, Vector2 pVelocity, Color pColour, float lifeTime)
         {
             Position = pPosition;
             Velocity = pVelocity;
             Colour = pColour;
             BULLET_RADIUS = 10.0f;
+            LifeTime = lifeTime;
         }
 
         public virtual void Update(float pSeconds)
@@ -83,11 +85,12 @@ namespace Tankontroller.World
             return collisionNormal;
         }
 
-        public abstract void DoCollision(Tank pTank);
-        public abstract void DoCollision(Rectangle pRectangle);
-        public abstract void DoCollision(RectWall pWall);
-        public abstract void DoCollision(Bullet pBullet);
+        public abstract bool DoCollision(Tank pTank);
+        public abstract bool DoCollision(Rectangle pRectangle);
+        public abstract bool DoCollision(RectWall pWall);
+        public abstract bool DoCollision(Bullet pBullet);
 
+        public abstract bool LifeTimeExpired();
 
         public virtual void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
