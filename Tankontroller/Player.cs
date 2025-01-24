@@ -31,10 +31,11 @@ namespace Tankontroller
             Controller = pController;
         }
 
-        public void GamePreparation(float pTankXPosition, float pTankYPosition, float pTankRotation, float pTankScale, Rectangle pRectangle)
+        public void GamePreparation(Tank pTank, Rectangle pRectangle)
         {
+            Tank = pTank;
             Controller.SetColour(Colour);
-            Tank = new Tank(pTankXPosition, pTankYPosition, pTankRotation, Colour, pTankScale);
+            Tank.SetColour(Colour);
             GUI.Reposition(pRectangle);
         }
 

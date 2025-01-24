@@ -11,35 +11,33 @@ namespace Tankontroller.World
 {
     public class TheWorld
     {
-        private List<Tank> m_Tanks = new List<Tank>();
+        private static readonly Texture2D mPixelTexture = Tankontroller.Instance().CM().Load<Texture2D>("block");
+        private static readonly Texture2D m_BulletTexture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
+        private static readonly Color GROUND_COLOUR = DGS.Instance.GetColour("COLOUR_GROUND");
 
-        public void AddTank(Tank pTank)
+        private Rectangle mPlayArea;
+        private Rectangle mPlayAreaOutline;
+        private List<Tank> mTanks = new List<Tank>();
+        private List<RectWall> mWalls;
+
+        public Rectangle PlayArea { get { return mPlayArea; } }
+
+        public TheWorld(Rectangle pPlayArea, List<RectWall> pWalls, List<Tank> pTanks)
         {
-            m_Tanks.Add(pTank);
+            mWalls = pWalls;
+            mTanks = pTanks;
+            mPlayArea = pPlayArea;
+            mPlayAreaOutline = new Rectangle(mPlayArea.X - 5, mPlayArea.Y - 5, mPlayArea.Width + 10, mPlayArea.Height + 10);
         }
-        public Tank GetTank(int pTankIndex)
+
+        public List<Tank> GetTanksForPlayers(int pPlayerCount)
         {
-            if (m_Tanks.Count > pTankIndex)
+            if (mTanks.Count >= pPlayerCount && pPlayerCount > 0)
             {
-                return m_Tanks[pTankIndex];
+                mTanks = mTanks.GetRange(0, (int)pPlayerCount);
+                return mTanks;
             }
             return null;
-        }
-
-        public List<RectWall> Walls { get; private set; }
-
-        public TheWorld(Rectangle playArea, List<RectWall> pWalls)
-        {
-            Walls = pWalls;
-        }
-
-        public void CollideAllTheThingsWithPlayArea(Rectangle pRectangle)
-        {
-            for (int i = 0; i < m_Tanks.Count; i++)
-            {
-                m_Tanks[i].CollideWithPlayArea(pRectangle);
-                m_Tanks[i].CheckBulletCollisionsWithPlayArea(pRectangle);
-            }
         }
 
         public void Update(float pSeconds)
@@ -47,21 +45,21 @@ namespace Tankontroller.World
             Particles.ParticleManager.Instance().Update(pSeconds);
 
             // Check collisions for each tank
-            for (int tankIndex = 0; tankIndex < m_Tanks.Count; tankIndex++)
+            for (int tankIndex = 0; tankIndex < mTanks.Count; tankIndex++)
             {
-                m_Tanks[tankIndex].Update(pSeconds);
+                mTanks[tankIndex].Update(pSeconds);
 
                 // Wall collisions
-                foreach (RectWall wall in Walls)
+                foreach (RectWall wall in mWalls)
                 {
                     // bullet collision
-                    m_Tanks[tankIndex].CheckBulletCollisions(wall);
+                    mTanks[tankIndex].CheckBulletCollisions(wall);
                     // tank collision
-                    m_Tanks[tankIndex].Collide(wall);
+                    mTanks[tankIndex].Collide(wall);
                 }
 
                 // Collisions with other tanks
-                for (int i = 0; i < m_Tanks.Count; i++)
+                for (int i = 0; i < mTanks.Count; i++)
                 {
                     // bullet collision
                     m_Tanks[tankIndex].CheckBulletCollisions(m_Tanks[i]);
@@ -71,8 +69,44 @@ namespace Tankontroller.World
                         continue;
                     }
                     // tank against tanks
-                    m_Tanks[tankIndex].Collide(m_Tanks[i]);
+                    mTanks[tankIndex].Collide(mTanks[i]);
                 }
+
+                // Collisions with the play area
+                mTanks[tankIndex].CollideWithPlayArea(mPlayArea);
+                mTanks[tankIndex].CheckBulletCollisionsWithPlayArea(mPlayArea);
+            }
+        }
+
+        public void Draw(SpriteBatch pSpriteBatch)
+        {
+            pSpriteBatch.Draw(mPixelTexture, mPlayAreaOutline, Color.Black);
+            pSpriteBatch.Draw(mPixelTexture, mPlayArea, GROUND_COLOUR);
+
+            TrackSystem.GetInstance().Draw(pSpriteBatch);
+
+            //Draws the tanks (on top of tracks but below particles)
+            foreach (Tank t in mTanks)
+            {
+                t.Draw(pSpriteBatch);
+            }
+
+            ParticleManager.Instance().Draw(pSpriteBatch);
+
+            //Draws the bullets
+            foreach (Tank t in mTanks)
+            {
+                t.DrawBullets(pSpriteBatch, m_BulletTexture);
+            }
+
+            //Draws the walls
+            foreach (RectWall w in mWalls)
+            {
+                w.DrawOutlines(pSpriteBatch);
+            }
+            foreach (RectWall w in mWalls)
+            {
+                w.Draw(pSpriteBatch);
             }
         }
     }
