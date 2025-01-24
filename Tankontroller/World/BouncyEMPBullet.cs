@@ -50,17 +50,13 @@ namespace Tankontroller.World
 
         private void CreateBlast()
         {
-            EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 3.0f);
+            EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 6.5f);
             Particles.ParticleManager.Instance().InitialiseParticles(explosion, 200);
         }
 
         public override bool LifeTimeExpired()
         {
-            if(LifeTime < 0.0f)
-            {
-                return true;
-            }
-            return false;
+            return (LifeTime <= 0.0f);
         }
 
         public override void Draw(SpriteBatch pBatch, Texture2D pTexture)

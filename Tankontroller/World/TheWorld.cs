@@ -75,6 +75,7 @@ namespace Tankontroller.World
                 // Collisions with the play area
                 mTanks[tankIndex].CollideWithPlayArea(mPlayArea);
                 mTanks[tankIndex].CheckBulletCollisionsWithPlayArea(mPlayArea);
+                mTanks[tankIndex].CheckBulletLifeTime();    
             }
         }
 

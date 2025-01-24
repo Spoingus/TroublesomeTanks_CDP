@@ -8,11 +8,13 @@ namespace Tankontroller.World
 {
     class Shockwave : Bullet
     {
+        private static readonly Texture2D ShockWaveTexture = Tankontroller.Instance().CM().Load<Texture2D>("Shockwave");
         public Shockwave(Vector2 pPosition, Vector2 pVelocity, Color pColour, float pLifeTime) : base(pPosition, pVelocity, pColour, pLifeTime) { }
         private new float BULLET_RADIUS = 1.0f;
         public override void Update(float pSeconds)
         {
             BULLET_RADIUS += 1.0f;
+            LifeTime -= pSeconds;
             base.Update(pSeconds);
         }
         public override bool DoCollision(Rectangle pRectangle)
@@ -42,11 +44,13 @@ namespace Tankontroller.World
         }
         public override bool LifeTimeExpired()
         {
-            if(BULLET_RADIUS >= 30.0f)
-            {
-                return true;
-            }
-            return false;
+            return (LifeTime <= 0);
+        }
+        public override void Draw(SpriteBatch pBatch, Texture2D pTexture)
+        {
+            Color ShockWaveColour = Color.Aqua;
+            ShockWaveColour.A = (byte)(0.0f);
+            Particle.DrawCircle(pBatch, ShockWaveTexture, (int)BULLET_RADIUS + 2 * Particle.EDGE_THICKNESS, Position, ShockWaveColour);
         }
     }
 }

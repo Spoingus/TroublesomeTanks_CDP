@@ -322,6 +322,10 @@ namespace Tankontroller.World.Particles
             {
                 m_LifeTime = m_LifeTime * (float)(1.0 - (m_Rng.NextDouble() * 0.01));
                 Vector2 velocity = Vector2.Transform(new Vector2(0, 1), Matrix.CreateRotationZ((float)(m_Rng.NextDouble() * 2 * Math.PI))) * m_Rng.Next(90, 121);
+                // normalize the velocity
+                velocity.Normalize();
+                // apply speed
+                velocity = velocity * 30;
                 pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(3, 11), m_Rng.Next(0, 2), m_Colours[m_Rng.Next(2)], m_LifeTime);
             }
         }

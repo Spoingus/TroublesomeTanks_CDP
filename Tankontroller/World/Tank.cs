@@ -28,6 +28,12 @@ namespace Tankontroller.World
         static private readonly Texture2D mCannonTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannon");
         static private readonly Texture2D mCannonFireTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannonFire");
 
+        public enum BulletType
+        {
+            NONE,
+            BOUNCY_EMP
+        }
+
         private Vector2[] TANK_CORNERS = { new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, TANK_WIDTH / 2), new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, TANK_WIDTH / 2) };
 
         private List<Bullet> m_Bullets;
@@ -274,14 +280,20 @@ namespace Tankontroller.World
             return m_TimePrimed > 0;
         }
 
-        public void Fire()
+        public void Fire(BulletType bullet)
         {
             m_TimePrimed = 0;
             mFired = BLAST_DELAY;
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-            m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED, 20.0f));
+            if(bullet == BulletType.BOUNCY_EMP) {
+                m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED, 20.0f));
+            }
+            else
+            {
+                m_Bullets.Add(new DefaultBullet(endOfCannon, cannonDirection * BULLET_SPEED, mColour, 1.0f));
+            }
         }
 
         public void PutBack()
@@ -358,12 +370,12 @@ namespace Tankontroller.World
                 {
                     continue;
                 }
-                if (m_Bullets[i] is Shockwave)
+                if (pTank.Collide(m_Bullets[i]) && !(m_Bullets[i] is Shockwave))
                 {
-                    
-                }
-                if (pTank.Collide(m_Bullets[i]))
-                {
+                    if (m_Bullets[i] is BouncyEMPBullet)
+                    {
+                        m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 5.0f));
+                    }
                     if (m_Bullets[i].DoCollision(pTank))
                     {
                         m_Bullets.RemoveAt(i);
@@ -424,11 +436,7 @@ namespace Tankontroller.World
             for (int i = 0; i < m_Bullets.Count; ++i)
             {
                 if (m_Bullets[i].LifeTimeExpired())
-                {
-                    if (m_Bullets[i] is BouncyEMPBullet)
-                    {
-                        m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 1.0f));
-                    }
+                { 
                     m_Bullets.RemoveAt(i);
                 }
             }

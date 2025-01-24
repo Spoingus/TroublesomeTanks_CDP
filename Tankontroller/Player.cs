@@ -2,12 +2,14 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
 using Tankontroller.World;
 
 namespace Tankontroller
 {
+    
     public class Player
     {
         public static readonly float TRACK_DEPLETION_RATE = DGS.Instance.GetFloat("TRACK_DEPLETION_RATE");
@@ -18,12 +20,14 @@ namespace Tankontroller
         public Tank Tank { get; private set; }
         public IController Controller { get; private set; }
         public Color Colour { get; private set; }
+        public Tank.BulletType bulletType { get; private set; }
 
         public Player(IController pController, Avatar pAvatar)
         {
             Controller = pController;
             GUI = new TeamGUI(pAvatar, new Rectangle(), Controller);
             Colour = pAvatar.GetColour();
+            bulletType = Tank.BulletType.NONE;
         }
 
         public void SetController(IController pController)
@@ -109,8 +113,9 @@ namespace Tankontroller
                 }
                 else if (Controller.IsPressedWithCharge(Control.TURRET_RIGHT))
                 {
-                    Tank.CannonRight();
-                    Controller.DepleteCharge(Control.TURRET_RIGHT, TRACK_DEPLETION_RATE * pSeconds);
+                    //Tank.CannonRight();
+                    //Controller.DepleteCharge(Control.TURRET_RIGHT, TRACK_DEPLETION_RATE * pSeconds);
+                    bulletType = Tank.BulletType.BOUNCY_EMP;
                 }
 
                 if (Controller.IsPressedWithCharge(Control.FIRE))
@@ -123,11 +128,14 @@ namespace Tankontroller
                     {
                         if (Controller.DepleteCharge(Control.FIRE, BULLET_CHARGE_DEPLETION))
                         {
-                            Tank.Fire();
+                            Tank.Fire(bulletType);
                             SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
                             bulletShot.Play();
+                            if(!(bulletType == Tank.BulletType.NONE)) { bulletType = Tank.BulletType.NONE; }
                         }
                     }
+                    //if tank fire is held
+                    //tank fire special bullet
                 }
 
                 if (Controller.IsPressed(Control.RECHARGE) && !Controller.WasPressed(Control.RECHARGE))
@@ -137,5 +145,9 @@ namespace Tankontroller
             }
             return tankMoved;
         }
+
+        //Pick up a special bullet
+        //if player has  a special bullet, replace current
+        //
     }
 }
