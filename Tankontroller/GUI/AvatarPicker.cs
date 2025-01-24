@@ -193,17 +193,17 @@ namespace Tankontroller.GUI
             List<Color> colours = new List<Color>
             {
                 Color.Red,
+                Color.DeepSkyBlue,
                 Color.Lime,
-                Color.DarkGreen,
-                Color.MonoGameOrange,
-                Color.Blue,
-                Color.Yellow,
-                Color.NavajoWhite,
-                Color.DarkSlateGray,
-                Color.SaddleBrown,
-                Color.Indigo,
-                Color.Magenta,
-                Color.Aqua
+                Color.DeepPink,
+                Color.Gold,
+                Color.Sienna,
+                Color.Firebrick,
+                Color.Navy,
+                Color.ForestGreen,
+                Color.DarkMagenta,
+                Color.DarkOrange,
+                Color.Tan
             };
 
             var rectangles = GetSelectionRectangles(colours.Count);
