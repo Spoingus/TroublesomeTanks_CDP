@@ -76,6 +76,7 @@ namespace Tankontroller.Controller
             public Jack()
             {
                 mIsDown = WasDown = false;
+                Control = Control.NONE;
                 ResetCharge();
             }
             public void ResetCharge()
@@ -359,6 +360,65 @@ namespace Tankontroller.Controller
             }
         }
 
+        private static Control GetControlFromState(ControllerState pState)
+        {
+            switch (pState)
+            {
+                case ControllerState.LEFT_TRACK_FORWARDS:
+                case ControllerState.LEFT_TRACK_FORWARDS_PRESSED:
+                    return Control.LEFT_TRACK_FORWARDS;
+
+                case ControllerState.LEFT_TRACK_BACKWARDS:
+                case ControllerState.LEFT_TRACK_BACKWARDS_PRESSED:
+                    return Control.LEFT_TRACK_BACKWARDS;
+
+                case ControllerState.RIGHT_TRACK_FORWARDS:
+                case ControllerState.RIGHT_TRACK_FORWARDS_PRESSED:
+                    return Control.RIGHT_TRACK_FORWARDS;
+
+                case ControllerState.RIGHT_TRACK_BACKWARDS:
+                case ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED:
+                    return Control.RIGHT_TRACK_BACKWARDS;
+
+                case ControllerState.TURRET_LEFT:
+                case ControllerState.TURRET_LEFT_PRESSED:
+                    return Control.TURRET_LEFT;
+
+                case ControllerState.TURRET_RIGHT:
+                case ControllerState.TURRET_RIGHT_PRESSED:
+                    return Control.TURRET_RIGHT;
+
+                case ControllerState.CHARGE:
+                case ControllerState.CHARGE_PRESSED:
+                    return Control.RECHARGE;
+
+                case ControllerState.FIRE:
+                case ControllerState.FIRE_PRESSED:
+                    return Control.FIRE;
+
+                default:
+                    return Control.NONE;
+            }
+        }
+
+        private static bool GetIsDownFromControl(ControllerState pState)
+        {
+            switch (pState)
+            {
+                case ControllerState.LEFT_TRACK_FORWARDS_PRESSED:
+                case ControllerState.LEFT_TRACK_BACKWARDS_PRESSED:
+                case ControllerState.RIGHT_TRACK_FORWARDS_PRESSED:
+                case ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED:
+                case ControllerState.FIRE_PRESSED:
+                case ControllerState.CHARGE_PRESSED:
+                case ControllerState.TURRET_LEFT_PRESSED:
+                case ControllerState.TURRET_RIGHT_PRESSED:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         private void PullData()
         {
             while (mLightsOn && mConnected)
@@ -373,71 +433,21 @@ namespace Tankontroller.Controller
                 }
                 for (int i = 0; i < ports.Length; ++i)
                 {
-                    switch (ports[i])
+                    Control control = GetControlFromState(ports[i]);
+                    bool isDown = GetIsDownFromControl(ports[i]);
+
+                    if (mJacks[i].Control == Control.NONE)
                     {
-                        case ControllerState.NOT_CONNECTED:
-                            mJacks[i].Control = Control.NONE;
-                            break;
-
-                        case ControllerState.LEFT_TRACK_FORWARDS:
-                        case ControllerState.LEFT_TRACK_FORWARDS_PRESSED:
-                            mJacks[i].Control = Control.LEFT_TRACK_FORWARDS;
-                            break;
-
-                        case ControllerState.LEFT_TRACK_BACKWARDS:
-                        case ControllerState.LEFT_TRACK_BACKWARDS_PRESSED:
-                            mJacks[i].Control = Control.LEFT_TRACK_BACKWARDS;
-                            break;
-
-                        case ControllerState.RIGHT_TRACK_FORWARDS:
-                        case ControllerState.RIGHT_TRACK_FORWARDS_PRESSED:
-                            mJacks[i].Control = Control.RIGHT_TRACK_FORWARDS;
-                            break;
-
-                        case ControllerState.RIGHT_TRACK_BACKWARDS:
-                        case ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED:
-                            mJacks[i].Control = Control.RIGHT_TRACK_BACKWARDS;
-                            break;
-
-                        case ControllerState.TURRET_LEFT:
-                        case ControllerState.TURRET_LEFT_PRESSED:
-                            mJacks[i].Control = Control.TURRET_LEFT;
-                            break;
-
-                        case ControllerState.TURRET_RIGHT:
-                        case ControllerState.TURRET_RIGHT_PRESSED:
-                            mJacks[i].Control = Control.TURRET_RIGHT;
-                            break;
-
-                        case ControllerState.CHARGE:
-                        case ControllerState.CHARGE_PRESSED:
-                            mJacks[i].Control = Control.RECHARGE;
-                            break;
-
-                        case ControllerState.FIRE:
-                        case ControllerState.FIRE_PRESSED:
-                            mJacks[i].Control = Control.FIRE;
-                            break;
-
-                        case ControllerState.NO_MATCH:
-                            break;
+                        mJacks[i].Control = control;
+                        mJacks[i].IsDown = isDown;
                     }
-
-                    switch (ports[i])
+                    else
                     {
-                        case ControllerState.LEFT_TRACK_FORWARDS_PRESSED:
-                        case ControllerState.LEFT_TRACK_BACKWARDS_PRESSED:
-                        case ControllerState.RIGHT_TRACK_FORWARDS_PRESSED:
-                        case ControllerState.RIGHT_TRACK_BACKWARDS_PRESSED:
-                        case ControllerState.FIRE_PRESSED:
-                        case ControllerState.CHARGE_PRESSED:
-                        case ControllerState.TURRET_LEFT_PRESSED:
-                        case ControllerState.TURRET_RIGHT_PRESSED:
-                            mJacks[i].IsDown = true;
-                            break;
-                        default:
-                            mJacks[i].IsDown = false;
-                            break;
+                        if (control == mJacks[i].Control || control == Control.NONE)
+                        {
+                            mJacks[i].Control = control;
+                            mJacks[i].IsDown = isDown;
+                        }
                     }
                 }
             }

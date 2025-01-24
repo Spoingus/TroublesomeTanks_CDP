@@ -61,12 +61,13 @@ namespace Tankontroller.World
                 // Collisions with other tanks
                 for (int i = 0; i < mTanks.Count; i++)
                 {
+                    // bullet collision
+                    m_Tanks[tankIndex].CheckBulletCollisions(m_Tanks[i]);
+
                     if (tankIndex == i) // Skip collision with self
                     {
                         continue;
                     }
-                    // bullet collision
-                    mTanks[tankIndex].CheckBulletCollisions(mTanks[i]);
                     // tank against tanks
                     mTanks[tankIndex].Collide(mTanks[i]);
                 }

@@ -96,7 +96,7 @@ namespace Tankontroller.Scenes
                     if (secondsLeft <= 0.0f)
                     {
                         mButtonList.SelectPreviousButton();
-                        secondsLeft = 1.0f;
+                        secondsLeft = 0.5f;
                     }
                 }
                 if (controller.IsPressed(Control.LEFT_TRACK_BACKWARDS) || controller.IsPressed(Control.TURRET_RIGHT))
@@ -104,7 +104,7 @@ namespace Tankontroller.Scenes
                     if (secondsLeft <= 0.0f)
                     {
                         mButtonList.SelectNextButton();
-                        secondsLeft = 1.0f;
+                        secondsLeft = 0.5f;
                     }
                 }
 
