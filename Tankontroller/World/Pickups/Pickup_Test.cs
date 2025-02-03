@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Tankontroller.Managers;
 
 namespace Tankontroller.World.Pickups
 {
@@ -12,9 +13,10 @@ namespace Tankontroller.World.Pickups
 
         public void Pickup_Test_Collide(Tank tank)
         {
-            if (Collide(tank))
+            //Check if the tank has collided with the pickup using the collision manager
+            if (CollisionManager.Collide(tank, m_Pickup_Rect, false))
             {
-                // Stop Drawing
+                //If the tank has collided with the pickup, set the pickup to inactive
                 m_Active = false;
             }
         }

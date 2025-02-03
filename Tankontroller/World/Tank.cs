@@ -441,6 +441,41 @@ namespace Tankontroller.World
                 }
             }
         }
+        public void CheckBullets(List<Tank> pTanks,Rectangle pPlayArea, List<RectWall> pWalls)
+        {
+            for (int i = 0; i < m_Bullets.Count; ++i)
+            {
+                for (int j = 0; j < pTanks.Count; ++j)
+                {
+                    if (m_Bullets[i].Collide(pTanks[j]) && !(m_Bullets[i] is Shockwave))
+                    {
+                        if (m_Bullets[i] is BouncyEMPBullet)
+                        {
+                            m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 5.0f));
+                        }
+                        if (m_Bullets[i].DoCollision(pTanks[j]))
+                        {
+                            m_Bullets.RemoveAt(i);
+                            pTanks[j].TakeDamage();
+                        }
+                        break;
+                    }
+                }
+                if (m_Bullets[i].CollideWithPlayArea(pPlayArea))
+                {
+                    m_Bullets.RemoveAt(i);
+                    continue;
+                }
+                for (int j = 0; j < pWalls.Count; ++j)
+                {
+                    if (m_Bullets[i].Collide(pWalls[j]))
+                    {
+                        m_Bullets.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
 
         public void TakeDamage()
         {

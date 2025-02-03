@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Tankontroller.Managers;
 using Tankontroller.World.Particles;
+using Tankontroller.World.Pickups;
 
 namespace Tankontroller.World
 {
@@ -19,6 +22,9 @@ namespace Tankontroller.World
         private Rectangle mPlayAreaOutline;
         private List<Tank> mTanks = new List<Tank>();
         private List<RectWall> mWalls;
+
+        //Test pickup
+        private Pickup_Test m_Pickup_Test = new Pickup_Test();
 
         public Rectangle PlayArea { get { return mPlayArea; } }
 
@@ -49,13 +55,22 @@ namespace Tankontroller.World
             {
                 mTanks[tankIndex].Update(pSeconds);
 
+                //mTanks[tankIndex].CheckBullets(mTanks, mPlayArea, mWalls);
+
+                //test pickup collision
+                m_Pickup_Test.Pickup_Test_Collide(mTanks[tankIndex]);
+
                 // Wall collisions
                 foreach (RectWall wall in mWalls)
                 {
-                    // bullet collision
+                    Rectangle wallRect = wall.Rectangle;
+
+                    // bullet collision using collision manager
                     mTanks[tankIndex].CheckBulletCollisions(wall);
-                    // tank collision
-                    mTanks[tankIndex].Collide(wall);
+
+                    // tank collision using collision manager
+                    if (CollisionManager.Collide(mTanks[tankIndex], wallRect, false))
+                        mTanks[tankIndex].PutBack();
                 }
 
                 // Collisions with other tanks
@@ -68,14 +83,17 @@ namespace Tankontroller.World
                     {
                         continue;
                     }
-                    // tank against tanks
-                    mTanks[tankIndex].Collide(mTanks[i]);
+                    // tank against tanks using collision manager
+                    if (CollisionManager.Collide(mTanks[tankIndex], mTanks[i]))
+                        mTanks[tankIndex].PutBack();
                 }
 
                 // Collisions with the play area
-                mTanks[tankIndex].CollideWithPlayArea(mPlayArea);
+                if (CollisionManager.Collide(mTanks[tankIndex], mPlayArea, true)) // True tp check inside the play area
+                    mTanks[tankIndex].PutBack();
+
                 mTanks[tankIndex].CheckBulletCollisionsWithPlayArea(mPlayArea);
-                mTanks[tankIndex].CheckBulletLifeTime();    
+                mTanks[tankIndex].CheckBulletLifeTime();
             }
         }
 
@@ -85,6 +103,9 @@ namespace Tankontroller.World
             pSpriteBatch.Draw(mPixelTexture, mPlayArea, GROUND_COLOUR);
 
             TrackSystem.GetInstance().Draw(pSpriteBatch);
+
+            //test pickup draw
+            m_Pickup_Test.Draw(pSpriteBatch);
 
             //Draws the tanks (on top of tracks but below particles)
             foreach (Tank t in mTanks)
