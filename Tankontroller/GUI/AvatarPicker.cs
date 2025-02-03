@@ -46,6 +46,22 @@ namespace Tankontroller.GUI
         private Rectangle mRotateRightButton;
         private Rectangle mBackTextRectangle;
 
+        private List<Color> colours = new List<Color>
+            {
+                Color.Red,
+                Color.DeepSkyBlue,
+                Color.Lime,
+                Color.DeepPink,
+                Color.Gold,
+                Color.Sienna,
+                Color.Firebrick,
+                Color.Navy,
+                Color.ForestGreen,
+                Color.DarkMagenta,
+                Color.DarkOrange,
+                Color.Tan
+            };
+
         public AvatarPicker(Rectangle pRectangle)
         {
             mBoundsRectangle = pRectangle;
@@ -66,7 +82,6 @@ namespace Tankontroller.GUI
             mRadius = mBoundsRectangle.Height / 2 - mAvatarRadius;
 
             SetUpAvatarSelection();
-            PrepareColourSelection("engineer");
             Reset();
         }
 
@@ -117,7 +132,6 @@ namespace Tankontroller.GUI
             avatarRect.Width = avatarRect.Height = (int)(middleAvatarRadius * 2);
 
             Color color = mAvatarSet ? mColours[mSelectionIndex].GetColour() : Color.White;
-
             mCentreAvatar = new Avatar(name, avatarRect, color);
         }
 
@@ -185,31 +199,24 @@ namespace Tankontroller.GUI
                 mAvatars.Add(avatar);
             }
         }
-        private void PrepareColourSelection(string pAvatarString)
+        private void UpdateColorOptions(string pAvatarString, List<int> pBlockedIndex)
         {
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mColours = new List<Avatar>();
-            List<Color> colours = new List<Color>
-            {
-                Color.Red,
-                Color.DeepSkyBlue,
-                Color.Lime,
-                Color.DeepPink,
-                Color.Gold,
-                Color.Sienna,
-                Color.Firebrick,
-                Color.Navy,
-                Color.ForestGreen,
-                Color.DarkMagenta,
-                Color.DarkOrange,
-                Color.Tan
-            };
 
             var rectangles = GetSelectionRectangles(colours.Count);
             for (int i = 0; i < colours.Count; i++)
             {
-                Avatar avatar = new Avatar(pAvatarString, rectangles[i], colours[i]);
+                Avatar avatar;
+                if (pBlockedIndex.Contains(i))
+                {
+                    avatar = new Avatar(pAvatarString, rectangles[i], Color.DimGray);
+                }
+                else
+                {
+                    avatar = new Avatar(pAvatarString, rectangles[i], colours[i]);
+                }
                 mColours.Add(avatar);
             }
         }
@@ -240,10 +247,12 @@ namespace Tankontroller.GUI
             }
         }
 
-        public void Draw(SpriteBatch pSpriteBatch)
+        public void Draw(SpriteBatch pSpriteBatch, List<int> pBlockedIndex)
         {
             if (HasController())
             {
+                //UpdateCentreAvatar();
+                UpdateColorOptions(mCentreAvatar.GetName(), pBlockedIndex);
                 mCentreAvatar.Draw(pSpriteBatch, true, 0);
                 if (!mAvatarSet)
                 {
@@ -287,7 +296,7 @@ namespace Tankontroller.GUI
         }
 
 
-        public void MakeSelection()
+        public void MakeSelection(List<int> pBlockedIndex)
         {
             if (HasController())
             {
@@ -295,23 +304,28 @@ namespace Tankontroller.GUI
                 {
                     mAvatarSet = true;
                     mSelectionIndex = 0;
-                    PrepareColourSelection(mCentreAvatar.GetName());
+                    UpdateColorOptions(mCentreAvatar.GetName(), pBlockedIndex);
                     mSelectionRectangles = GetSelectionRectangles(mColours.Count);
                     UpdateCentreAvatar();
                 }
                 else if (!mColourSet)
                 {
-                    mColourSet = true;
-                    UpdateCentreAvatar();
+                    if (mColours[mSelectionIndex].GetColour() != Color.DimGray)
+                    {
+                        mColourSet = true;
+                        UpdateCentreAvatar();
+                        pBlockedIndex.Add(mSelectionIndex);
+                    }
                 }
             }
         }
 
-        public void UndoSelection()
+        public void UndoSelection(List<int> pBlockedIndex)
         {
             if (mColourSet)
             {
                 mColourSet = false;
+                pBlockedIndex.Remove(mSelectionIndex);
                 UpdateCentreAvatar();
             }
             else if (mAvatarSet)

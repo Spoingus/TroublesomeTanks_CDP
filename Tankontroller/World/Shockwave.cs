@@ -25,17 +25,21 @@ namespace Tankontroller.World
         {
             return false;
         }
-        public override bool DoCollision(Tank pTank)
+        public override bool Collide(Tank pTank)
         {
-
-            float distance = Vector2.Distance(Position, pTank.GetWorldPosition());
+            float distance = Vector2.Distance(pTank.GetWorldPosition(), Position);
             if (distance < BULLET_RADIUS)
             {
-                Vector2 CollisionNormal = Vector2.Normalize(Position - pTank.GetWorldPosition());
-                ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position, CollisionNormal, Colour);
-                Particles.ParticleManager.Instance().InitialiseParticles(explosion, 20);
                 return true;
             }
+            return false;
+        }
+
+        public override bool DoCollision(Tank pTank)
+    {
+            Vector2 CollisionNormal = Vector2.Normalize(Position - pTank.GetWorldPosition());
+            ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position * 2, CollisionNormal, Colour);
+            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 20);
             return false;
         }
         public override bool DoCollision(Bullet pBullet)
@@ -48,7 +52,7 @@ namespace Tankontroller.World
         }
         public override void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
-            Color ShockWaveColour = Color.Aqua;
+            Color ShockWaveColour = Color.Yellow;
             ShockWaveColour.A = (byte)(0.0f);
             Particle.DrawCircle(pBatch, ShockWaveTexture, (int)BULLET_RADIUS + 2 * Particle.EDGE_THICKNESS, Position, ShockWaveColour);
         }

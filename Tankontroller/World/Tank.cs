@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -288,7 +289,7 @@ namespace Tankontroller.World
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
             if(bullet == BulletType.BOUNCY_EMP) {
-                m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED, 20.0f));
+                m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED * 1.5f, mColour, 20.0f));
             }
             else
             {
@@ -348,7 +349,7 @@ namespace Tankontroller.World
         {
             if (pBullet.Collide(this))
             {
-                if (pBullet is not BouncyEMPBullet)
+                if (pBullet is not BouncyEMPBullet && pBullet is not Shockwave)
                 {
                     TakeDamage();
                 }
@@ -380,6 +381,11 @@ namespace Tankontroller.World
                     {
                         m_Bullets.RemoveAt(i);
                     }
+                    return true;
+                }
+                else if (pTank.Collide(m_Bullets[i]) && m_Bullets[i] is Shockwave)
+                {
+                    m_Bullets[i].DoCollision(pTank);
                     return true;
                 }
             }

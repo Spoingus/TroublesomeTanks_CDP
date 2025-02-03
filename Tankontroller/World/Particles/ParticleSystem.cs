@@ -312,8 +312,8 @@ namespace Tankontroller.World.Particles
         {
             m_Position = pPosition;
             m_LifeTime = pLifeTime;
-            m_Colours[0] = Color.Aqua;
-            m_Colours[1] = Color.DodgerBlue;
+            m_Colours[0] = Color.Yellow;
+            m_Colours[1] = Color.Gold;
         }
 
         public void InitiateParticles(Particle[] pParticles)
