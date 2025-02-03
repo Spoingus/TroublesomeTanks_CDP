@@ -85,19 +85,18 @@ namespace Tankontroller.World
             pSpriteBatch.Draw(mPixelTexture, mPlayArea, GROUND_COLOUR);
 
             TrackSystem.GetInstance().Draw(pSpriteBatch);
-
-            //Draws the tanks (on top of tracks but below particles)
-            foreach (Tank t in mTanks)
-            {
-                t.Draw(pSpriteBatch);
-            }
-
             ParticleManager.Instance().Draw(pSpriteBatch);
 
             //Draws the bullets
             foreach (Tank t in mTanks)
             {
                 t.DrawBullets(pSpriteBatch, m_BulletTexture);
+            }
+
+            //Draws the tanks
+            foreach (Tank t in mTanks)
+            {
+                t.Draw(pSpriteBatch);
             }
 
             //Draws the walls
