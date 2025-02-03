@@ -189,7 +189,6 @@ namespace Tankontroller.Scenes
                     if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE))
                     {
                         avatarPicker.MakeSelection(blockedIndex);
-
                     }
                     if (controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
                     {
@@ -198,7 +197,6 @@ namespace Tankontroller.Scenes
                     if (controller.IsPressed(Control.TURRET_RIGHT))
                     {
                         avatarPicker.ChangeSelection(1);
-
                     }
                     else if (controller.IsPressed(Control.TURRET_LEFT))
                     {

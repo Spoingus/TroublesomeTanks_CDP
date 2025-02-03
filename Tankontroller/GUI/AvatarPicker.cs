@@ -235,9 +235,16 @@ namespace Tankontroller.GUI
                 avatar.Draw(pSpriteBatch, true, 0);
             }
         }
-        public void DrawSelection(SpriteBatch pSpriteBatch)
+        public void DrawSelection(SpriteBatch pSpriteBatch, List<int> pBlockedIndex)
         {
-            pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.White);
+            if (mAvatarSet && pBlockedIndex.Contains(mSelectionIndex))
+            {
+                pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.Black);
+            }
+            else
+            {
+                pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.White);
+            }
         }
         public void DrawJoinButton(SpriteBatch pSpriteBatch)
         {
@@ -251,19 +258,18 @@ namespace Tankontroller.GUI
         {
             if (HasController())
             {
-                //UpdateCentreAvatar();
                 UpdateColorOptions(mCentreAvatar.GetName(), pBlockedIndex);
                 mCentreAvatar.Draw(pSpriteBatch, true, 0);
                 if (!mAvatarSet)
                 {
-                    DrawSelection(pSpriteBatch);
+                    DrawSelection(pSpriteBatch, pBlockedIndex);
                     DrawAvatars(pSpriteBatch);
                     pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
                     pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
                 }
                 else if (!mColourSet)
                 {
-                    DrawSelection(pSpriteBatch);
+                    DrawSelection(pSpriteBatch, pBlockedIndex);
                     DrawColours(pSpriteBatch);
                     pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
                     pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
@@ -343,6 +349,7 @@ namespace Tankontroller.GUI
 
         public void Update(float pSeconds)
         {
+            if(!mColourSet) { UpdateCentreAvatar(); }
             mJoinButtonFlashTimer -= pSeconds;
             mSelectionCoolDown -= pSeconds;
             if (mJoinButtonFlashTimer <= 0)
