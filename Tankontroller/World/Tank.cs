@@ -4,6 +4,7 @@ using System.ComponentModel.Design;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Tankontroller.Managers;
 using Tankontroller.World.Bullets;
 using Tankontroller.World.Particles;
 

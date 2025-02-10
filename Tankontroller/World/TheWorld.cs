@@ -77,7 +77,7 @@ namespace Tankontroller.World
                 mTanks[tankIndex].CheckBullets(mTanks, mPlayArea, mWalls);
 
                 //test pickup collision
-                m_Pickup_Test.Pickup_Test_Collide(mTanks[tankIndex]);
+                m_Pickup_Test.PickUpCollision(mTanks[tankIndex]);
 
                 // Wall collisions
                 foreach (RectWall wall in mWalls)

@@ -138,7 +138,7 @@ namespace Tankontroller
                             Tank.Fire(bulletType);
                             SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
                             bulletShot.Play();
-                            bulletType = Tank.BulletType.NONE;
+                            bulletType = BulletType.DEFAULT;
                         }
                     }
                     //if tank fire is held
