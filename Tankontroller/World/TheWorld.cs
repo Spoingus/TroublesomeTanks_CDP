@@ -55,7 +55,7 @@ namespace Tankontroller.World
             {
                 mTanks[tankIndex].Update(pSeconds);
 
-                //mTanks[tankIndex].CheckBullets(mTanks, mPlayArea, mWalls);
+                mTanks[tankIndex].CheckBullets(mTanks, mPlayArea, mWalls);
 
                 //test pickup collision
                 m_Pickup_Test.Pickup_Test_Collide(mTanks[tankIndex]);
@@ -65,9 +65,6 @@ namespace Tankontroller.World
                 {
                     Rectangle wallRect = wall.Rectangle;
 
-                    // bullet collision using collision manager
-                    mTanks[tankIndex].CheckBulletCollisions(wall);
-
                     // tank collision using collision manager
                     if (CollisionManager.Collide(mTanks[tankIndex], wallRect, false))
                         mTanks[tankIndex].PutBack();
@@ -76,9 +73,6 @@ namespace Tankontroller.World
                 // Collisions with other tanks
                 for (int i = 0; i < mTanks.Count; i++)
                 {
-                    // bullet collision
-                    mTanks[tankIndex].CheckBulletCollisions(mTanks[i]);
-
                     if (tankIndex == i) // Skip collision with self
                     {
                         continue;
@@ -91,9 +85,6 @@ namespace Tankontroller.World
                 // Collisions with the play area
                 if (CollisionManager.Collide(mTanks[tankIndex], mPlayArea, true)) // True tp check inside the play area
                     mTanks[tankIndex].PutBack();
-
-                mTanks[tankIndex].CheckBulletCollisionsWithPlayArea(mPlayArea);
-                mTanks[tankIndex].CheckBulletLifeTime();
             }
         }
 

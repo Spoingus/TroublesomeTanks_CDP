@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Tankontroller.Managers;
 using Tankontroller.World.Particles;
 
 
@@ -302,152 +303,16 @@ namespace Tankontroller.World
             mRotation = mOldRotation;
         }
 
-        public bool Collide(Tank pTank)
+        public void CheckBullets(List<Tank> pTanks, Rectangle pPlayArea, List<RectWall> pWalls)
         {
-            Vector2[] thisTankCorners = new Vector2[4];
-            Vector2[] otherTankCorners = new Vector2[4];
-            GetCorners(thisTankCorners);
-            pTank.GetCorners(otherTankCorners);
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < m_Bullets.Count; ++i)
             {
-                if (PointIsInTank(otherTankCorners[i]) || pTank.PointIsInTank(thisTankCorners[i]))
-                {
-                    PutBack();
-                    pTank.PutBack();
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool Collide(RectWall pWall)
-        {
-            Rectangle rectangle = pWall.Rectangle;
-            Vector2[] tankCorners = new Vector2[4];
-            GetCorners(tankCorners);
+                bool bulletRemoved = false;
 
-            foreach (Vector2 corner in tankCorners)
-            {
-                if (rectangle.Contains(corner))
-                {
-                    PutBack();
-                    return true;
-                }
-            }
-            // Check if any of the corners of the wall are within the tank
-            if (PointIsInTank(new Vector2(rectangle.Left, rectangle.Top)) ||
-               PointIsInTank(new Vector2(rectangle.Right, rectangle.Top)) ||
-               PointIsInTank(new Vector2(rectangle.Left, rectangle.Bottom)) ||
-               PointIsInTank(new Vector2(rectangle.Right, rectangle.Bottom)))
-            {
-                PutBack();
-                return true;
-            }
-            return false;
-        }
-        public bool Collide(Bullet pBullet)
-        {
-            if (pBullet.Collide(this))
-            {
-                if (pBullet is not BouncyEMPBullet)
-                {
-                    TakeDamage();
-                }
-                Random rand = new Random();
-                int clang = rand.Next(1, 4);
-                string tankClang = "Sounds/Tank_Clang" + clang;
-                SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
-                tankClangSound.Play();
-                return true;
-            }
-            return false;
-        }
-
-        public bool CheckBulletCollisions(Tank pTank)
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
-                if (pTank == this && !(m_Bullets[i] is BouncyEMPBullet))
-                {
-                    continue;
-                }
-                if (pTank.Collide(m_Bullets[i]) && !(m_Bullets[i] is Shockwave))
-                {
-                    if (m_Bullets[i] is BouncyEMPBullet)
-                    {
-                        m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 5.0f));
-                    }
-                    if (m_Bullets[i].DoCollision(pTank))
-                    {
-                        m_Bullets.RemoveAt(i);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool CheckBulletCollisions(RectWall pWall)
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
-                if (m_Bullets[i].Collide(pWall))
-                {
-                    if (m_Bullets[i].DoCollision(pWall))
-                    {
-                        m_Bullets.RemoveAt(i);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool CheckBulletCollisionsWithPlayArea(Rectangle pRect)
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
-                if (m_Bullets[i].CollideWithPlayArea(pRect))
-                {
-                    if (m_Bullets[i].DoCollision(pRect))
-                    {
-                        m_Bullets.RemoveAt(i);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool CollideWithPlayArea(Rectangle pRectangle)
-        {
-            Vector2[] tankCorners = new Vector2[4];
-            GetCorners(tankCorners);
-            foreach (Vector2 corner in tankCorners)
-            {
-                if (!pRectangle.Contains(corner))
-                {
-                    PutBack();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void CheckBulletLifeTime()
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
-                if (m_Bullets[i].LifeTimeExpired())
-                { 
-                    m_Bullets.RemoveAt(i);
-                }
-            }
-        }
-        public void CheckBullets(List<Tank> pTanks,Rectangle pPlayArea, List<RectWall> pWalls)
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
+                // Check collision with tanks
                 for (int j = 0; j < pTanks.Count; ++j)
                 {
-                    if (m_Bullets[i].Collide(pTanks[j]) && !(m_Bullets[i] is Shockwave))
+                    if (CollisionManager.Collide(m_Bullets[i], pTanks[j]) && !(m_Bullets[i] is Shockwave))
                     {
                         if (m_Bullets[i] is BouncyEMPBullet)
                         {
@@ -457,22 +322,44 @@ namespace Tankontroller.World
                         {
                             m_Bullets.RemoveAt(i);
                             pTanks[j].TakeDamage();
+                            bulletRemoved = true;
+                            break;
                         }
-                        break;
                     }
                 }
-                if (m_Bullets[i].CollideWithPlayArea(pPlayArea))
+
+                if (bulletRemoved) continue;
+
+                // Check collision with play area
+                if (CollisionManager.Collide(m_Bullets[i], pPlayArea, true))
                 {
-                    m_Bullets.RemoveAt(i);
-                    continue;
-                }
-                for (int j = 0; j < pWalls.Count; ++j)
-                {
-                    if (m_Bullets[i].Collide(pWalls[j]))
+                    if (m_Bullets[i].DoCollision(pPlayArea))
                     {
                         m_Bullets.RemoveAt(i);
-                        break;
+                        continue;
                     }
+                }
+
+                // Check collision with walls
+                for (int j = 0; j < pWalls.Count; ++j)
+                {
+                    if (CollisionManager.Collide(m_Bullets[i], pWalls[j].Rectangle, false))
+                    {
+                        if (m_Bullets[i].DoCollision(pWalls[j]))
+                        {
+                            m_Bullets.RemoveAt(i);
+                            bulletRemoved = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (bulletRemoved) continue;
+
+                // Check bullet lifetime
+                if (m_Bullets[i].LifeTimeExpired())
+                {
+                    m_Bullets.RemoveAt(i);
                 }
             }
         }
