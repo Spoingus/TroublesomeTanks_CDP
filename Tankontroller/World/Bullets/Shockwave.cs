@@ -29,7 +29,7 @@ namespace Tankontroller.World.Bullets
         public override bool Collide(Tank pTank)
         {
             float distance = Vector2.Distance(pTank.GetWorldPosition(), Position);
-            if (distance < BULLET_RADIUS)
+            if (distance < BULLET_RADIUS / 2) //TODO: Change this to a more accurate collision detection
             {
                 return true;
             }

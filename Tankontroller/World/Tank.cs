@@ -57,6 +57,8 @@ namespace Tankontroller.World
         private int m_LeftTrackFrame;
         private int m_RightTrackFrame;
 
+        private bool mIsInsideShockwave = false; // Needed so that Player knows to deplete charge from shockwave
+
         public Tank(Vector2 pPos, float pRotation, float pScale) : this(pPos.X, pPos.Y, pRotation, pScale) { }
 
         public Tank(float pXPosition, float pYPosition, float pRotation, float pScale)
@@ -104,6 +106,16 @@ namespace Tankontroller.World
         public Color Colour()
         {
             return mColour;
+        }
+
+        public bool IsInsideShockwave()
+        {
+            if (mIsInsideShockwave)
+            {
+                mIsInsideShockwave = false;
+                return true;
+            }
+            return false;
         }
 
         public void Rotate(float pRotate)
@@ -290,7 +302,8 @@ namespace Tankontroller.World
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-            if(bullet == BulletType.BOUNCY_EMP) {
+            if (bullet == BulletType.BOUNCY_EMP)
+            {
                 m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED * 1.5f, mColour, 20.0f));
             }
             else
@@ -354,12 +367,16 @@ namespace Tankontroller.World
                 if (pBullet is not BouncyEMPBullet && pBullet is not Shockwave)
                 {
                     TakeDamage();
+                    Random rand = new Random();
+                    int clang = rand.Next(1, 4);
+                    string tankClang = "Sounds/Tank_Clang" + clang;
+                    SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
+                    tankClangSound.Play();
                 }
-                Random rand = new Random();
-                int clang = rand.Next(1, 4);
-                string tankClang = "Sounds/Tank_Clang" + clang;
-                SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
-                tankClangSound.Play();
+                else
+                {
+                    mIsInsideShockwave = true;
+                }
                 return true;
             }
             return false;
@@ -369,11 +386,11 @@ namespace Tankontroller.World
         {
             for (int i = 0; i < m_Bullets.Count; ++i)
             {
-                if (pTank == this && !(m_Bullets[i] is BouncyEMPBullet))
+                if (pTank == this && (m_Bullets[i] is DefaultBullet))
                 {
                     continue;
                 }
-                if (pTank.Collide(m_Bullets[i]) && !(m_Bullets[i] is Shockwave))
+                if (pTank.Collide(m_Bullets[i]))
                 {
                     if (m_Bullets[i] is BouncyEMPBullet)
                     {
@@ -385,14 +402,10 @@ namespace Tankontroller.World
                     }
                     return true;
                 }
-                else if (pTank.Collide(m_Bullets[i]) && m_Bullets[i] is Shockwave)
-                {
-                    m_Bullets[i].DoCollision(pTank);
-                    return true;
-                }
             }
             return false;
         }
+
         public bool CheckBulletCollisions(RectWall pWall)
         {
             for (int i = 0; i < m_Bullets.Count; ++i)
@@ -444,7 +457,7 @@ namespace Tankontroller.World
             for (int i = 0; i < m_Bullets.Count; ++i)
             {
                 if (m_Bullets[i].LifeTimeExpired())
-                { 
+                {
                     m_Bullets.RemoveAt(i);
                 }
             }
