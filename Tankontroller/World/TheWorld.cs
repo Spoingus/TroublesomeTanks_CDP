@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.World.Particles;
+using Tankontroller.World.Pickups;
 
 namespace Tankontroller.World
 {
@@ -14,19 +15,26 @@ namespace Tankontroller.World
         private static readonly Texture2D mPixelTexture = Tankontroller.Instance().CM().Load<Texture2D>("block");
         private static readonly Texture2D m_BulletTexture = Tankontroller.Instance().CM().Load<Texture2D>("circle");
         private static readonly Color GROUND_COLOUR = DGS.Instance.GetColour("COLOUR_GROUND");
+        private static readonly bool PICKUP_SPAWN = DGS.Instance.GetBool("PICKUPS_ON");
+        private static readonly float PICKUP_SPAWN_TIME = DGS.Instance.GetFloat("PICKUP_SPAWN_RATE");
 
         private Rectangle mPlayArea;
         private Rectangle mPlayAreaOutline;
         private List<Tank> mTanks = new List<Tank>();
         private List<RectWall> mWalls;
+        private List<Vector2> mPickupSpawnPositions = new List<Vector2>();
+        private List<Pickup> mPickups = new List<Pickup>();
+        private HealthPickup mHealthPickup = new HealthPickup(new Vector2(400, 500));
+        private float mPickupSpawnTimer = PICKUP_SPAWN_TIME;
 
         public Rectangle PlayArea { get { return mPlayArea; } }
 
-        public TheWorld(Rectangle pPlayArea, List<RectWall> pWalls, List<Tank> pTanks)
+        public TheWorld(Rectangle pPlayArea, List<RectWall> pWalls, List<Tank> pTanks, List<Vector2> pPickupSpawnPositions)
         {
             mWalls = pWalls;
             mTanks = pTanks;
             mPlayArea = pPlayArea;
+            mPickupSpawnPositions = pPickupSpawnPositions;
             mPlayAreaOutline = new Rectangle(mPlayArea.X - 5, mPlayArea.Y - 5, mPlayArea.Width + 10, mPlayArea.Height + 10);
         }
 
@@ -40,15 +48,30 @@ namespace Tankontroller.World
             return null;
         }
 
+        public void AddPickup()
+        {
+            mPickupSpawnTimer = PICKUP_SPAWN_TIME;
+            if (PICKUP_SPAWN)
+            {
+                int i = new Random().Next(0, mPickupSpawnPositions.Count());
+                mHealthPickup = new HealthPickup(mPickupSpawnPositions[i]);
+            }
+        }
+
         public void Update(float pSeconds)
         {
+            mPickupSpawnTimer -= pSeconds;
+            if(mPickupSpawnTimer <= 0) { AddPickup(); }
             Particles.ParticleManager.Instance().Update(pSeconds);
 
             // Check collisions for each tank
             for (int tankIndex = 0; tankIndex < mTanks.Count; tankIndex++)
             {
                 mTanks[tankIndex].Update(pSeconds);
-
+                foreach (Pickup pickup in mPickups)
+                {
+                    pickup.PickUpCollision(mTanks[tankIndex]);
+                }
                 // Wall collisions
                 foreach (RectWall wall in mWalls)
                 {
@@ -109,6 +132,8 @@ namespace Tankontroller.World
             {
                 w.Draw(pSpriteBatch);
             }
+
+            mHealthPickup.Draw(pSpriteBatch);
         }
     }
 }

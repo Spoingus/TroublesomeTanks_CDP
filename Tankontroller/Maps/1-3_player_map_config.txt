@@ -93,3 +93,23 @@ tank {
 	position = 95, 95
     rotation = 225
 }
+
+# Pickups
+pickup {
+	position = 50, 30
+}
+pickup {
+	position = 50, 70
+}
+pickup {
+	position = 30, 40
+}
+pickup {
+	position = 30, 60
+}
+pickup {
+	position = 70, 40
+}
+pickup {
+	position = 70, 60
+}

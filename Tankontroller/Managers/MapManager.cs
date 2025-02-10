@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.Managers;
 using Tankontroller.World;
+using Tankontroller.World.Pickups;
 using static Tankontroller.Scenes.GameScene;
 
 namespace Tankontroller
@@ -28,6 +29,7 @@ namespace Tankontroller
             Rectangle playArea = new Rectangle(screenWidth * 2 / 100, screenHeight * 25 / 100, screenWidth * 96 / 100, screenHeight * 73 / 100);
             List<RectWall> Walls = new List<RectWall>();
             List<Tank> Tanks = new List<Tank>();
+            List<Vector2> PickupSpawnPositions = new List<Vector2>();
             float tankScale = (float)playArea.Width / (50 * 40);
 
             string texture = null;
@@ -36,6 +38,7 @@ namespace Tankontroller
             float rotation = 0f;
             bool isWall = false;
             bool isTank = false;
+            bool isPickup = false;
 
             foreach (string line in lines)
             {
@@ -55,6 +58,11 @@ namespace Tankontroller
                 else if (line.StartsWith("tank"))
                 {
                     isTank = true;
+                    continue;
+                }
+                else if (line.StartsWith("pickup"))
+                {
+                    isPickup = true;
                     continue;
                 }
                 else if (line.Contains("texture"))
@@ -99,8 +107,13 @@ namespace Tankontroller
                     Tanks.Add(new Tank(position, rotation, tankScale));
                     isTank = false;
                 }
+                else if (isPickup)
+                {
+                    PickupSpawnPositions.Add(position);
+                    isPickup = false;
+                }
             }
-            return new TheWorld(playArea, Walls, Tanks);
+            return new TheWorld(playArea, Walls, Tanks, PickupSpawnPositions);
         }
     }
 }

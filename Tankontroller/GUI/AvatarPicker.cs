@@ -9,8 +9,8 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     // AvatarPicker
     //
-    // This class is used to represent the avatar picker in the game. It displays the avatars and colours
-    // that the player can choose from.
+    // This is the picker on the player selection scene that the player navigates to select an avatar
+    // and a colour.
     //-------------------------------------------------------------------------------------------------
     public class AvatarPicker
     {
@@ -65,8 +65,6 @@ namespace Tankontroller.GUI
         public AvatarPicker(Rectangle pRectangle)
         {
             mBoundsRectangle = pRectangle;
-
-            // Load Textures
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             mCircle = game.CM().Load<Texture2D>("circle");
             mJoinButtonTexture = game.CM().Load<Texture2D>("fire");
@@ -76,7 +74,6 @@ namespace Tankontroller.GUI
             mRotateRightTexture = game.CM().Load<Texture2D>("turretRight");
             PrepareButtons();
 
-            // Prepare Draw Variables
             mCentre = new Vector2(mBoundsRectangle.X + mBoundsRectangle.Width / 2, mBoundsRectangle.Y + mBoundsRectangle.Height / 2);
             mAvatarRadius = 70;
             mRadius = mBoundsRectangle.Height / 2 - mAvatarRadius;
@@ -101,7 +98,6 @@ namespace Tankontroller.GUI
 
         public bool Ready() { return HasController() && mAvatarSet && mColourSet; }
         public bool HasController() { return mController != null; }
-
 
         public void Reposition(Rectangle pRectangle)
         {

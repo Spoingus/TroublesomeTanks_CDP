@@ -5,17 +5,19 @@ namespace Tankontroller.World.Pickups
 {
     public abstract class Pickup
     {
-        private Rectangle m_Pickup_Rect;
-        private Texture2D m_Texture;
+        public Rectangle m_Pickup_Rect { get; protected set; }
+        public Texture2D m_Texture { get; protected set; }
         protected bool m_Active = true;
 
         protected Pickup(Texture2D pTexture, Rectangle pRectangle) { m_Pickup_Rect = pRectangle; m_Texture = pTexture; }
 
-        public void Draw(SpriteBatch pSpriteBatch)
+        public virtual void Draw(SpriteBatch pSpriteBatch)
         {
             if (m_Active)
                 pSpriteBatch.Draw(m_Texture, m_Pickup_Rect, Color.DeepPink);
         }
+
+        public virtual void PickUpCollision(Tank pTank) { }
 
         public bool Collide(Tank pTank)
         {

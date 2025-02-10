@@ -10,7 +10,7 @@ namespace Tankontroller.World.Pickups
         {
         }
 
-        public void Pickup_Test_Collide(Tank tank)
+        public override void PickUpCollision(Tank tank)
         {
             if (Collide(tank))
             {
