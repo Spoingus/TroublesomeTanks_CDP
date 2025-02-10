@@ -2,9 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Tankontroller.World.Bullets;
 using Tankontroller.World.Particles;
 
-namespace Tankontroller.World
+namespace Tankontroller.World.Bullets
 {
     class Shockwave : Bullet
     {

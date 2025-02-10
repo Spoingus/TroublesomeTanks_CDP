@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tankontroller.World.Particles;
 
-namespace Tankontroller.World
+namespace Tankontroller.World.Bullets
 {
     class DefaultBullet : Bullet
     {
@@ -50,7 +50,7 @@ namespace Tankontroller.World
         private void CreateExplosion(Vector2 pCollisionNormal)
         {
             ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position, pCollisionNormal, Colour);
-            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 100);
+            ParticleManager.Instance().InitialiseParticles(explosion, 100);
         }
 
         public override bool LifeTimeExpired()

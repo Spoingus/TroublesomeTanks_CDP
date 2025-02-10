@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Tankontroller.World.Particles;
 
-namespace Tankontroller.World
+namespace Tankontroller.World.Bullets
 {
     class BouncyEMPBullet : Bullet
     {
@@ -13,7 +13,8 @@ namespace Tankontroller.World
         private static readonly Texture2D EMPTexture2 = Tankontroller.Instance().CM().Load<Texture2D>("ShockWave2");
         private static readonly Texture2D EMPTexture3 = Tankontroller.Instance().CM().Load<Texture2D>("ShockWave3");
         private static readonly Texture2D EMPTexture4 = Tankontroller.Instance().CM().Load<Texture2D>("ShockWave4");
-        public BouncyEMPBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour, float pLifeTime) : base(pPosition, pVelocity, pColour, pLifeTime) {
+        public BouncyEMPBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour, float pLifeTime) : base(pPosition, pVelocity, pColour, pLifeTime)
+        {
             EMPTextures.Add(EMPTexture1);
             EMPTextures.Add(EMPTexture2);
             EMPTextures.Add(EMPTexture3);
@@ -25,7 +26,7 @@ namespace Tankontroller.World
         {
             Random rand = new Random();
             EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 0.5f);
-            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 1);
+            ParticleManager.Instance().InitialiseParticles(explosion, 1);
             //Rotation += 0.01f;
             LifeTime -= pSeconds;
             base.Update(pSeconds);
@@ -60,18 +61,18 @@ namespace Tankontroller.World
         private void CreateBlast()
         {
             EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 6.5f);
-            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 200);
+            ParticleManager.Instance().InitialiseParticles(explosion, 200);
         }
 
         public override bool LifeTimeExpired()
         {
-            return (LifeTime <= 0.0f);
+            return LifeTime <= 0.0f;
         }
 
         public override void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
-            Particle.DrawCircle(pBatch, pTexture, ((int)BULLET_RADIUS * 3) + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
-            Particle.DrawCircle(pBatch, pTexture, ((int)BULLET_RADIUS * 3), Position, Colour);
+            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS * 3 + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
+            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS * 3, Position, Colour);
             int i = new Random().Next(0, 4);
             pBatch.Draw(EMPTextures[i], Position, null, Color.White, Rotation, new Vector2(EMPTextures[i].Width / 2, EMPTextures[i].Height / 2), BULLET_RADIUS * 0.02f, SpriteEffects.None, 0.0f);
         }

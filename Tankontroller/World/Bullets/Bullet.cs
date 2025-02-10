@@ -3,14 +3,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.World.Particles;
 
-namespace Tankontroller.World
+namespace Tankontroller.World.Bullets
 {
     public abstract class Bullet
     {
         public float BULLET_RADIUS { get; protected set; }
         public Vector2 Position { get; protected set; }
         public Vector2 Velocity { get; protected set; }
-        public  Color Colour { get; private set; }
+        public Color Colour { get; private set; }
         public float LifeTime { get; protected set; }
 
         public Bullet(Vector2 pPosition, Vector2 pVelocity, Color pColour, float lifeTime)

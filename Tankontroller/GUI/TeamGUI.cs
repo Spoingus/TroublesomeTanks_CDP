@@ -21,7 +21,7 @@ namespace Tankontroller.GUI
         private PortNumLabel[] m_PortNumLabels = new PortNumLabel[8];
         private IController mController;
         private Color m_Color { get; set; }
-        private Tank.BulletType m_BulletType { get; set; }
+        private BulletType m_BulletType { get; set; }
 
         public TeamGUI(Avatar pAvatar,Rectangle pRectangle,IController pController)
         {
@@ -99,12 +99,12 @@ namespace Tankontroller.GUI
             m_Avatar.Draw(pSpriteBatch, pHealth > 0, avatarIndex);
         }
 
-        public void DrawHeldBullet(SpriteBatch pSpriteBatch, Tank.BulletType pBulletType)
+        public void DrawHeldBullet(SpriteBatch pSpriteBatch, BulletType pBulletType)
         {
             //TODO: fix the positons of the circle and the bullet
             Vector2 pos = new Vector2(50, 50);
             DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("circle"), 65, pos, Color.White);
-            if (pBulletType == Tank.BulletType.BOUNCY_EMP)
+            if (pBulletType == BulletType.BOUNCY_EMP)
             {
                 pSpriteBatch.Draw(Tankontroller.Instance().CM().Load<Texture2D>("battery"), pos, null, Color.White, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 0.0f);
             }
@@ -123,7 +123,7 @@ namespace Tankontroller.GUI
             pBatch.Draw(pTexture, rectangle, pColour);
         }
 
-        public void Draw(SpriteBatch pSpriteBatch, int pHealth, Tank.BulletType pBulletType)
+        public void Draw(SpriteBatch pSpriteBatch, int pHealth, BulletType pBulletType)
         {
             DrawAvatar(pSpriteBatch, pHealth);
             DrawHealthBar(pSpriteBatch, pHealth);

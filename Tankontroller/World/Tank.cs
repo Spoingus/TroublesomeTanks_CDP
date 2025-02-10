@@ -4,8 +4,14 @@ using System.ComponentModel.Design;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Tankontroller.World.Bullets;
 using Tankontroller.World.Particles;
 
+public enum BulletType
+{
+    DEFAULT,
+    BOUNCY_EMP
+}
 
 namespace Tankontroller.World
 {
@@ -29,11 +35,7 @@ namespace Tankontroller.World
         static private readonly Texture2D mCannonTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannon");
         static private readonly Texture2D mCannonFireTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannonFire");
 
-        public enum BulletType
-        {
-            NONE,
-            BOUNCY_EMP
-        }
+        
 
         private Vector2[] TANK_CORNERS = { new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, TANK_WIDTH / 2), new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, TANK_WIDTH / 2) };
 
@@ -456,6 +458,16 @@ namespace Tankontroller.World
                 m_Health = 0;
             }
         }
+
+        public void Heal()
+        {
+            m_Health++;
+            if (m_Health > MAX_HEALTH)
+            {
+                m_Health = MAX_HEALTH;
+            }
+        }
+
 
         public void Update(float pSeconds)
         {
