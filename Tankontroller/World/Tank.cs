@@ -351,13 +351,20 @@ namespace Tankontroller.World
                 // Check collision with tanks
                 for (int j = 0; j < pTanks.Count; ++j)
                 {
-                    if (CollisionManager.Collide(m_Bullets[i], pTanks[j]) && !(m_Bullets[i] is Shockwave))
+                    if (CollisionManager.Collide(m_Bullets[i], pTanks[j]))
                     {
                         if (m_Bullets[i] is BouncyEMPBullet)
                         {
                             m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 5.0f));
+                            m_Bullets.RemoveAt(i);
+                            bulletRemoved = true;
+                            break;
                         }
-                        if (m_Bullets[i].DoCollision(pTanks[j]))
+                        if (m_Bullets[i] is Shockwave)
+                        {
+                            mIsInsideShockwave = true;
+                        }
+                        else if (m_Bullets[i].DoCollision(pTanks[j]))
                         {
                             m_Bullets.RemoveAt(i);
                             pTanks[j].TakeDamage();
