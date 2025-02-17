@@ -22,8 +22,6 @@
     { "Position": [ "95", "95" ], "Rotation": "225" }
   ],
   "Pickups": [
-    { "Position": [ "50", "30" ] },
-    { "Position": [ "50", "70" ] },
     { "Position": [ "30", "40" ] },
     { "Position": [ "30", "60" ] },
     { "Position": [ "70", "40" ] },

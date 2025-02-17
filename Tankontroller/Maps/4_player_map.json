@@ -12,5 +12,11 @@
     { "Position": [ "90", "10" ], "Rotation": "180" },
     { "Position": [ "10", "90" ], "Rotation": "0" },
     { "Position": [ "90", "90" ], "Rotation": "180" }
+  ],
+  "Pickups": [
+    { "Position": [ "30", "30" ] },
+    { "Position": [ "30", "70" ] },
+    { "Position": [ "70", "30" ] },
+    { "Position": [ "70", "70" ] }
   ]
 }
