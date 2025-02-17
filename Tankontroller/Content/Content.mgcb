@@ -601,18 +601,6 @@
 /processorParam:TextureFormat=Color
 /build:background_err.png
 
-#begin battery.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:battery.png
-
 #begin block.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -648,6 +636,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:bullet.png
+
+#begin BulletSlot.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BulletSlot.png
 
 #begin cannon.png
 /importer:TextureImporter
@@ -781,7 +781,7 @@
 /processorParam:TextureFormat=Color
 /build:Countdown/two.png
 
-#begin EMPBullet.png
+#begin EMP.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -791,7 +791,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:EMPBullet.png
+/build:EMP.png
 
 #begin Empty.png
 /importer:TextureImporter
