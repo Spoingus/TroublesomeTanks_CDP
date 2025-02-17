@@ -43,6 +43,7 @@ namespace Tankontroller.World
         private List<Bullet> m_Bullets;
 
         private int m_Health;
+        public BulletType mbulletType { get; protected set; }
 
         private float mRotation;
         private float mOldRotation;
@@ -65,6 +66,8 @@ namespace Tankontroller.World
         public Tank(float pXPosition, float pYPosition, float pRotation, float pScale)
         {
             m_Health = MAX_HEALTH;
+            mbulletType = BulletType.DEFAULT;
+
             mColour = Color.White;
             m_Bullets = new List<Bullet>();
             mFired = 0;
@@ -306,11 +309,17 @@ namespace Tankontroller.World
             if (bullet == BulletType.BOUNCY_EMP)
             {
                 m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED * 1.5f, mColour, 20.0f));
+                mbulletType = BulletType.DEFAULT;
             }
             else
             {
                 m_Bullets.Add(new DefaultBullet(endOfCannon, cannonDirection * BULLET_SPEED, mColour, 1.0f));
             }
+        }
+
+        public void SetBulletType(BulletType pBulletType)
+        {
+            mbulletType = pBulletType;
         }
 
         public void PutBack()

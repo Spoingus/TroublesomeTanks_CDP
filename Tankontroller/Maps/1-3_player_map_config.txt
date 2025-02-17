@@ -96,12 +96,6 @@ tank {
 
 # Pickups
 pickup {
-	position = 50, 30
-}
-pickup {
-	position = 50, 70
-}
-pickup {
 	position = 30, 40
 }
 pickup {

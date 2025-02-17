@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Tankontroller.Managers;
 
 namespace Tankontroller.World.Pickups
 {
@@ -8,27 +9,26 @@ namespace Tankontroller.World.Pickups
         private static readonly Texture2D mHeartBack = Tankontroller.Instance().CM().Load<Texture2D>("healthbars/heart_bw");
         private static readonly Texture2D mHeartColour = Tankontroller.Instance().CM().Load<Texture2D>("healthbars/heart_colour");
 
-        public HealthPickup(Vector2 position) : base(Tankontroller.Instance().CM().Load<Texture2D>("circle"), new Rectangle(400, 500, 40, 40))
+        public HealthPickup(Vector2 pPosition) : base(Tankontroller.Instance().CM().Load<Texture2D>("circle"), new Rectangle(400, 500, 40, 40), new Vector2(0,0))
         {
-            m_Pickup_Rect = new Rectangle((int)position.X, (int)position.Y, 40, 40);
+            m_Position = pPosition;
+            m_Pickup_Rect = new Rectangle((int)m_Position.X - (m_Pickup_Rect.Width / 2), (int)m_Position.Y - (m_Pickup_Rect.Height / 2), 40, 40);
         }
 
         public override void Draw(SpriteBatch pSpriteBatch)
         {
-            if (m_Active) {
                 pSpriteBatch.Draw(mHeartBack, m_Pickup_Rect, Color.White);
                 pSpriteBatch.Draw(mHeartColour, m_Pickup_Rect, Color.Red);
-            }
         }
 
-        public override void PickUpCollision(Tank tank)
+        public override bool PickUpCollision(Tank tank)
         {
-            if (Collide(tank))
+            if (CollisionManager.Collide(tank, m_Pickup_Rect, false))
             {
-                // Stop Drawing
                 tank.Heal();
-                m_Active = false;
+                return true;
             }
+            return false;
         }
     }
 }

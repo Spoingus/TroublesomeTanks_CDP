@@ -7,24 +7,19 @@ namespace Tankontroller.World.Pickups
     {
         public Rectangle m_Pickup_Rect { get; protected set; }
         public Texture2D m_Texture { get; protected set; }
-        protected bool m_Active = true;
+        public Vector2 m_Position { get; protected set; }
 
-        protected Pickup(Texture2D pTexture, Rectangle pRectangle) { m_Pickup_Rect = pRectangle; m_Texture = pTexture; }
+        protected Pickup(Texture2D pTexture, Rectangle pRectangle, Vector2 pPosition) { m_Pickup_Rect = pRectangle; m_Texture = pTexture; m_Position = pPosition; }
 
         public virtual void Draw(SpriteBatch pSpriteBatch)
         {
-            if (m_Active)
-                pSpriteBatch.Draw(m_Texture, m_Pickup_Rect, Color.DeepPink);
+             pSpriteBatch.Draw(m_Texture, m_Pickup_Rect, Color.DeepPink);
         }
 
-        public virtual void PickUpCollision(Tank pTank) { }
+        public virtual bool PickUpCollision(Tank pTank) { return false; }
 
         public bool Collide(Tank pTank)
         {
-            if (!m_Active)
-            {
-                return false;
-            }
             Vector2[] tankCorners = new Vector2[4];
             pTank.GetCorners(tankCorners);
 

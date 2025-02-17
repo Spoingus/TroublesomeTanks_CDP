@@ -42,7 +42,7 @@ namespace Tankontroller
 
             foreach (string line in lines)
             {
-                if (!isWall && !isTank)
+                if (!isWall && !isTank && !isPickup)
                 {
                     texture = null;
                     position = Vector2.Zero;

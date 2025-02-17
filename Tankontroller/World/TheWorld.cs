@@ -10,6 +10,12 @@ using Tankontroller.Managers;
 using Tankontroller.World.Particles;
 using Tankontroller.World.Pickups;
 
+public enum PickupType
+{
+    HEALTH,
+    EMP
+}
+
 namespace Tankontroller.World
 {
     public class TheWorld
@@ -26,11 +32,7 @@ namespace Tankontroller.World
         private List<RectWall> mWalls;
         private List<Vector2> mPickupSpawnPositions = new List<Vector2>();
         private List<Pickup> mPickups = new List<Pickup>();
-        private HealthPickup mHealthPickup = new HealthPickup(new Vector2(400, 500));
         private float mPickupSpawnTimer = PICKUP_SPAWN_TIME;
-
-        //Test pickup
-        private Pickup_Test m_Pickup_Test = new Pickup_Test();
 
         public Rectangle PlayArea { get { return mPlayArea; } }
 
@@ -58,8 +60,26 @@ namespace Tankontroller.World
             mPickupSpawnTimer = PICKUP_SPAWN_TIME;
             if (PICKUP_SPAWN)
             {
-                int i = new Random().Next(0, mPickupSpawnPositions.Count());
-                mHealthPickup = new HealthPickup(mPickupSpawnPositions[i]);
+                int randPos = new Random().Next(0, mPickupSpawnPositions.Count());
+                //Checks for any pickups at this position to prevent spawn overlap
+                foreach (Pickup p in mPickups)
+                {
+                    if (p.m_Position == mPickupSpawnPositions[randPos])
+                    {
+                        return;
+                    }
+                }
+                int randPickup = new Random().Next(0, Enum.GetNames(typeof(PickupType)).Length);
+                if ((PickupType)randPickup == PickupType.HEALTH)
+                {
+                    HealthPickup mHealthPickup = new HealthPickup(mPickupSpawnPositions[randPos]);
+                    mPickups.Add(mHealthPickup);
+                }
+                else if ((PickupType)randPickup == PickupType.EMP)
+                {
+                    EMPPickup mEMPPickup = new EMPPickup(mPickupSpawnPositions[randPos]);
+                    mPickups.Add(mEMPPickup);
+                }
             }
         }
 
@@ -77,7 +97,14 @@ namespace Tankontroller.World
                 mTanks[tankIndex].CheckBullets(mTanks, mPlayArea, mWalls);
 
                 //test pickup collision
-                m_Pickup_Test.PickUpCollision(mTanks[tankIndex]);
+                foreach (Pickup p in mPickups)
+                {
+                    if (p.PickUpCollision(mTanks[tankIndex]))
+                    {
+                        mPickups.Remove(p);
+                        break;
+                    }
+                }
 
                 // Wall collisions
                 foreach (RectWall wall in mWalls)
@@ -115,9 +142,6 @@ namespace Tankontroller.World
             TrackSystem.GetInstance().Draw(pSpriteBatch);
             ParticleManager.Instance().Draw(pSpriteBatch);
 
-            //test pickup draw
-            m_Pickup_Test.Draw(pSpriteBatch);
-
             //Draws the tanks (on top of tracks but below particles)
             foreach (Tank t in mTanks)
             {
@@ -140,7 +164,10 @@ namespace Tankontroller.World
                 w.Draw(pSpriteBatch);
             }
 
-            mHealthPickup.Draw(pSpriteBatch);
+            foreach (Pickup p in mPickups)
+            {
+                p.Draw(pSpriteBatch);
+            }
         }
     }
 }

@@ -52,3 +52,16 @@ tank {
 	position = 90, 90
 	rotation = 180
 }
+# Pickups
+pickup {
+	position = 30, 40
+}
+pickup {
+	position = 30, 60
+}
+pickup {
+	position = 70, 40
+}
+pickup {
+	position = 70, 60
+}

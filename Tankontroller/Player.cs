@@ -7,7 +7,6 @@ using Tankontroller.World;
 
 namespace Tankontroller
 {
-
     public class Player
     {
         public static readonly float TRACK_DEPLETION_RATE = DGS.Instance.GetFloat("TRACK_DEPLETION_RATE");
@@ -18,14 +17,13 @@ namespace Tankontroller
         public Tank Tank { get; private set; }
         public IController Controller { get; private set; }
         public Color Colour { get; private set; }
-        public BulletType bulletType { get; protected set; }
+        
 
         public Player(IController pController, Avatar pAvatar)
         {
             Controller = pController;
             GUI = new TeamGUI(pAvatar, new Rectangle(), Controller);
             Colour = pAvatar.GetColour();
-            bulletType = BulletType.DEFAULT;
         }
 
         public void SetController(IController pController)
@@ -135,10 +133,9 @@ namespace Tankontroller
                     {
                         if (Controller.DepleteCharge(Control.FIRE, BULLET_CHARGE_DEPLETION))
                         {
-                            Tank.Fire(bulletType);
+                            Tank.Fire(Tank.mbulletType);
                             SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
                             bulletShot.Play();
-                            bulletType = BulletType.DEFAULT;
                         }
                     }
                     //if tank fire is held
@@ -152,10 +149,5 @@ namespace Tankontroller
             }
             return tankMoved;
         }
-
-        
-        //Pick up a special bullet
-        //if player has  a special bullet, replace current
-        //
     }
 }
