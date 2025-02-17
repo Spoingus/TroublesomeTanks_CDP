@@ -51,8 +51,10 @@ namespace Tankontroller.Scenes
 
             m_Teams = pPlayers;
 
-            string mapFileName = m_Teams.Count < 4 ? "1-3_player_map_config" : "4_player_map_config";
-            m_World = MapManager.LoadMap("Maps/" + mapFileName + ".txt");
+            //string mapFileName = m_Teams.Count < 4 ? "1-3_player_map_config" : "4_player_map_config";
+            string mapFileName = m_Teams.Count < 4 ? "1-3_player_map" : "4_player_map";
+            //m_World = MapManager.LoadMap("Maps/" + mapFileName + ".txt");
+            m_World = MapManager.LoadMapFromJson("Maps/" + mapFileName + ".json");
             if (m_World == null)
             {
                 throw new Exception("Couldn't load map file: " + mapFileName); //TODO Handle map load error

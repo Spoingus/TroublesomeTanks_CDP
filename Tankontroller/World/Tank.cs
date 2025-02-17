@@ -90,7 +90,14 @@ namespace Tankontroller.World
         private void ChangeLeftTrackFrame(int pAmount)
         {
             m_LeftTrackFrame += pAmount;
-            m_LeftTrackFrame = Math.Clamp(m_LeftTrackFrame, 1, 14);
+            if(m_LeftTrackFrame < 1)
+            {
+                m_LeftTrackFrame = 14;
+            }
+            else if (m_LeftTrackFrame > 14)
+            {
+                m_LeftTrackFrame = 1;
+            }
             DustInitialisationPolicy dust = new DustInitialisationPolicy(GetLeftFrontCorner(), GetLeftBackCorner());
             ParticleManager.Instance().InitialiseParticles(dust, 4);
         }
@@ -98,7 +105,14 @@ namespace Tankontroller.World
         private void ChangeRightTrackFrame(int pAmount)
         {
             m_RightTrackFrame += pAmount;
-            m_RightTrackFrame = Math.Clamp(m_RightTrackFrame, 1, 14);
+            if (m_RightTrackFrame < 1)
+            {
+                m_RightTrackFrame = 14;
+            }
+            else if (m_RightTrackFrame > 14)
+            {
+                m_RightTrackFrame = 1;
+            }
             DustInitialisationPolicy dust = new DustInitialisationPolicy(GetRightFrontCorner(), GetRightBackCorner());
             ParticleManager.Instance().InitialiseParticles(dust, 4);
         }
