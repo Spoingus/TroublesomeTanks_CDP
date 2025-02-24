@@ -7,9 +7,21 @@ The repository is a fork of the 3DP version (3D printed), which is the original 
 
 ## New Features:
 The CDP version of the game has implemented a number of new features, here is a brief list of those features:
+
 - Map Loading From Json Files
 - Power Up Abilities
 - Map Based Pickup System
+
+It should be of note that not all of these new features are in the main branch as of yet.
+
+## Refactoring:
+The project has undergone numerous refactoring efforts over the course of the CDP version, this is a brief look into what has been refactored within this repository:
+
+- Controller Code: Adding ID support to the controllers for easier reconnection and preventing bugs with team controllers getting mixed swapped.
+- Map Management: Maps now have a dedicated manager to handle the parsing and loading of the Json map files.
+- Manager Classes: Manager classes have been implemented for Sound, Collision and other similar aspects of the game to prevent code duplication while improving readability.
+
+It should be of note that not all of these refactoring efforts are in the main branch as of yet.
 
 ## Solution Diagrams:
 ### Scenes - Class Diagram
