@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using Tankontroller.World.Bullets;
 using Tankontroller.World.Particles;
 
 namespace Tankontroller.World.Bullets
@@ -40,7 +37,7 @@ namespace Tankontroller.World.Bullets
     {
             Vector2 CollisionNormal = Vector2.Normalize(Position - pTank.GetWorldPosition());
             ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position * 2, CollisionNormal, Colour);
-            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 20);
+            Particles.ParticleManager.Instance().InitialiseParticles(explosion, 120);
             return false;
         }
         public override bool DoCollision(Bullet pBullet)

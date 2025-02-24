@@ -364,7 +364,7 @@ namespace Tankontroller.World
                         {
                             mIsInsideShockwave = true;
                         }
-                        else if (m_Bullets[i].DoCollision(pTanks[j]))
+                        if (m_Bullets[i].DoCollision(pTanks[j]))
                         {
                             m_Bullets.RemoveAt(i);
                             pTanks[j].TakeDamage();
