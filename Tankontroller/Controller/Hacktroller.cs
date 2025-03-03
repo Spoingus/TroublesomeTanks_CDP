@@ -110,9 +110,11 @@ namespace Tankontroller.Controller
     public class Hacktroller
     {
         SerialPort port;
+        public string PortName { get { return port.PortName; } }
 
         static int numPins = 7;
         static byte[] SetColorCommand = new byte[] { (byte)'P', 0 };
+        static byte[] SetIDCommand = new byte[] { (byte)'U', (byte)' ' };
         static byte[] GetPortCommand = new byte[] { (byte)'R' };
 
         static byte[] frameBuffer = new byte[61 * 3];
@@ -178,6 +180,22 @@ namespace Tankontroller.Controller
             for (int i = 0; i < frameBuffer.Length; i++)
             {
                 frameBuffer[i] = 20;
+            }
+        }
+
+        public void SetID(string pID)
+        {
+            if (pID.Length > 9)
+            {
+                pID = pID.Substring(0, 10);
+                try
+                {
+                    port.DiscardInBuffer();
+                    port.Write(SetIDCommand, 0, 2);
+                    port.Write(pID);
+                }
+                catch
+                { }
             }
         }
 

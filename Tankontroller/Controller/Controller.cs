@@ -279,10 +279,11 @@ namespace Tankontroller.Controller
     public class ModularController : Controller
     {
         private Hacktroller mHacktroller;
+        public string COMPortName { get { return mHacktroller.PortName; } }
+        private Thread UpdateThread;
 
         public ModularController(Hacktroller pHackTroller) : base()
         {
-
             mJacks[5].LED_IDS = new int[8] { 0, 1, 2, 3, 4, 5, 6, 7 };
             mJacks[4].LED_IDS = new int[8] { 8, 9, 10, 11, 12, 13, 14, 15 };
             mJacks[3].LED_IDS = new int[8] { 16, 17, 18, 19, 20, 21, 22, 23 };
@@ -291,16 +292,23 @@ namespace Tankontroller.Controller
             mJacks[0].LED_IDS = new int[8] { 40, 41, 42, 43, 44, 45, 46, 47 };
             mJacks[6].LED_IDS = new int[8] { 48, 49, 50, 51, 52, 53, 54, 55 };
             mLedArray = new int[5] { 56, 57, 58, 59, 60 };
-            mHacktroller = pHackTroller;
+            SetHacktroller(pHackTroller);
+        }
 
+        public void SetHacktroller(Hacktroller pHackTroller)
+        {
+            mHacktroller = pHackTroller;
+            mConnected = true;
             PullDataThread();
         }
 
         public void PullDataThread()
         {
-            Thread.Sleep(10);
-            Thread UpdateController = new Thread(new ThreadStart(PullData));
-            UpdateController.Start();
+            if (UpdateThread == null || !UpdateThread.IsAlive)
+            {
+                UpdateThread = new Thread(new ThreadStart(PullData));
+                UpdateThread.Start();
+            }
         }
 
         private async Task UpdateColors()
@@ -421,14 +429,13 @@ namespace Tankontroller.Controller
 
         private void PullData()
         {
-            while (mLightsOn && mConnected)
+            while (mConnected)
             {
                 ControllerState[] ports = mHacktroller.GetPorts();
 
                 if (ports == null)
                 {
                     mConnected = false;
-                    Tankontroller.Instance().GetControllers().Remove(this);
                     return;
                 }
                 for (int i = 0; i < ports.Length; ++i)

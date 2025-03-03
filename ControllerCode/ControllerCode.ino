@@ -5,7 +5,7 @@
   
  */
  
- 
+#include <EEPROM.h>
 #include <Adafruit_NeoPixel.h>
 
 #define PIN 7
@@ -28,6 +28,11 @@ int values[NUM_PORTS];
 byte connections[NUM_PORTS];
 int maxSample = 0;
 int totalSamples = NUM_PORTS * NUM_SAMPLES;
+
+const int ID_ADDRESS = 0;
+const int ID_LENGTH = 10;
+char ID[ID_LENGTH];
+
 // the setup routine runs once when you press reset:
 void setup() {                
   // start serial port at 9600 bps:
@@ -37,6 +42,7 @@ void setup() {
   strip.show(); // Initialize all pixels to 'off'
   initialiseAnimation();
   initialiseSamples();
+  EEPROM.get(ID_ADDRESS, ID);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
@@ -109,30 +115,38 @@ void sendData()
 
 // the loop routine runs over and over again forever:
 void loop() {
-  
   if (Serial.available() > 0 ) 
   {
     int command = Serial.read();
-    if ( command == 'R' )
-    {
+    if ( command == 'R' ) {
      // Serial.println("fish");
       collectSamples();
       //printConnections();
       sendData();
     }
-   if ( command == 'P')
-   {
+    else if ( command == 'P') {
      receivePanel();
-   }
-    if( command == 'I')
-    {
+    }
+    else if( command == 'I') {
       identifyDevice();
+    }
+    else if( command == 'U') { // Update ID
+      //while(Serial.available() < 11) { }
+      GetCh(); // Read space
+      for(int i = 0; i < ID_LENGTH; ++i) {
+        ID[i] = GetCh();
+      }
+      EEPROM.put(ID_ADDRESS, ID);
     }
   }
 }
 void identifyDevice()
 {  
   Serial.write("Tankontroller\n");
+  for(int i = 0; i < ID_LENGTH; ++i) {
+    Serial.write(ID[i]);
+  }
+  Serial.write("\n");
 }
 
 void shiftSamples() {

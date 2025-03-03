@@ -47,7 +47,7 @@ namespace Tankontroller
 
         public static IGame Instance()
         {
-            if(mGameInterface == null)
+            if (mGameInterface == null)
             {
                 mGameInterface = new Tankontroller();
             }
@@ -63,17 +63,30 @@ namespace Tankontroller
             }
         }
 
+        private bool COMPortInUse(string pPortName)
+        {
+            foreach (IController item in mControllers.Values)
+            {
+                if (item.IsConnected() && item is ModularController controller)
+                {
+                    if (controller.COMPortName == pPortName)
+                        return true;
+                }
+            }
+            return false;
+        }
+
         private async Task DetectControllersAsync()
         {
             string[] portNames = SerialPort.GetPortNames();
             foreach (string portName in portNames)
             {
-                if (!mControllers.ContainsKey(portName))
+                if (!COMPortInUse(portName))
                 {
                     SerialPort port;
                     try
                     {
-                        port = new SerialPort(portName, 19200); //, Parity.None, 8, StopBits.One);
+                        port = new SerialPort(portName, 19200);
                         port.Open();
                     }
                     catch
@@ -87,10 +100,10 @@ namespace Tankontroller
                     port.WriteTimeout = 10;
 
                     port.DiscardInBuffer();
-                    //port.Write(new byte[] { (byte)'I' }, 0, 1);
+
                     await port.BaseStream.WriteAsync(new byte[] { (byte)'I' }, 0, 1);
 
-                    System.Threading.Thread.Sleep(10); 
+                    System.Threading.Thread.Sleep(10);
 
                     if (port.BytesToRead > 0)
                     {
@@ -101,8 +114,21 @@ namespace Tankontroller
                             if (response == "Tankontroller")
                             {
                                 Hacktroller hacktroller = new Hacktroller(port);
-                                IController controller = new ModularController(hacktroller);
-                                mControllers.Add(portName, controller);
+                                string id = port.ReadLine();
+                                if (mControllers.ContainsKey(id))
+                                {
+                                    if (mControllers[id] is ModularController controller)
+                                    {
+                                        controller.SetHacktroller(hacktroller);
+                                    }
+                                }
+                                else
+                                {
+                                    string newID = Guid.NewGuid().ToString("N").Substring(0, 10);
+                                    hacktroller.SetID(newID);
+                                    ModularController controller = new ModularController(hacktroller);
+                                    mControllers.Add(newID, controller);
+                                }
                             }
                             else
                             {
@@ -117,19 +143,6 @@ namespace Tankontroller
                     else { port.Close(); }
                 }
             }
-
-            List<string> toRemove = new List<string>();
-            foreach (KeyValuePair<string, IController> controller in mControllers)
-            {
-                if (!controller.Value.IsConnected())
-                {
-                    toRemove.Add(controller.Key);
-                }
-            }
-            foreach (string key in toRemove)
-            {
-                mControllers.Remove(key);
-            }
         }
 
         public void TurnOffControllers()
@@ -140,24 +153,24 @@ namespace Tankontroller
             }
         }
 
-        public IController GetController(int pIndex) {  return mControllers.Values.ElementAt(pIndex); }
+        public IController GetController(int pIndex) { return mControllers.Values.ElementAt(pIndex); }
         public int GetControllerCount() { return mControllers.Count; }
         public List<IController> GetControllers() { return mControllers.Values.ToList(); }
-       
+
         public SoundManager GetSoundManager() { return mSoundManager; }
         public SceneManager SM() { return mSceneManager; }
         public ContentManager CM() { return Content; }
         public GraphicsDeviceManager GDM() { return mGraphics; }
         public Tankontroller()
         {
-            mGraphics               = new GraphicsDeviceManager(this);
-            Content.RootDirectory   = "Content";
+            mGraphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
             mControllers = new Dictionary<string, IController>();
-            
-                
+
+
             if (DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_1"))
             {
-                    
+
                 Dictionary<Keys, Control> Player1KeyMap = new Dictionary<Keys, Control>
                 {
                     { Keys.Q, Control.LEFT_TRACK_FORWARDS },
@@ -185,7 +198,7 @@ namespace Tankontroller
                 mControllers.Add("Keyboard1", controller);
             }
 
-            if(DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_2"))
+            if (DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_2"))
             {
                 Dictionary<Keys, Control> Player2KeyMap = new Dictionary<Keys, Control>
                 {
@@ -222,7 +235,7 @@ namespace Tankontroller
             this.Window.Title = "TroubleSome Tanks - CDP Edition!";
         }
 
-        
+
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -256,7 +269,7 @@ namespace Tankontroller
             mSoundManager.Add("Sounds/Tank_Clang3");
 
             mSceneManager.Push(new FlashScreenScene());
-           // mSceneManager.Push(new GameScene());
+            // mSceneManager.Push(new GameScene());
 
             // TODO: use this.Content to load your game content here
         }

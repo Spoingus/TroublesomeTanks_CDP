@@ -176,24 +176,8 @@ namespace Tankontroller.Scenes
                 mGameInstance.DetectControllers();
 
                 mControllersConnected = true;
-                foreach (Player p in m_Teams)
+                foreach (Player p in m_Teams) // Wait until all controllers are reconnected
                 {
-                    if (!p.Controller.IsConnected())
-                    {
-                        // Check to see if there is a connected controller not yet associated to a player
-                        foreach (IController controller in mGameInstance.GetControllers())
-                        {
-                            if (!m_Teams.Any(player => player.Controller == controller))
-                            {
-                                if (controller != null) // I don't think this is neccessary but the game crashed when controller was null
-                                {
-                                    controller.TransferJackCharge(p.Controller);
-                                    p.SetController(controller);
-                                    break;
-                                }
-                            }
-                        }
-                    }
                     mControllersConnected = mControllersConnected && p.Controller.IsConnected();
                 }
             }
