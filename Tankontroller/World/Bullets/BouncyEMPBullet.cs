@@ -13,6 +13,7 @@ namespace Tankontroller.World.Bullets
         private static readonly Texture2D EMPTexture2 = Tankontroller.Instance().CM().Load<Texture2D>("ShockWave2");
         private static readonly Texture2D EMPTexture3 = Tankontroller.Instance().CM().Load<Texture2D>("ShockWave3");
         private static readonly Texture2D EMPTexture4 = Tankontroller.Instance().CM().Load<Texture2D>("ShockWave4");
+        private int index = 0;
         public BouncyEMPBullet(Vector2 pPosition, Vector2 pVelocity, Color pColour, float pLifeTime) : base(pPosition, pVelocity, pColour, pLifeTime)
         {
             EMPTextures.Add(EMPTexture1);
@@ -48,7 +49,8 @@ namespace Tankontroller.World.Bullets
 
         public override bool DoCollision(Tank pTank)
         {
-            CreateBlast();
+            EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 6.5f);
+            ParticleManager.Instance().InitialiseParticles(explosion, 200);
             return true;
         }
 
@@ -58,12 +60,6 @@ namespace Tankontroller.World.Bullets
             return false;
         }
 
-        private void CreateBlast()
-        {
-            EMPBlastInitPolicy explosion = new EMPBlastInitPolicy(Position, 6.5f);
-            ParticleManager.Instance().InitialiseParticles(explosion, 200);
-        }
-
         public override bool LifeTimeExpired()
         {
             return LifeTime <= 0.0f;
@@ -71,10 +67,14 @@ namespace Tankontroller.World.Bullets
 
         public override void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
-            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS * 3 + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
-            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS * 3, Position, Colour);
-            int i = new Random().Next(0, 4);
-            pBatch.Draw(EMPTextures[i], Position, null, Color.White, Rotation, new Vector2(EMPTextures[i].Width / 2, EMPTextures[i].Height / 2), BULLET_RADIUS * 0.02f, SpriteEffects.None, 0.0f);
+            Particle.DrawCircle(pBatch, pTexture, (int)Radius * 3 + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
+            Particle.DrawCircle(pBatch, pTexture, (int)Radius * 3, Position, Colour);
+            int rand = new Random().Next(0, 20);
+            if (rand == 0)
+            {
+               index = new Random().Next(0, 4);
+            }
+            pBatch.Draw(EMPTextures[index], Position, null, Color.White, Rotation, new Vector2(EMPTextures[index].Width / 2, EMPTextures[index].Height / 2), Radius * 0.02f, SpriteEffects.None, 0.0f);
         }
     }
 }

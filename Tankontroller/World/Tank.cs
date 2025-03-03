@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -301,7 +302,15 @@ namespace Tankontroller.World
             }
             return result;
         }
-
+        public bool TankInRadius(float pBulletRadius, Vector2 pPoint)
+        {
+            float distance = Vector2.Distance(new Vector2(mPosition.X, mPosition.Y), pPoint);
+            if (distance < (pBulletRadius - 10 ))
+            {
+                return true;
+            }
+            return false;
+        }
 
         public void PrimingWeapon(float pSeconds)
         {
@@ -355,6 +364,7 @@ namespace Tankontroller.World
                     {
                         if (m_Bullets[i] is BouncyEMPBullet)
                         {
+                            m_Bullets[i].DoCollision(pTanks[j]);
                             m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 5.0f));
                             m_Bullets.RemoveAt(i);
                             bulletRemoved = true;
@@ -362,7 +372,7 @@ namespace Tankontroller.World
                         }
                         if (m_Bullets[i] is Shockwave)
                         {
-                            mIsInsideShockwave = true;
+                            pTanks[j].mIsInsideShockwave = true;
                         }
                         if (m_Bullets[i].DoCollision(pTanks[j]))
                         {
