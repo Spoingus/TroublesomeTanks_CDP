@@ -17,6 +17,8 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class PlayerSelectionScene : IScene
     {
+        private string mapFile;
+        
         Texture2D mBackgroundTexture = null;
         Rectangle mBackgroundRectangle;
         Texture2D[] mCountDownTextures = new Texture2D[6];
@@ -29,8 +31,10 @@ namespace Tankontroller.Scenes
 
         public List<int> blockedIndex = new List<int>();
 
-        public PlayerSelectionScene()
+        public PlayerSelectionScene(string mapFile)
         {
+            this.mapFile = mapFile;
+            
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
 
             spriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
@@ -94,7 +98,7 @@ namespace Tankontroller.Scenes
             mAvatarPickers.Add(new AvatarPicker(rectangle));
         }
 
-        private List<Player> getReadyPlayers()
+        private List<Player> GetReadyPlayers()
         {
             List<Player> players = new List<Player>();
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
@@ -110,7 +114,7 @@ namespace Tankontroller.Scenes
         private void StartGame()
         {
             IGame game = Tankontroller.Instance();
-            game.SM().Transition(new GameScene(getReadyPlayers()), true);
+            game.SM().Transition(new GameScene(GetReadyPlayers(), mapFile), true);
         }
 
         private AvatarPicker getEmptyAvatarPicker()
