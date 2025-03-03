@@ -304,7 +304,7 @@ namespace Tankontroller.World.Particles
     {
         private Vector2 m_Position;
         private float m_LifeTime;
-        private float m_VelocityScale;
+        //private float m_VelocityScale;
         private Random m_Rng = new Random();
         private Color[] m_Colours = new Color[2];
 
