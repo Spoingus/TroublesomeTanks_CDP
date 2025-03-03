@@ -306,11 +306,14 @@ namespace Tankontroller.World.Particles
         private float m_LifeTime;
         //private float m_VelocityScale;
         private Random m_Rng = new Random();
+        private Color[] m_Colours = new Color[2];
 
         public EMPBlastInitPolicy(Vector2 pPosition, float pLifeTime)
         {
             m_Position = pPosition;
             m_LifeTime = pLifeTime;
+            m_Colours[0] = Color.Yellow;
+            m_Colours[1] = Color.Gold;
         }
 
         public void InitiateParticles(Particle[] pParticles)
@@ -319,7 +322,11 @@ namespace Tankontroller.World.Particles
             {
                 m_LifeTime = m_LifeTime * (float)(1.0 - (m_Rng.NextDouble() * 0.01));
                 Vector2 velocity = Vector2.Transform(new Vector2(0, 1), Matrix.CreateRotationZ((float)(m_Rng.NextDouble() * 2 * Math.PI))) * m_Rng.Next(90, 121);
-                pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(3, 11), m_Rng.Next(0, 2), Color.Yellow, m_LifeTime);
+                // normalize the velocity
+                velocity.Normalize();
+                // apply speed
+                velocity = velocity * 30;
+                pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(3, 11), m_Rng.Next(0, 2), m_Colours[m_Rng.Next(2)], m_LifeTime);
             }
         }
     }

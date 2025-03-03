@@ -26,6 +26,9 @@ namespace Tankontroller.Scenes
         float mCountdown;
         bool mPlayersWereReady;
 
+
+        public List<int> blockedIndex = new List<int>();
+
         public PlayerSelectionScene()
         {
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
@@ -185,17 +188,15 @@ namespace Tankontroller.Scenes
                     }
                     if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE))
                     {
-                        avatarPicker.MakeSelection();
-
+                        avatarPicker.MakeSelection(blockedIndex);
                     }
                     if (controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
                     {
-                        avatarPicker.UndoSelection();
+                        avatarPicker.UndoSelection(blockedIndex);
                     }
                     if (controller.IsPressed(Control.TURRET_RIGHT))
                     {
                         avatarPicker.ChangeSelection(1);
-
                     }
                     else if (controller.IsPressed(Control.TURRET_LEFT))
                     {
@@ -244,7 +245,7 @@ namespace Tankontroller.Scenes
         {
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
             {
-                avatarPicker.Draw(pSpriteBatch);
+                avatarPicker.Draw(pSpriteBatch, blockedIndex);
             }
         }
         private void DrawCountDown(SpriteBatch pSpriteBatch)

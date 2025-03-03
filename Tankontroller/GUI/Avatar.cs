@@ -25,7 +25,7 @@ namespace Tankontroller.GUI
         private const int LAYER_COUNT = 5;
         private Texture2D[] m_BlackAndWhiteLayer = new Texture2D[LAYER_COUNT];
         private Texture2D[] m_ColourLayer = new Texture2D[LAYER_COUNT];
-        private Rectangle m_Rectangle;
+        public Rectangle m_Rectangle { get; protected set; }
         private Rectangle[] m_DrawRectangles = new Rectangle[LAYER_COUNT];
         private Color m_Colour;
         private string m_Name;

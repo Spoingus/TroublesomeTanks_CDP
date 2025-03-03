@@ -9,8 +9,8 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     // AvatarPicker
     //
-    // This class is used to represent the avatar picker in the game. It displays the avatars and colours
-    // that the player can choose from.
+    // This is the picker on the player selection scene that the player navigates to select an avatar
+    // and a colour.
     //-------------------------------------------------------------------------------------------------
     public class AvatarPicker
     {
@@ -46,11 +46,25 @@ namespace Tankontroller.GUI
         private Rectangle mRotateRightButton;
         private Rectangle mBackTextRectangle;
 
+        private List<Color> colours = new List<Color>
+            {
+                Color.Red,
+                Color.DeepSkyBlue,
+                Color.Lime,
+                Color.DeepPink,
+                Color.Gold,
+                Color.Sienna,
+                Color.Firebrick,
+                Color.Navy,
+                Color.ForestGreen,
+                Color.DarkMagenta,
+                Color.DarkOrange,
+                Color.Tan
+            };
+
         public AvatarPicker(Rectangle pRectangle)
         {
             mBoundsRectangle = pRectangle;
-
-            // Load Textures
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
             mCircle = game.CM().Load<Texture2D>("circle");
             mJoinButtonTexture = game.CM().Load<Texture2D>("fire");
@@ -60,13 +74,11 @@ namespace Tankontroller.GUI
             mRotateRightTexture = game.CM().Load<Texture2D>("turretRight");
             PrepareButtons();
 
-            // Prepare Draw Variables
             mCentre = new Vector2(mBoundsRectangle.X + mBoundsRectangle.Width / 2, mBoundsRectangle.Y + mBoundsRectangle.Height / 2);
             mAvatarRadius = 70;
             mRadius = mBoundsRectangle.Height / 2 - mAvatarRadius;
 
             SetUpAvatarSelection();
-            PrepareColourSelection("engineer");
             Reset();
         }
 
@@ -86,7 +98,6 @@ namespace Tankontroller.GUI
 
         public bool Ready() { return HasController() && mAvatarSet && mColourSet; }
         public bool HasController() { return mController != null; }
-
 
         public void Reposition(Rectangle pRectangle)
         {
@@ -117,7 +128,6 @@ namespace Tankontroller.GUI
             avatarRect.Width = avatarRect.Height = (int)(middleAvatarRadius * 2);
 
             Color color = mAvatarSet ? mColours[mSelectionIndex].GetColour() : Color.White;
-
             mCentreAvatar = new Avatar(name, avatarRect, color);
         }
 
@@ -185,31 +195,24 @@ namespace Tankontroller.GUI
                 mAvatars.Add(avatar);
             }
         }
-        private void PrepareColourSelection(string pAvatarString)
+        private void UpdateColorOptions(string pAvatarString, List<int> pBlockedIndex)
         {
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
             mColours = new List<Avatar>();
-            List<Color> colours = new List<Color>
-            {
-                Color.Red,
-                Color.Lime,
-                Color.DarkGreen,
-                Color.MonoGameOrange,
-                Color.Blue,
-                Color.Yellow,
-                Color.NavajoWhite,
-                Color.DarkSlateGray,
-                Color.SaddleBrown,
-                Color.Indigo,
-                Color.Magenta,
-                Color.Aqua
-            };
 
             var rectangles = GetSelectionRectangles(colours.Count);
             for (int i = 0; i < colours.Count; i++)
             {
-                Avatar avatar = new Avatar(pAvatarString, rectangles[i], colours[i]);
+                Avatar avatar;
+                if (pBlockedIndex.Contains(i))
+                {
+                    avatar = new Avatar(pAvatarString, rectangles[i], Color.DimGray);
+                }
+                else
+                {
+                    avatar = new Avatar(pAvatarString, rectangles[i], colours[i]);
+                }
                 mColours.Add(avatar);
             }
         }
@@ -228,9 +231,16 @@ namespace Tankontroller.GUI
                 avatar.Draw(pSpriteBatch, true, 0);
             }
         }
-        public void DrawSelection(SpriteBatch pSpriteBatch)
+        public void DrawSelection(SpriteBatch pSpriteBatch, List<int> pBlockedIndex)
         {
-            pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.White);
+            if (mAvatarSet && pBlockedIndex.Contains(mSelectionIndex))
+            {
+                pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.Black);
+            }
+            else
+            {
+                pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.White);
+            }
         }
         public void DrawJoinButton(SpriteBatch pSpriteBatch)
         {
@@ -240,21 +250,22 @@ namespace Tankontroller.GUI
             }
         }
 
-        public void Draw(SpriteBatch pSpriteBatch)
+        public void Draw(SpriteBatch pSpriteBatch, List<int> pBlockedIndex)
         {
             if (HasController())
             {
+                UpdateColorOptions(mCentreAvatar.GetName(), pBlockedIndex);
                 mCentreAvatar.Draw(pSpriteBatch, true, 0);
                 if (!mAvatarSet)
                 {
-                    DrawSelection(pSpriteBatch);
+                    DrawSelection(pSpriteBatch, pBlockedIndex);
                     DrawAvatars(pSpriteBatch);
                     pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
                     pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
                 }
                 else if (!mColourSet)
                 {
-                    DrawSelection(pSpriteBatch);
+                    DrawSelection(pSpriteBatch, pBlockedIndex);
                     DrawColours(pSpriteBatch);
                     pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
                     pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
@@ -287,7 +298,7 @@ namespace Tankontroller.GUI
         }
 
 
-        public void MakeSelection()
+        public void MakeSelection(List<int> pBlockedIndex)
         {
             if (HasController())
             {
@@ -295,23 +306,28 @@ namespace Tankontroller.GUI
                 {
                     mAvatarSet = true;
                     mSelectionIndex = 0;
-                    PrepareColourSelection(mCentreAvatar.GetName());
+                    UpdateColorOptions(mCentreAvatar.GetName(), pBlockedIndex);
                     mSelectionRectangles = GetSelectionRectangles(mColours.Count);
                     UpdateCentreAvatar();
                 }
                 else if (!mColourSet)
                 {
-                    mColourSet = true;
-                    UpdateCentreAvatar();
+                    if (mColours[mSelectionIndex].GetColour() != Color.DimGray)
+                    {
+                        mColourSet = true;
+                        UpdateCentreAvatar();
+                        pBlockedIndex.Add(mSelectionIndex);
+                    }
                 }
             }
         }
 
-        public void UndoSelection()
+        public void UndoSelection(List<int> pBlockedIndex)
         {
             if (mColourSet)
             {
                 mColourSet = false;
+                pBlockedIndex.Remove(mSelectionIndex);
                 UpdateCentreAvatar();
             }
             else if (mAvatarSet)
@@ -329,6 +345,7 @@ namespace Tankontroller.GUI
 
         public void Update(float pSeconds)
         {
+            if(!mColourSet) { UpdateCentreAvatar(); }
             mJoinButtonFlashTimer -= pSeconds;
             mSelectionCoolDown -= pSeconds;
             if (mJoinButtonFlashTimer <= 0)
