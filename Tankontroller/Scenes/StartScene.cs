@@ -50,7 +50,7 @@ namespace Tankontroller.Scenes
                     startGameButtonTexture.Width,
                     startGameButtonTexture.Height);
 
-            Button startGameButton = new Button(startGameButtonTexture, startGameButtonTexturePressed, startGameButtonRectangle, Color.Red, StartGame);
+            Button startGameButton = new Button(startGameButtonTexture, startGameButtonTexturePressed, startGameButtonRectangle, Color.Red, SelectLevel);
             startGameButton.Selected = true;
             mButtonList.Add(startGameButton);
 
@@ -71,7 +71,7 @@ namespace Tankontroller.Scenes
             tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
 
             // Level Selection Button
-            Texture2D levelSelectionButtonTexture = tankControllerInstance.CM().Load<Texture2D>("menu_play_white");
+            /*Texture2D levelSelectionButtonTexture = tankControllerInstance.CM().Load<Texture2D>("menu_play_white");
             Texture2D levelSelectionButtonTexturePressed = tankControllerInstance.CM().Load<Texture2D>("menu_quit_dark");
 
             Rectangle levelSelectionButtonRectangle =
@@ -83,7 +83,7 @@ namespace Tankontroller.Scenes
 
             Button levelSelectionButton = new Button(levelSelectionButtonTexture, levelSelectionButtonTexturePressed, levelSelectionButtonRectangle, Color.Red, SelectLevel);
             levelSelectionButton.Selected = false;
-            mButtonList.Add(levelSelectionButton);
+            mButtonList.Add(levelSelectionButton);*/
 
         }
         
@@ -100,6 +100,8 @@ namespace Tankontroller.Scenes
         //Starts the game
         private void StartGame()
         {
+            //load level select scene
+
             string defaultMapFile = "Maps/1-3_player_map.json"; // Specify the default map file to use
             gameInstance.SM().Transition(new PlayerSelectionScene(defaultMapFile), false);
         }
