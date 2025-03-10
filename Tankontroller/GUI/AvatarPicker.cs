@@ -329,6 +329,7 @@ namespace Tankontroller.GUI
 
         public void Update(float pSeconds)
         {
+            if (mController != null) mController.SetColour(mCentreAvatar.GetColour());
             mJoinButtonFlashTimer -= pSeconds;
             mSelectionCoolDown -= pSeconds;
             if (mJoinButtonFlashTimer <= 0)

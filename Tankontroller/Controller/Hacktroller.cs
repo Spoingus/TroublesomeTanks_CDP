@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Ports;
 using System.Threading.Tasks;
 
@@ -237,37 +238,35 @@ namespace Tankontroller.Controller
         }
 
 
-        public async Task<bool> SetColor(ControllerColor[] colourArray)
+        public async Task<bool> SetColor(Dictionary<byte, ControllerColor> colourData)
         {
             byte[] colourWriteCommand = SetColorCommand;
-            byte[] writeColour = new byte[3];
+            byte[] writeColour = new byte[4];
 
-
-            // My ugly protocol does not support sending panel items larger than 254 pixels 
-            if (colourArray.Length > 254)
+            // List can't be larger than 255 as it is sent as a byte (There are only 10 LEDs on a controller anyways)
+            if (colourData.Count > 254)
                 return false;
 
-            colourWriteCommand[1] = (byte)colourArray.Length;
+            colourWriteCommand[1] = (byte)colourData.Count;
 
             // Write the command
             await port.BaseStream.WriteAsync(colourWriteCommand, 0, 2);
 
             byte check = 0;
-
-            foreach (ControllerColor c in colourArray)
+            foreach (KeyValuePair<byte, ControllerColor> data in colourData)
             {
                 // HACK think this is RBG instead of RGB so have swapped subscripts around
-                check += c.R;
-                writeColour[0] = c.R;
-                check += c.G;
-                writeColour[2] = c.G;
-                check += c.B;
-                writeColour[1] = c.B;
-                await port.BaseStream.WriteAsync(writeColour, 0, 3);
+                writeColour[0] = data.Key;
+                check += data.Value.R;
+                writeColour[1] = data.Value.R;
+                check += data.Value.G;
+                writeColour[3] = data.Value.G;
+                check += data.Value.B;
+                writeColour[2] = data.Value.B;
+                await port.BaseStream.WriteAsync(writeColour, 0, 4);
             }
 
             // Write out the checksum
-
             writeColour[0] = check;
             await port.BaseStream.WriteAsync(writeColour, 0, 1);
             return true;

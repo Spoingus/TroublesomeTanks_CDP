@@ -311,50 +311,62 @@ namespace Tankontroller.Controller
             }
         }
 
+        public void SetCentreLED(Color pColour)
+        {
+            Dictionary<byte, ControllerColor> result = new();
+            for (byte i = 7; i < 10; i++)
+            {
+                float brightness = 0.6f;
+                ControllerColor colour = new ControllerColor((byte)(mColour.R * brightness), (byte)(mColour.G * brightness), (byte)(mColour.B * brightness));
+                result.Add(i, colour);
+            }
+            _ = mHacktroller.SetColor(result);
+        }
+
         private async Task UpdateColors()
         {
-            ControllerColor[] result = new ControllerColor[61];
+            Dictionary<byte, ControllerColor> result = new();
 
-            for (int i = 0; i < result.Length; i++)
+            for (byte i = 0; i < 10; i++)
             {
-                result[i].R = 0;
-                result[i].G = 0;
-                result[i].B = 0;
+                float brightness = 0.6f;
+                ControllerColor colour = new ControllerColor((byte)(mColour.R * brightness), (byte)(mColour.G * brightness), (byte)(mColour.B * brightness));
+                result.Add(i, colour);
             }
-            if (mLightsOn && mConnected)
-            {
-                foreach (Jack J in mJacks)
-                {
-                    // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
-                    // J.charge should be between 0 and DGS.MAX_CHARGE
-                    //int FullByte = 50;
-                    float brightness = 0.2f;
-                    float decimalCharge = J.charge / MAX_CHARGE;
-                    float remainingCharge = 8 * decimalCharge;
-                    foreach (int i in J.LED_IDS)
-                    {
-                        if (remainingCharge >= 1)
-                        {
-                            result[i].R = (byte)(mColour.R * brightness);
-                            result[i].G = (byte)(mColour.G * brightness);
-                            result[i].B = (byte)(mColour.B * brightness);
-                        }
-                        else
-                        {
-                            result[i].R = 0;
-                            result[i].G = 0;
-                            result[i].B = 0;
-                        }
-                        remainingCharge--;
-                    }
-                    foreach (int i in mLedArray)
-                    {
-                        result[i].R = 30;
-                        result[i].G = 30;
-                        result[i].B = 30;
-                    }
-                }
-            }
+            //if (mLightsOn && mConnected)
+            //{
+            //    foreach (Jack J in mJacks)
+            //    {
+            //        // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
+            //        // J.charge should be between 0 and DGS.MAX_CHARGE
+            //        //int FullByte = 50;
+            //        float brightness = 0.2f;
+            //        float decimalCharge = J.charge / MAX_CHARGE;
+            //        float remainingCharge = 8 * decimalCharge;
+            //        foreach (int i in J.LED_IDS)
+            //        {
+            //            if (remainingCharge >= 1)
+            //            {
+            //                result[i].R = (byte)(mColour.R * brightness);
+            //                result[i].G = (byte)(mColour.G * brightness);
+            //                result[i].B = (byte)(mColour.B * brightness);
+            //            }
+            //            else
+            //            {
+            //                result[i].R = 0;
+            //                result[i].G = 0;
+            //                result[i].B = 0;
+            //            }
+            //            remainingCharge--;
+            //        }
+            //        foreach (int i in mLedArray)
+            //        {
+            //            result[i].R = 30;
+            //            result[i].G = 30;
+            //            result[i].B = 30;
+            //        }
+            //    }
+            //}
 
 
             await mHacktroller.SetColor(result);

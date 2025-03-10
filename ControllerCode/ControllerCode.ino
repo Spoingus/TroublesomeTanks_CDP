@@ -376,13 +376,14 @@ void receivePanel()
     int i;
     for ( i=0; i < pixelCount; i++)
     {
+      byte index = GetCh();
       byte r = GetCh();
       check += r;
       byte g = GetCh();
       check += g;
       byte b = GetCh();
       check += b;
-      strip.setPixelColor(i, r, b, g);
+      strip.setPixelColor(index, r, b, g);
     }
     
     byte receivedCheck = GetCh();
