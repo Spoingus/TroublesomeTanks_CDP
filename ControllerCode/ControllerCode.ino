@@ -17,14 +17,35 @@
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(61, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(10, PIN, NEO_GRB + NEO_KHZ800);
 
 //#define TEST_MODE 0
+const int NUM_CONNECTION_TYPES = 17;
 const int NUM_PORTS = 7;
-const int NUM_SAMPLES = 3;
+const int NUM_SAMPLES = 1;
 const int TOLERANCE = 10;
 int samples[NUM_PORTS * NUM_SAMPLES]; 
 int values[NUM_PORTS];
+const int resistances[] = {
+  1021, // nothing connected
+  932, // charge - unpressed
+  181, // charge - pressed
+  608, // right forward - unpressed
+  7, // right forward - pressed
+  699, // right backward - unpressed
+  21, // right backward - pressed
+  785, // left forward - unpressed
+  45, // left forward - pressed
+  836, // left backward - unpressed
+  93, // left backward - pressed
+  959, // gun fire - unpressed
+  327, // gun fire - pressed
+  1002, // gun right - unpressed
+  511, // gun right - pressed
+  978, // gun left - unpressed
+  402 // gun left - pressed
+};
+
 byte connections[NUM_PORTS];
 int maxSample = 0;
 int totalSamples = NUM_PORTS * NUM_SAMPLES;
@@ -48,6 +69,8 @@ void setup() {
   }
   
 }
+
+ 
 void printAllSamples() {
   Serial.print("maxSample = ");
     Serial.println(maxSample);
@@ -111,21 +134,27 @@ void sendData()
     check = check + id;    
   }
   Serial.write(check);
+  
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
+  collectSamples();
+  
   if (Serial.available() > 0 ) 
   {
     int command = Serial.read();
     if ( command == 'R' ) {
      // Serial.println("fish");
-      collectSamples();
+      
       //printConnections();
       sendData();
     }
     else if ( command == 'P') {
      receivePanel();
+    }
+    else if(command == 'T') {
+    initialiseAnimation();
     }
     else if( command == 'I') {
       identifyDevice();
@@ -140,12 +169,13 @@ void loop() {
     }
   }
 }
+
 void identifyDevice()
 {  
   Serial.write("Tankontroller\n");
   for(int i = 0; i < ID_LENGTH; ++i) {
     Serial.write(ID[i]);
-  }
+}
   Serial.write("\n");
 }
 
@@ -174,9 +204,15 @@ void collectSamples() {
   }
   averageSamples();
   identifyValues();
-  
+ // sumConnections();
 }
-
+void sumConnections() {
+  for(int portIndex = 0; portIndex < NUM_PORTS; portIndex++) {
+    if(connections[portIndex] != 0) {
+      Serial.println(connections[portIndex]);
+    }
+  }
+}
 void averageSamples() {
   int start = NUM_SAMPLES - maxSample;
   for(int sampleIndex = start; sampleIndex < NUM_SAMPLES; sampleIndex++) {
@@ -192,6 +228,7 @@ void averageSamples() {
   }
   for(int portIndex = 0; portIndex < NUM_PORTS; portIndex++) {
     values[portIndex] = values[portIndex] / maxSample;
+    
   }
 }
 void printValues() {
@@ -213,10 +250,27 @@ void printConnections() {
 void identifyValues() {
   for(int portIndex = 0; portIndex < NUM_PORTS; portIndex++) {
     int value = values[portIndex];
-    byte connection = IdentifyConnection(value);
+    byte connection = IdentifyConnection2(value);
     connections[portIndex] = connection;
   }
   //printConnections();
+}
+
+byte IdentifyConnection2(int value) {
+  int differences[NUM_CONNECTION_TYPES];
+  int lowestValue = 10000;
+  byte lowestIndex = 0;
+  for(byte i = 0; i < NUM_CONNECTION_TYPES; i++)
+  {
+    int difference = abs(resistances[i] - value);
+    differences[i] = difference;
+    if(difference < lowestValue)
+    {
+      lowestValue = difference;
+      lowestIndex = i;
+    }
+  }
+  return lowestIndex;
 }
 
 byte IdentifyConnection(int value) {
