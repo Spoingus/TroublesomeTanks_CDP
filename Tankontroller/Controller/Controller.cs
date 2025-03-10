@@ -450,7 +450,7 @@ namespace Tankontroller.Controller
                     }
                     else
                     {
-                        if (control == mJacks[i].Control || control == Control.NONE)
+                        //if (control == mJacks[i].Control || control == Control.NONE)
                         {
                             mJacks[i].Control = control;
                             mJacks[i].IsDown = isDown;
