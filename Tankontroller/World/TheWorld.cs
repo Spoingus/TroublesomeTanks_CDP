@@ -13,7 +13,8 @@ using Tankontroller.World.Pickups;
 public enum PickupType
 {
     HEALTH,
-    EMP
+    EMP,
+    MINE
 }
 
 namespace Tankontroller.World
@@ -79,6 +80,11 @@ namespace Tankontroller.World
                 {
                     EMPPickup mEMPPickup = new EMPPickup(mPickupSpawnPositions[randPos]);
                     mPickups.Add(mEMPPickup);
+                }
+                else if ((PickupType)randPickup == PickupType.MINE)
+                {
+                    MinePickup mMinePickup = new MinePickup(mPickupSpawnPositions[randPos]);
+                    mPickups.Add(mMinePickup);
                 }
             }
         }

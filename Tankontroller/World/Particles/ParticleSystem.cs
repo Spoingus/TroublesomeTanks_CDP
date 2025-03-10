@@ -335,4 +335,44 @@ namespace Tankontroller.World.Particles
             }
         }
     }
+    public class MineBlastInitPolicy : IParticleInitialisationPolicy
+    {
+        private Vector2 m_Position;
+        private float m_LifeTime;
+        private Random m_Rng = new Random();
+        private Color[] m_SmokeColours = new Color[2];
+        private Color[] m_BlastColours = new Color[2];
+
+        public MineBlastInitPolicy(Vector2 pPosition, float pLifeTime)
+        {
+            m_Position = pPosition;
+            m_LifeTime = pLifeTime;
+            m_SmokeColours[0] = Color.DarkSlateGray;
+            m_SmokeColours[1] = new Color(47,50,50,1);
+            m_BlastColours[0] = Color.Orange;
+            m_BlastColours[1] = Color.MonoGameOrange;
+        }
+
+        public void InitiateParticles(Particle[] pParticles)
+        {
+            for (int i = 0; i < pParticles.Length; i++)
+            {
+                m_LifeTime = m_LifeTime * (float)(1.0 - (m_Rng.NextDouble() * 0.01));
+                Vector2 velocity = Vector2.Transform(new Vector2(0, 1), Matrix.CreateRotationZ((float)(m_Rng.NextDouble() * 2 * Math.PI))) * m_Rng.Next(90, 121);
+                velocity.Normalize();
+               
+                if (i >= (pParticles.Length / 2))
+                {
+                    velocity = velocity * 20;
+                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(3, 5), m_Rng.Next(0, 6), m_SmokeColours[m_Rng.Next(2)], m_LifeTime);
+                }
+                else
+                {
+                    velocity = velocity * 10;
+                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(0, 6), m_Rng.Next(0, 2), m_BlastColours[m_Rng.Next(2)], m_LifeTime);
+                }
+
+            }
+        }
+    }
 }
