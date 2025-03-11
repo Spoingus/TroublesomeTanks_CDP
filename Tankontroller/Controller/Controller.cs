@@ -27,6 +27,8 @@ namespace Tankontroller.Controller
         void ResetJacks();
         void TurnOffLights();
         void TurnOnLights();
+
+        void Disconnect();
         bool IsConnected();
 
         void SetColour(Color pColour);
@@ -200,6 +202,11 @@ namespace Tankontroller.Controller
         {
             return mConnected;
         }
+
+        public void Disconnect()
+        {
+            mConnected = false;
+        }
     }
 
     //---------------------------------------------------------------------------------------------------
@@ -299,6 +306,7 @@ namespace Tankontroller.Controller
         {
             mHacktroller = pHackTroller;
             mConnected = true;
+            Thread.Sleep(10); // Give the Hacktroller time to connect (otherwise there's sometiems a semaphore timeout when writing)
             PullDataThread();
         }
 

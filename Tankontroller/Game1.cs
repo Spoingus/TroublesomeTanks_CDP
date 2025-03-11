@@ -39,7 +39,7 @@ namespace Tankontroller
         private SpriteBatch mBatch;
 
         private static IGame mGameInterface = null;
-        
+
 
         public static IGame Instance()
         {
@@ -155,8 +155,10 @@ namespace Tankontroller
             mSoundManager.Add("Sounds/Tank_Clang2");
             mSoundManager.Add("Sounds/Tank_Clang3");
 
-            ControllerManager.CircleTex = Tankontroller.Instance().CM().Load<Texture2D>("circle");
             ControllerManager.TextFont = Tankontroller.Instance().CM().Load<SpriteFont>("handwritingfont");
+            ControllerManager.CircleTex = Tankontroller.Instance().CM().Load<Texture2D>("circle");
+            ControllerManager.PixelTex = new Texture2D(GraphicsDevice, 1, 1);
+            ControllerManager.PixelTex.SetData(new Color[] { Color.White });
 
             mSceneManager.Push(new FlashScreenScene());
 
@@ -183,7 +185,7 @@ namespace Tankontroller
             mSceneManager.Update(seconds);
             base.Update(gameTime);
         }
-       
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>

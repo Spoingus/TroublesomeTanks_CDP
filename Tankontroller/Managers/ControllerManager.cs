@@ -13,6 +13,7 @@ namespace Tankontroller.Managers
     public class ControllerManager
     {
         public static Texture2D CircleTex;
+        public static Texture2D PixelTex;
         public static SpriteFont TextFont;
 
         private Dictionary<string, IController> mControllers = new Dictionary<string, IController>();
@@ -40,6 +41,7 @@ namespace Tankontroller.Managers
             foreach (KeyValuePair<string, IController> controller in mControllers)
             {
                 controller.Value.TurnOffLights();
+                controller.Value.Disconnect();
             }
         }
 
@@ -141,11 +143,15 @@ namespace Tankontroller.Managers
 
         public void Draw(SpriteBatch pSpriteBatch, Rectangle pDrawArea)
         {
-            Rectangle conRect = new Rectangle(pDrawArea.X, pDrawArea.Y, pDrawArea.Width, pDrawArea.Height / mControllers.Count);
+            Rectangle conRect = new Rectangle(pDrawArea.X, pDrawArea.Y, pDrawArea.Width, Math.Min(pDrawArea.Height / mControllers.Count, pDrawArea.Height / 20));
+            pDrawArea.Height = conRect.Height * mControllers.Count;
+            pSpriteBatch.Draw(PixelTex, pDrawArea, new Color(Color.Black, 128));
             foreach (KeyValuePair<string, IController> controller in mControllers)
             {
-                pSpriteBatch.Draw(CircleTex, new Rectangle(conRect.X, conRect.Y, conRect.Width / 5, conRect.Height), controller.Value.IsConnected() ? Color.Green : Color.Red);
-                pSpriteBatch.DrawString(TextFont, controller.Key, new Vector2(conRect.X + conRect.Width / 4, conRect.Y + (conRect.Height / 2)), Color.White);
+                Rectangle circleRect = new Rectangle(conRect.X + conRect.Height / 4, conRect.Y + conRect.Height / 4, conRect.Height / 2, conRect.Height / 2);
+                pSpriteBatch.Draw(CircleTex, circleRect, controller.Value.IsConnected() ? Color.Green : Color.Red);
+                Vector2 textSize = TextFont.MeasureString(controller.Key);
+                pSpriteBatch.DrawString(TextFont, controller.Key, new Vector2(conRect.X + conRect.Width / 5, conRect.Y + (conRect.Height / 2) - (textSize.Y / 2)), Color.White);
                 conRect.Y += conRect.Height;
             }
         }

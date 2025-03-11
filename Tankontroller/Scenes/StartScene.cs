@@ -39,6 +39,8 @@ namespace Tankontroller.Scenes
             mTitleTexture = mGameInstance.CM().Load<Texture2D>("menu_title");
             mTitleRectangle = new Rectangle((screenWidth / 2) - (644 / 2), (screenHeight / 2) - (128 / 2), 644, 128);
 
+            mControllerInfoRect = new Rectangle(0, 0, screenWidth / 5, screenHeight);
+
             mButtonList = new ButtonList();
 
             //Start Game Button
@@ -144,6 +146,8 @@ namespace Tankontroller.Scenes
             spriteBatch.Draw(mForgroundTexture, mBackgroundRectangle, backColour);
 
             spriteBatch.Draw(mTitleTexture, mTitleRectangle, backColour);
+
+            mGameInstance.GetControllerManager().Draw(spriteBatch, mControllerInfoRect);
 
             mButtonList.Draw(spriteBatch);
 
