@@ -1,15 +1,20 @@
-﻿using Microsoft.Xna.Framework.Input;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Tankontroller.Controller;
 
 namespace Tankontroller.Managers
 {
     public class ControllerManager
     {
+        public static Texture2D CircleTex;
+        public static SpriteFont TextFont;
+
         private Dictionary<string, IController> mControllers = new Dictionary<string, IController>();
         static ControllerManager mInstance = new ControllerManager();
         public static ControllerManager Instance
@@ -131,6 +136,17 @@ namespace Tankontroller.Managers
                     }
                     else { port.Close(); }
                 }
+            }
+        }
+
+        public void Draw(SpriteBatch pSpriteBatch, Rectangle pDrawArea)
+        {
+            Rectangle conRect = new Rectangle(pDrawArea.X, pDrawArea.Y, pDrawArea.Width, pDrawArea.Height / mControllers.Count);
+            foreach (KeyValuePair<string, IController> controller in mControllers)
+            {
+                pSpriteBatch.Draw(CircleTex, new Rectangle(conRect.X, conRect.Y, conRect.Width / 5, conRect.Height), controller.Value.IsConnected() ? Color.Green : Color.Red);
+                pSpriteBatch.DrawString(TextFont, controller.Key, new Vector2(conRect.X + conRect.Width / 4, conRect.Y + (conRect.Height / 2)), Color.White);
+                conRect.Y += conRect.Height;
             }
         }
     }

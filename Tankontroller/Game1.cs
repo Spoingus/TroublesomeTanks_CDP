@@ -39,8 +39,7 @@ namespace Tankontroller
         private SpriteBatch mBatch;
 
         private static IGame mGameInterface = null;
-        private SoundEffectInstance mCurrentMusic;
-        private string mCurrentMusicName;
+        
 
         public static IGame Instance()
         {
@@ -61,7 +60,7 @@ namespace Tankontroller
             mGraphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-
+            // Set up keyboard controllers for debugging
             if (DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_1"))
             {
 
@@ -119,15 +118,11 @@ namespace Tankontroller
                 mControllerManager.AddKeyboardController(Player2KeyMap, Player2PortMap);
             }
 
-            //mSoundManager = SoundManager.Instance;
-
             mGraphics.PreferredBackBufferHeight = DGS.Instance.GetInt("SCREENHEIGHT");
             mGraphics.PreferredBackBufferWidth = DGS.Instance.GetInt("SCREENWIDTH");
             mGraphics.IsFullScreen = DGS.Instance.GetBool("IS_FULL_SCREEN");
-            this.Window.Title = "TroubleSome Tanks - CDP Edition!";
+            Window.Title = "TroubleSome Tanks - CDP Edition!";
         }
-
-
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -160,8 +155,10 @@ namespace Tankontroller
             mSoundManager.Add("Sounds/Tank_Clang2");
             mSoundManager.Add("Sounds/Tank_Clang3");
 
+            ControllerManager.CircleTex = Tankontroller.Instance().CM().Load<Texture2D>("circle");
+            ControllerManager.TextFont = Tankontroller.Instance().CM().Load<SpriteFont>("handwritingfont");
+
             mSceneManager.Push(new FlashScreenScene());
-            // mSceneManager.Push(new GameScene());
 
             // TODO: use this.Content to load your game content here
         }
@@ -186,24 +183,7 @@ namespace Tankontroller
             mSceneManager.Update(seconds);
             base.Update(gameTime);
         }
-        public SoundEffectInstance ReplaceCurrentMusicInstance(string pName, bool pLoopable)
-        {
-            if (mCurrentMusicName != pName)
-            {
-                if (mCurrentMusic != null)
-                {
-                    mCurrentMusic.Stop();
-                }
-                mCurrentMusicName = pName;
-                SoundEffectInstance replacement = mSoundManager.GetSoundEffectInstance(pName);
-                replacement.IsLooped = pLoopable;
-                mCurrentMusic = replacement;
-                mCurrentMusic.Play();
-            }
-            mCurrentMusic.IsLooped = pLoopable;
-
-            return mCurrentMusic;
-        }
+       
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>

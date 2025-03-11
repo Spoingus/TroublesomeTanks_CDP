@@ -37,7 +37,7 @@ namespace Tankontroller.Scenes
             mBackgroundTexture = game.CM().Load<Texture2D>("background_06");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
-            game.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            game.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_start", true);
             prepareAvatarPickers();
             mPlayersWereReady = false;
             prepareCountDown();
