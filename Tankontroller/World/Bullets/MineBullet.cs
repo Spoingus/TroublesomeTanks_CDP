@@ -28,7 +28,7 @@ namespace Tankontroller.World.Bullets
 
         public override bool DoCollision(Tank pTank)
         {
-            MineBlastInitPolicy explosion = new MineBlastInitPolicy(Position, 2.0f);
+            MineBlastInitPolicy explosion = new MineBlastInitPolicy(Position, 1.0f);
             ParticleManager.Instance().InitialiseParticles(explosion, 200);
             return true;
         }
@@ -45,8 +45,8 @@ namespace Tankontroller.World.Bullets
 
         public override void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
-            Particle.DrawCircle(pBatch, pTexture, (int)(Radius * 2.5f), Position, Colour);
-            Particle.DrawCircle(pBatch, MineTexture, (int)Radius * 3, Position, Color.White);
+            Particle.DrawCircle(pBatch, pTexture, (int)(Radius * 3.5f), Position, Colour);
+            Particle.DrawCircle(pBatch, MineTexture, (int)(Radius * 4), Position, Color.White);
         }
     }
 }

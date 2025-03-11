@@ -361,15 +361,15 @@ namespace Tankontroller.World.Particles
                 Vector2 velocity = Vector2.Transform(new Vector2(0, 1), Matrix.CreateRotationZ((float)(m_Rng.NextDouble() * 2 * Math.PI))) * m_Rng.Next(90, 121);
                 velocity.Normalize();
                
-                if (i >= (pParticles.Length / 2))
+                if (i <= (pParticles.Length / 2))
                 {
-                    velocity = velocity * 20;
-                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(3, 5), m_Rng.Next(0, 6), m_SmokeColours[m_Rng.Next(2)], m_LifeTime);
+                    velocity = velocity * 40;
+                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(1, 7), m_Rng.Next(15, 25), m_SmokeColours[m_Rng.Next(2)], m_LifeTime);
                 }
                 else
                 {
-                    velocity = velocity * 10;
-                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(0, 6), m_Rng.Next(0, 2), m_BlastColours[m_Rng.Next(2)], m_LifeTime);
+                    velocity = velocity * 20;
+                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(0, 6), m_Rng.Next(10, 20), m_BlastColours[m_Rng.Next(2)], m_LifeTime + 0.4f);
                 }
 
             }

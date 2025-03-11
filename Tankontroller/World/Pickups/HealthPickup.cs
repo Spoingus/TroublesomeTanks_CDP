@@ -11,7 +11,7 @@ namespace Tankontroller.World.Pickups
         public HealthPickup(Vector2 pPosition) : base(Tankontroller.Instance().CM().Load<Texture2D>("circle"), new Rectangle(400, 500, 40, 40), new Vector2(0,0))
         {
             m_Position = pPosition;
-            m_Pickup_Rect = new Rectangle((int)m_Position.X - (m_Pickup_Rect.Width / 2), (int)m_Position.Y - (m_Pickup_Rect.Height / 2), 35, 50);
+            m_Pickup_Rect = new Rectangle((int)m_Position.X - (m_Pickup_Rect.Width / 2), (int)m_Position.Y - (m_Pickup_Rect.Height / 2), 30, 45);
         }
 
         public override void Draw(SpriteBatch pSpriteBatch)
