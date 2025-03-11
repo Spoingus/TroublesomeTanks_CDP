@@ -97,18 +97,26 @@ namespace Tankontroller.Scenes
             string mapContent = File.ReadAllText(pMapFile);
             MapData mapData = JsonSerializer.Deserialize<MapData>(mapContent);
 
-            int thumbnailWidth = 320;
-            int thumbnailHeight = 180;
+            int thumbnailWidth = 640;
+            int thumbnailHeight = 360;
             RenderTarget2D renderTarget = new RenderTarget2D(mGameInstance.GDM().GraphicsDevice, thumbnailWidth, thumbnailHeight);
 
             mGameInstance.GDM().GraphicsDevice.SetRenderTarget(renderTarget);
-            mGameInstance.GDM().GraphicsDevice.Clear(Color.SandyBrown);
+            mGameInstance.GDM().GraphicsDevice.Clear(Color.Transparent);
 
             int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
-            Rectangle playArea = new Rectangle(screenWidth * 2 / 100, screenHeight * 25 / 100, screenWidth * 96 / 100, screenHeight * 73 / 100);
+            Rectangle playArea = new Rectangle(screenWidth * 2 / 100, screenHeight * 2 / 100, screenWidth * 96 / 100, screenHeight * 96 / 100);
 
             spriteBatch.Begin();
+
+            // Draw black outline
+            Rectangle outlineRect = new Rectangle(0, 0, thumbnailWidth, thumbnailHeight);
+            spriteBatch.Draw(mGameInstance.CM().Load<Texture2D>("block"), outlineRect, Color.Black);
+
+            // Draw inner rectangle with map background color
+            Rectangle innerRect = new Rectangle(2, 2, thumbnailWidth - 4, thumbnailHeight - 4);
+            spriteBatch.Draw(mGameInstance.CM().Load<Texture2D>("block"), innerRect, DGS.Instance.GetColour("COLOUR_GROUND"));
 
             // Draw outlines for walls
             foreach (var wall in mapData.Walls)
@@ -130,6 +138,8 @@ namespace Tankontroller.Scenes
                     (int)(playArea.Y + (playArea.Height * (float.Parse(tank.Position[1]) / 100))),
                     10, 10
                 );
+                tankRect.X -= tankRect.Width / 2;
+                tankRect.Y -= tankRect.Height / 2;
                 DrawOutline(tankRect, "block");
             }
 
@@ -141,6 +151,8 @@ namespace Tankontroller.Scenes
                     (int)(playArea.Y + (playArea.Height * (float.Parse(pickup.Position[1]) / 100))),
                     10, 10
                 );
+                pickupRect.X -= pickupRect.Width / 2;
+                pickupRect.Y -= pickupRect.Height / 2;
                 DrawOutline(pickupRect, "circle");
             }
 
@@ -157,7 +169,7 @@ namespace Tankontroller.Scenes
                     (int)(playArea.Width * (float.Parse(wall.Size[0]) / 100)),
                     (int)(playArea.Height * (float.Parse(wall.Size[1]) / 100))
                 );
-                spriteBatch.Draw(mGameInstance.CM().Load<Texture2D>(wall.Texture), wallRect, Color.White);
+                spriteBatch.Draw(mGameInstance.CM().Load<Texture2D>(wall.Texture), wallRect, DGS.Instance.GetColour("COLOUR_WALLS"));
             }
 
             // Draw tanks
@@ -166,9 +178,10 @@ namespace Tankontroller.Scenes
                 Rectangle tankRect = new Rectangle(
                     (int)(playArea.X + (playArea.Width * (float.Parse(tank.Position[0]) / 100))),
                     (int)(playArea.Y + (playArea.Height * (float.Parse(tank.Position[1]) / 100))),
-                    (int)(playArea.Width * 0.02f),
-                    (int)(playArea.Height * 0.02f)
+                    9, 9
                 );
+                tankRect.X -= tankRect.Width / 2;
+                tankRect.Y -= tankRect.Height / 2;
                 spriteBatch.Draw(mGameInstance.CM().Load<Texture2D>("block"), tankRect, Color.Blue);
             }
 
@@ -178,9 +191,10 @@ namespace Tankontroller.Scenes
                 Rectangle pickupRect = new Rectangle(
                     (int)(playArea.X + (playArea.Width * (float.Parse(pickup.Position[0]) / 100))),
                     (int)(playArea.Y + (playArea.Height * (float.Parse(pickup.Position[1]) / 100))),
-                    (int)(playArea.Width * 0.01f),
-                    (int)(playArea.Height * 0.01f)
+                    9, 9
                 );
+                pickupRect.X -= pickupRect.Width / 2;
+                pickupRect.Y -= pickupRect.Height / 2;
                 spriteBatch.Draw(mGameInstance.CM().Load<Texture2D>("circle"), pickupRect, Color.Red);
             }
 
@@ -240,8 +254,8 @@ namespace Tankontroller.Scenes
 
             int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
-            int thumbnailWidth = 320;
-            int thumbnailHeight = 180;
+            int thumbnailWidth = 640;
+            int thumbnailHeight = 360;
             int spacing = 20;
 
             spriteBatch.End();
