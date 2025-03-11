@@ -69,7 +69,7 @@ namespace Tankontroller.Scenes
                 {
                     if (secondsLeft <= 0.0f)
                     {
-                        mCurrentScrollPosition = Math.Max(0, mCurrentScrollPosition - 1);
+                        mCurrentScrollPosition = (mCurrentScrollPosition - 1 + mMapFiles.Count) % mMapFiles.Count;
                         secondsLeft = 0.5f;
                     }
                 }
@@ -77,7 +77,7 @@ namespace Tankontroller.Scenes
                 {
                     if (secondsLeft <= 0.0f)
                     {
-                        mCurrentScrollPosition = Math.Min(mMapFiles.Count - 1, mCurrentScrollPosition + 1);
+                        mCurrentScrollPosition = (mCurrentScrollPosition + 1) % mMapFiles.Count;
                         secondsLeft = 0.5f;
                     }
                 }
@@ -91,6 +91,7 @@ namespace Tankontroller.Scenes
                 }
             }
         }
+
 
         void MakeThumbnailTextureFromMapFile(string pMapFile)
         {
@@ -251,25 +252,53 @@ namespace Tankontroller.Scenes
             mGameInstance.GDM().GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
             spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
+            spriteBatch.End();
 
             int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
-            int thumbnailWidth = 640;
-            int thumbnailHeight = 360;
+            int thumbnailWidth = 320;
+            int thumbnailHeight = 180;
+            int centreThumbWidth = 640;
+            int centreThumbHeight = 360;
             int spacing = 20;
 
-            spriteBatch.End();
+            // Calculate the indices of the previous, current, and next thumbnails
+            int prevIndex = (mCurrentScrollPosition - 1 + mMapFiles.Count) % mMapFiles.Count;
+            int nextIndex = (mCurrentScrollPosition + 1) % mMapFiles.Count;
 
-            for (int i = 0; i < mMapFiles.Count; i++)
-            {
-                int x = (screenWidth / 2) - (thumbnailWidth / 2) + ((i - mCurrentScrollPosition) * (thumbnailWidth + spacing));
-                int y = (screenHeight / 2) - (thumbnailHeight / 2);
-                Rectangle thumbnailRect = new Rectangle(x, y, thumbnailWidth, thumbnailHeight);
-                DrawThumbnail(mMapFiles[i], thumbnailRect);
-            }
+            // Calculate positions and sizes for the thumbnails
+            Rectangle prevRect = new Rectangle(
+                (screenWidth / 2) - (thumbnailWidth / 2) - thumbnailWidth,
+                (screenHeight / 2) - (thumbnailHeight / 2),
+                thumbnailWidth,
+                thumbnailHeight
+            );
 
-            
+            Rectangle currentRect = new Rectangle(
+                (screenWidth / 2) - (centreThumbWidth / 2),
+                (screenHeight / 2) - (centreThumbHeight / 2),
+                centreThumbWidth,
+                centreThumbHeight
+            );
+
+            Rectangle nextRect = new Rectangle(
+                (screenWidth / 2) - (thumbnailWidth / 2) + thumbnailWidth,
+                (screenHeight / 2) - (thumbnailHeight / 2),
+                thumbnailWidth,
+                thumbnailHeight
+            );
+
+            // Draw the previous and next thumbnails first
+            DrawThumbnail(mMapFiles[prevIndex], prevRect);
+            DrawThumbnail(mMapFiles[nextIndex], nextRect);
+
+            // Draw the current thumbnail last, in the center of the screen
+            DrawThumbnail(mMapFiles[mCurrentScrollPosition], currentRect);
         }
+
+
+
+
 
         public override void Escape()
         {
