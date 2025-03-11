@@ -165,14 +165,13 @@ namespace Tankontroller.Scenes
         public override void Update(float pSeconds)
         {
             IGame game = Tankontroller.Instance();
-            game.DetectControllers();
+            game.GetControllerManager().DetectControllers();
 
             Escape();
             UpdateAvatarPickers(pSeconds);
 
-            for (int i = 0; i < game.GetControllerCount(); i++)
+            foreach (IController controller in game.GetControllerManager().GetControllers())
             {
-                IController controller = game.GetController(i);
                 controller.UpdateController();
                 AvatarPicker avatarPicker = getAvatarPickerFromController(controller);
 

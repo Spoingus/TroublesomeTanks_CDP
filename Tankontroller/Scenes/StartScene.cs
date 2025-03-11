@@ -84,9 +84,9 @@ namespace Tankontroller.Scenes
         public override void Update(float pSeconds)
         {
             Escape();
-            gameInstance.DetectControllers();
+            gameInstance.GetControllerManager().DetectControllers();
 
-            foreach (IController controller in gameInstance.GetControllers())
+            foreach (IController controller in gameInstance.GetControllerManager().GetControllers())
             {
                 controller.UpdateController();
                 secondsLeft -= pSeconds;

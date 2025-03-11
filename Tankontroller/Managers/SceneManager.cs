@@ -20,7 +20,6 @@ namespace Tankontroller.Managers
         private List<IScene> mScenes = new List<IScene>();
         static SceneManager mInstance = new SceneManager();
 
-        static SceneManager() { }
         private SceneManager() { }
 
         public static SceneManager Instance
@@ -54,7 +53,7 @@ namespace Tankontroller.Managers
             {
                 // we should exit the game here...
                 Tankontroller game = (Tankontroller)Tankontroller.Instance();
-                game.TurnOffControllers();
+                game.GetControllerManager().TurnOffControllers();
                 game.Exit();
             }
         }

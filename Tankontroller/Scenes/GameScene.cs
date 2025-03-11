@@ -173,7 +173,7 @@ namespace Tankontroller.Scenes
             }
             else // At least one controller is disconnected
             {
-                mGameInstance.DetectControllers();
+                mGameInstance.GetControllerManager().DetectControllers();
 
                 mControllersConnected = true;
                 foreach (Player p in m_Teams) // Wait until all controllers are reconnected

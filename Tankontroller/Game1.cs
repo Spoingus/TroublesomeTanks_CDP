@@ -20,14 +20,10 @@ namespace Tankontroller
     public interface IGame
     {
         SoundManager GetSoundManager();
+        ControllerManager GetControllerManager();
         SceneManager SM();
         ContentManager CM();
         GraphicsDeviceManager GDM();
-
-        IController GetController(int pIndex);
-        int GetControllerCount();
-        List<IController> GetControllers();
-        void DetectControllers();
         void Exit();
     }
 
@@ -37,10 +33,11 @@ namespace Tankontroller
     public class Tankontroller : Game, IGame
     {
         private SoundManager mSoundManager = SoundManager.Instance;
+        private SceneManager mSceneManager = SceneManager.Instance;
+        private ControllerManager mControllerManager = ControllerManager.Instance;
         private GraphicsDeviceManager mGraphics;
         private SpriteBatch mBatch;
-        private SceneManager mSceneManager = SceneManager.Instance;
-        private Dictionary<string, IController> mControllers;
+
         private static IGame mGameInterface = null;
         private SoundEffectInstance mCurrentMusic;
         private string mCurrentMusicName;
@@ -54,110 +51,8 @@ namespace Tankontroller
             return mGameInterface;
         }
 
-        Task mDetectControllerTask = null;
-        public void DetectControllers()
-        {
-            if (mDetectControllerTask == null || mDetectControllerTask.IsCompleted)
-            {
-                mDetectControllerTask = Task.Run(async () => await DetectControllersAsync());
-            }
-        }
-
-        private bool COMPortInUse(string pPortName)
-        {
-            foreach (IController item in mControllers.Values)
-            {
-                if (item.IsConnected() && item is ModularController controller)
-                {
-                    if (controller.COMPortName == pPortName)
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        private async Task DetectControllersAsync()
-        {
-            string[] portNames = SerialPort.GetPortNames();
-            foreach (string portName in portNames)
-            {
-                if (!COMPortInUse(portName))
-                {
-                    SerialPort port;
-                    try
-                    {
-                        port = new SerialPort(portName, 19200);
-                        port.Open();
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-
-                    port.DtrEnable = true;
-
-                    port.ReadTimeout = 10;
-                    port.WriteTimeout = 10;
-
-                    port.DiscardInBuffer();
-
-                    await port.BaseStream.WriteAsync(new byte[] { (byte)'I' }, 0, 1);
-
-                    System.Threading.Thread.Sleep(10);
-
-                    if (port.BytesToRead > 0)
-                    {
-                        // The comms starts with 0xff 0xff
-                        try
-                        {
-                            string response = port.ReadLine();
-                            if (response == "Tankontroller")
-                            {
-                                Hacktroller hacktroller = new Hacktroller(port);
-                                string id = port.ReadLine();
-                                if (mControllers.ContainsKey(id))
-                                {
-                                    if (mControllers[id] is ModularController controller)
-                                    {
-                                        controller.SetHacktroller(hacktroller);
-                                    }
-                                }
-                                else
-                                {
-                                    string newID = Guid.NewGuid().ToString("N").Substring(0, 10);
-                                    hacktroller.SetID(newID);
-                                    ModularController controller = new ModularController(hacktroller);
-                                    mControllers.Add(newID, controller);
-                                }
-                            }
-                            else
-                            {
-                                port.Close();
-                            }
-                        }
-                        catch
-                        {
-                            //possible timeout - ignore
-                        }
-                    }
-                    else { port.Close(); }
-                }
-            }
-        }
-
-        public void TurnOffControllers()
-        {
-            foreach (KeyValuePair<string, IController> controller in mControllers)
-            {
-                controller.Value.TurnOffLights();
-            }
-        }
-
-        public IController GetController(int pIndex) { return mControllers.Values.ElementAt(pIndex); }
-        public int GetControllerCount() { return mControllers.Count; }
-        public List<IController> GetControllers() { return mControllers.Values.ToList(); }
-
         public SoundManager GetSoundManager() { return mSoundManager; }
+        public ControllerManager GetControllerManager() { return mControllerManager; }
         public SceneManager SM() { return mSceneManager; }
         public ContentManager CM() { return Content; }
         public GraphicsDeviceManager GDM() { return mGraphics; }
@@ -165,7 +60,6 @@ namespace Tankontroller
         {
             mGraphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            mControllers = new Dictionary<string, IController>();
 
 
             if (DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_1"))
@@ -194,8 +88,7 @@ namespace Tankontroller
                     { Keys.D7, 6 },
                 };
 
-                IController controller = new KeyboardController(Player1KeyMap, Player1PortMap);
-                mControllers.Add("Keyboard1", controller);
+                mControllerManager.AddKeyboardController(Player1KeyMap, Player1PortMap);
             }
 
             if (DGS.Instance.GetBool("ADD_KEYBOARD_CONTROLLER_2"))
@@ -223,8 +116,7 @@ namespace Tankontroller
                     { Keys.F7, 6 },
                 };
 
-                IController controller = new KeyboardController(Player2KeyMap, Player2PortMap);
-                mControllers.Add("Keyboard2", controller);
+                mControllerManager.AddKeyboardController(Player2KeyMap, Player2PortMap);
             }
 
             //mSoundManager = SoundManager.Instance;
