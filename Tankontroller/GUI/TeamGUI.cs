@@ -110,7 +110,11 @@ namespace Tankontroller.GUI
             }
             else if (pBulletType == BulletType.MINE)
             {
-                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("MinePickup"), 65, pos, Color.White);
+                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("MinePickup"), 60, pos, Color.White);
+            }
+            else if (pBulletType == BulletType.BOUNCY)
+            {
+                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("BouncyBulletPickup"), 60, pos, Color.White);
             }
             else
             {

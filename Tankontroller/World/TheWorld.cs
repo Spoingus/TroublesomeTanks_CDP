@@ -14,7 +14,8 @@ public enum PickupType
 {
     HEALTH,
     EMP,
-    MINE
+    MINE,
+    BOUNCY
 }
 
 namespace Tankontroller.World
@@ -85,6 +86,11 @@ namespace Tankontroller.World
                 {
                     MinePickup mMinePickup = new MinePickup(mPickupSpawnPositions[randPos]);
                     mPickups.Add(mMinePickup);
+                }
+                else if ((PickupType)randPickup == PickupType.BOUNCY)
+                {
+                    BouncyBulletPickup mBouncyBulletPickup = new BouncyBulletPickup(mPickupSpawnPositions[randPos]);
+                    mPickups.Add(mBouncyBulletPickup);
                 }
             }
         }
