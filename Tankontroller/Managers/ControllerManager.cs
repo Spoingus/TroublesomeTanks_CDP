@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,7 +17,8 @@ namespace Tankontroller.Managers
         public static Texture2D PixelTex;
         public static SpriteFont TextFont;
 
-        Task mDetectControllerTask = null;
+        private Task mDetectControllerTask = null;
+        private Mutex mControllerListLock = new Mutex();
 
         private Dictionary<string, IController> mControllers = new Dictionary<string, IController>();
         static ControllerManager mInstance = new ControllerManager();
@@ -26,13 +28,24 @@ namespace Tankontroller.Managers
         }
         private ControllerManager() { }
 
-        public IController GetController(int pIndex) { return mControllers.Values.ElementAt(pIndex); }
-        public int GetControllerCount() { return mControllers.Count; }
-        public List<IController> GetControllers() { return mControllers.Values.ToList(); }
+        public IController GetController(int pIndex) { return GetControllers().ElementAt(pIndex); }
+        public int GetControllerCount() { return GetControllers().Count; }
+        public List<IController> GetControllers()
+        {
+            try
+            {
+                mControllerListLock.WaitOne();
+                return mControllers.Values.ToList();
+            }
+            finally
+            {
+                mControllerListLock.ReleaseMutex();
+            }
+        }
 
         public void UpdateAllControllers()
         {
-            foreach (IController controller in mControllers.Values)
+            foreach (IController controller in GetControllers())
             {
                 controller.UpdateController();
             }
@@ -40,7 +53,7 @@ namespace Tankontroller.Managers
 
         public void SetAllControllersLEDsOff()
         {
-            foreach (IController controller in mControllers.Values)
+            foreach (IController controller in GetControllers())
             {
                 controller.SetColour(new Color(0, 0, 0));
             }
@@ -49,7 +62,7 @@ namespace Tankontroller.Managers
         public void DisconnectAllControllers()
         {
             mDetectControllerTask.Wait(); // Wait for any controller detection to finish otherwise it may detect a controller that is disconnected
-            foreach (IController controller in mControllers.Values)
+            foreach (IController controller in GetControllers())
             {
                 controller.Disconnect();
             }
@@ -57,7 +70,15 @@ namespace Tankontroller.Managers
 
         public void AddKeyboardController(Dictionary<Keys, Control> pKeyMap, Dictionary<Keys, int> pPortMap)
         {
-            mControllers.Add("Keyboard" + (mControllers.Count + 1).ToString("D2"), new KeyboardController(pKeyMap, pPortMap));
+            try
+            {
+                mControllerListLock.WaitOne();
+                mControllers.Add("Keyboard" + (mControllers.Count + 1).ToString("D2"), new KeyboardController(pKeyMap, pPortMap));
+            }
+            finally
+            {
+                mControllerListLock.ReleaseMutex();
+            }
         }
 
         public void DetectControllers()
@@ -70,7 +91,7 @@ namespace Tankontroller.Managers
 
         private bool COMPortInUse(string pPortName)
         {
-            foreach (IController item in mControllers.Values)
+            foreach (IController item in GetControllers())
             {
                 if (item.IsConnected() && item is ModularController controller)
                 {
@@ -132,7 +153,9 @@ namespace Tankontroller.Managers
                                     string newID = Guid.NewGuid().ToString("N").Substring(0, 10);
                                     hacktroller.SetID(newID);
                                     ModularController controller = new ModularController(hacktroller);
+                                    mControllerListLock.WaitOne();
                                     mControllers.Add(newID, controller);
+                                    mControllerListLock.ReleaseMutex();
                                 }
                             }
                             else
@@ -155,7 +178,16 @@ namespace Tankontroller.Managers
             Rectangle conRect = new Rectangle(pDrawArea.X, pDrawArea.Y, pDrawArea.Width, Math.Min(pDrawArea.Height / mControllers.Count, pDrawArea.Height / 20));
             pDrawArea.Height = conRect.Height * mControllers.Count;
             pSpriteBatch.Draw(PixelTex, pDrawArea, new Color(Color.Black, 128));
-            foreach (KeyValuePair<string, IController> controller in mControllers)
+
+            List<KeyValuePair<string, IController>> controllers;
+            try
+            {
+                mControllerListLock.WaitOne();
+                controllers = mControllers.ToList();
+            }
+            finally { mControllerListLock.ReleaseMutex(); }
+
+            foreach (KeyValuePair<string, IController> controller in controllers)
             {
                 Rectangle circleRect = new Rectangle(conRect.X + conRect.Height / 4, conRect.Y + conRect.Height / 4, conRect.Height / 2, conRect.Height / 2);
                 pSpriteBatch.Draw(CircleTex, circleRect, controller.Value.IsConnected() ? Color.Green : Color.Red);
