@@ -45,13 +45,14 @@ namespace Tankontroller.Scenes
             }
             int textureWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width / 2;
             int textureHeight = (int)(textureWidth * ((float)254 / (float)540));
-            int centreXOffset = 0;
+            int loserTextureWidth = textureWidth / 2;
+            int centreXOffset = loserTextureWidth / 2;
             for (int i = 0; i < mPlayers.Count; i++)
             {
                 if (i != mWinner) //Repositon the losers
                 {
                     int centreY = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height / 2 + textureHeight / 2;
-                    int loserTextureWidth = textureWidth / mPlayers.Count;
+                    
                     int loserTextureHeight = (int)(loserTextureWidth * ((float)254 / (float)540));
                     Rectangle newRectangle = new Rectangle(centreXOffset, centreY, loserTextureWidth, loserTextureHeight);
                     mPlayers[i].GUI.RepositionForGameOver(newRectangle);
