@@ -15,6 +15,7 @@ namespace Tankontroller.Scenes
     //--------------------------------------------------------------------------------------------------
     public class StartScene : IScene
     {
+        private static readonly bool SHOW_LIST_ON_MAIN_MENU = DGS.Instance.GetBool("SHOW_LIST_ON_MAIN_MENU");
         IGame mGameInstance = Tankontroller.Instance();
 
         ButtonList mButtonList = null;
@@ -147,7 +148,7 @@ namespace Tankontroller.Scenes
 
             spriteBatch.Draw(mTitleTexture, mTitleRectangle, backColour);
 
-            mGameInstance.GetControllerManager().Draw(spriteBatch, mControllerInfoRect);
+            if (SHOW_LIST_ON_MAIN_MENU) mGameInstance.GetControllerManager().Draw(spriteBatch, mControllerInfoRect);
 
             mButtonList.Draw(spriteBatch);
 
