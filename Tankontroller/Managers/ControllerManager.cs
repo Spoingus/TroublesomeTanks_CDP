@@ -16,6 +16,8 @@ namespace Tankontroller.Managers
         public static Texture2D PixelTex;
         public static SpriteFont TextFont;
 
+        Task mDetectControllerTask = null;
+
         private Dictionary<string, IController> mControllers = new Dictionary<string, IController>();
         static ControllerManager mInstance = new ControllerManager();
         public static ControllerManager Instance
@@ -36,12 +38,20 @@ namespace Tankontroller.Managers
             }
         }
 
-        public void TurnOffControllers()
+        public void SetAllControllersLEDsOff()
         {
-            foreach (KeyValuePair<string, IController> controller in mControllers)
+            foreach (IController controller in mControllers.Values)
             {
-                controller.Value.TurnOffLights();
-                controller.Value.Disconnect();
+                controller.SetColour(new Color(0, 0, 0));
+            }
+        }
+
+        public void DisconnectAllControllers()
+        {
+            mDetectControllerTask.Wait(); // Wait for any controller detection to finish otherwise it may detect a controller that is disconnected
+            foreach (IController controller in mControllers.Values)
+            {
+                controller.Disconnect();
             }
         }
 
@@ -50,7 +60,6 @@ namespace Tankontroller.Managers
             mControllers.Add("Keyboard" + (mControllers.Count + 1).ToString("D2"), new KeyboardController(pKeyMap, pPortMap));
         }
 
-        Task mDetectControllerTask = null;
         public void DetectControllers()
         {
             if (mDetectControllerTask == null || mDetectControllerTask.IsCompleted)

@@ -53,7 +53,7 @@ namespace Tankontroller.Managers
             {
                 // we should exit the game here...
                 Tankontroller game = (Tankontroller)Tankontroller.Instance();
-                game.GetControllerManager().TurnOffControllers();
+                game.GetControllerManager().DisconnectAllControllers();
                 game.Exit();
             }
         }

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
+using Tankontroller.Managers;
 
 
 namespace Tankontroller.Scenes
@@ -236,6 +237,7 @@ namespace Tankontroller.Scenes
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Tankontroller.Instance().SM().Transition(null);
+                ControllerManager.Instance.SetAllControllersLEDsOff();
             }
         }
 

@@ -186,7 +186,8 @@ namespace Tankontroller.Scenes
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                Tankontroller.Instance().SM().Transition(null);
+                mGameInstance.GetControllerManager().SetAllControllersLEDsOff();
+                mGameInstance.SM().Transition(null);
             }
         }
 
@@ -215,6 +216,5 @@ namespace Tankontroller.Scenes
             }
             return remaining;
         }
-
     }
 }

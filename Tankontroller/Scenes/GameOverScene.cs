@@ -72,6 +72,7 @@ namespace Tankontroller.Scenes
             if (secondsLeft <= 0.0f)
             {
                 IGame game = Tankontroller.Instance();
+                game.GetControllerManager().SetAllControllersLEDsOff();
                 game.SM().Transition(null);
             }
         }
