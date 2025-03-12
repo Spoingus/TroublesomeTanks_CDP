@@ -50,17 +50,15 @@ namespace Tankontroller.GUI
         private List<Color> colours = new List<Color>
             {
                 Color.Red,
-                Color.DeepSkyBlue,
-                Color.Lime,
-                Color.DeepPink,
-                Color.Gold,
-                Color.Sienna,
                 Color.Firebrick,
-                Color.Navy,
-                Color.ForestGreen,
-                Color.DarkMagenta,
                 Color.DarkOrange,
-                Color.Tan
+                Color.Gold,
+                Color.Lime,
+                Color.ForestGreen,
+                Color.Blue,
+                Color.DeepSkyBlue,
+                Color.MediumPurple,
+                Color.DeepPink,
             };
 
         public AvatarPicker(Rectangle pRectangle)
