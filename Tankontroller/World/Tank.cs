@@ -330,7 +330,7 @@ namespace Tankontroller.World
             mFired = BLAST_DELAY;
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
-            Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
+            Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 40;
             if (bullet == BulletType.BOUNCY_EMP)
             {
                 m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED * 1.5f, mColour, 20.0f));
