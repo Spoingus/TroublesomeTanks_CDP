@@ -29,7 +29,7 @@ namespace Tankontroller.Scenes
         private SoundEffectInstance introMusicInstance = null;
         private SoundEffectInstance tankMoveSound = null;
 
-        Tankontroller mGameInstance = (Tankontroller)Tankontroller.Instance();
+        IGame mGameInstance = Tankontroller.Instance();
 
         private const float SECONDS_BETWEEN_TRACKS_ADDED = 0.2f;
         private float m_SecondsTillTracksAdded = SECONDS_BETWEEN_TRACKS_ADDED;
@@ -44,7 +44,7 @@ namespace Tankontroller.Scenes
         {
             spriteBatch = new SpriteBatch(mGameInstance.GDM().GraphicsDevice);
 
-            introMusicInstance = mGameInstance.ReplaceCurrentMusicInstance("Music/Music_intro", false);
+            introMusicInstance = mGameInstance.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_intro", false);
             tankMoveSound = mGameInstance.GetSoundManager().GetLoopableSoundEffectInstance("Sounds/Tank_Tracks");
 
             mBackgroundRectangle = new Rectangle(0, 0, mGameInstance.GDM().GraphicsDevice.Viewport.Width, mGameInstance.GDM().GraphicsDevice.Viewport.Height);
@@ -117,7 +117,7 @@ namespace Tankontroller.Scenes
             Escape();
             if (introMusicInstance.State == SoundState.Stopped)
             {
-                mGameInstance.ReplaceCurrentMusicInstance("Music/Music_loopable", true);
+                mGameInstance.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_loopable", true);
             }
 
             if (mControllersConnected) // Game should pause in the event of controller disconnect
@@ -175,27 +175,11 @@ namespace Tankontroller.Scenes
             }
             else // At least one controller is disconnected
             {
-                mGameInstance.DetectControllers();
+                mGameInstance.GetControllerManager().DetectControllers();
 
                 mControllersConnected = true;
-                foreach (Player p in m_Teams)
+                foreach (Player p in m_Teams) // Wait until all controllers are reconnected
                 {
-                    if (!p.Controller.IsConnected())
-                    {
-                        // Check to see if there is a connected controller not yet associated to a player
-                        foreach (IController controller in mGameInstance.GetControllers())
-                        {
-                            if (!m_Teams.Any(player => player.Controller == controller))
-                            {
-                                if (controller != null) // I don't think this is neccessary but the game crashed when controller was null
-                                {
-                                    controller.TransferJackCharge(p.Controller);
-                                    p.SetController(controller);
-                                    break;
-                                }
-                            }
-                        }
-                    }
                     mControllersConnected = mControllersConnected && p.Controller.IsConnected();
                 }
             }
@@ -204,7 +188,8 @@ namespace Tankontroller.Scenes
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                Tankontroller.Instance().SM().Transition(null);
+                mGameInstance.GetControllerManager().SetAllControllersLEDsOff();
+                mGameInstance.SM().Transition(null);
             }
         }
 
@@ -233,6 +218,5 @@ namespace Tankontroller.Scenes
             }
             return remaining;
         }
-
     }
 }

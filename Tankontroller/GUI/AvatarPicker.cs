@@ -129,6 +129,7 @@ namespace Tankontroller.GUI
 
             Color color = mAvatarSet ? mColours[mSelectionIndex].GetColour() : Color.White;
             mCentreAvatar = new Avatar(name, avatarRect, color);
+            mController?.SetColour(color);
         }
 
         private void PrepareButtons()
@@ -339,6 +340,7 @@ namespace Tankontroller.GUI
             }
             else
             {
+                mController.SetColour(new Color(0, 0, 0));
                 mController = null;
             }
         }

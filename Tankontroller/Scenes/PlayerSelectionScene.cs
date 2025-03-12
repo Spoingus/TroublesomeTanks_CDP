@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
+using Tankontroller.Managers;
 
 
 namespace Tankontroller.Scenes
@@ -40,7 +41,7 @@ namespace Tankontroller.Scenes
             mBackgroundTexture = game.CM().Load<Texture2D>("background_06");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
-            game.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            game.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_start", true);
             prepareAvatarPickers();
             mPlayersWereReady = false;
             prepareCountDown();
@@ -168,14 +169,13 @@ namespace Tankontroller.Scenes
         public override void Update(float pSeconds)
         {
             IGame game = Tankontroller.Instance();
-            game.DetectControllers();
+            game.GetControllerManager().DetectControllers();
 
             Escape();
             UpdateAvatarPickers(pSeconds);
 
-            for (int i = 0; i < game.GetControllerCount(); i++)
+            foreach (IController controller in game.GetControllerManager().GetControllers())
             {
-                IController controller = game.GetController(i);
                 controller.UpdateController();
                 AvatarPicker avatarPicker = getAvatarPickerFromController(controller);
 
@@ -238,6 +238,7 @@ namespace Tankontroller.Scenes
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Tankontroller.Instance().SM().Transition(null);
+                ControllerManager.Instance.SetAllControllersLEDsOff();
             }
         }
 
