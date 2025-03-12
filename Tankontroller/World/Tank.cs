@@ -14,7 +14,7 @@ public enum BulletType
     DEFAULT,
     BOUNCY_EMP,
     MINE,
-    BOUNCY
+    BOUNCY_BULLET
 }
 
 namespace Tankontroller.World
@@ -344,7 +344,7 @@ namespace Tankontroller.World
                 m_Bullets.Add(new MineBullet(behindTheTank, Vector2.Zero, mColour, 600.0f));
                 mbulletType = BulletType.DEFAULT;
             }
-            else if (bullet == BulletType.BOUNCY)
+            else if (bullet == BulletType.BOUNCY_BULLET)
             {
                 m_Bullets.Add(new BouncyBullet(endOfCannon, cannonDirection * BULLET_SPEED * 3, mColour, 3.0f));
                 mbulletType = BulletType.DEFAULT;

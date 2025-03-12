@@ -23,7 +23,7 @@ namespace Tankontroller.World.Pickups
         {
             if (CollisionManager.Collide(tank, m_Pickup_Rect, false))
             {
-                tank.SetBulletType(BulletType.BOUNCY);
+                tank.SetBulletType(BulletType.BOUNCY_BULLET);
                 return true;
             }
             return false;
