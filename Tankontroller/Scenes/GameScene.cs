@@ -40,7 +40,7 @@ namespace Tankontroller.Scenes
         Rectangle mBackgroundRectangle;
 
         private bool mControllersConnected = true;
-        public GameScene(List<Player> pPlayers)
+        public GameScene(List<Player> pPlayers, string mapFile)
         {
             spriteBatch = new SpriteBatch(mGameInstance.GDM().GraphicsDevice);
 
@@ -51,13 +51,10 @@ namespace Tankontroller.Scenes
 
             m_Teams = pPlayers;
 
-            //string mapFileName = m_Teams.Count < 4 ? "1-3_player_map_config" : "4_player_map_config";
-            string mapFileName = m_Teams.Count < 4 ? "1-3_player_map" : "4_player_map";
-            //m_World = MapManager.LoadMap("Maps/" + mapFileName + ".txt");
-            m_World = MapManager.LoadMapFromJson("Maps/" + mapFileName + ".json");
+            m_World = MapManager.LoadMapFromJson(mapFile);
             if (m_World == null)
             {
-                throw new Exception("Couldn't load map file: " + mapFileName); //TODO Handle map load error
+                throw new Exception("Couldn't load map file: " + mapFile); //TODO Handle map load error
             }
 
             List<Tank> tanks = m_World.GetTanksForPlayers(m_Teams.Count);

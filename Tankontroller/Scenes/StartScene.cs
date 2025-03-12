@@ -5,14 +5,8 @@ using Microsoft.Xna.Framework.Input;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
 
-
 namespace Tankontroller.Scenes
 {
-    //--------------------------------------------------------------------------------------------------
-    // This is the main menu scene with the games title, play button and the exit button. This class
-    // is responsible for creating the buttons and dealing with any controller inputs detected on the
-    // main menu.
-    //--------------------------------------------------------------------------------------------------
     public class StartScene : IScene
     {
         private static readonly bool SHOW_LIST_ON_MAIN_MENU = DGS.Instance.GetBool("SHOW_LIST_ON_MAIN_MENU");
@@ -26,6 +20,9 @@ namespace Tankontroller.Scenes
         Rectangle mTitleRectangle;
         Rectangle mControllerInfoRect;
         private float secondsLeft;
+
+        private string defaultMapFile = "Maps/1-3_player_map.json"; // Default map file
+
 
         public StartScene()
         {
@@ -44,6 +41,7 @@ namespace Tankontroller.Scenes
 
             mButtonList = new ButtonList();
 
+
             //Start Game Button
             Texture2D startGameButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_play_white");
             Texture2D startGameButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_play_dark");
@@ -59,7 +57,6 @@ namespace Tankontroller.Scenes
             startGameButton.Selected = true;
             mButtonList.Add(startGameButton);
 
-
             //Makes the exit game button
             Texture2D exitGameButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_quit_white");
             Texture2D exitGameButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_quit_dark");
@@ -72,20 +69,46 @@ namespace Tankontroller.Scenes
             Button exitGameButton = new Button(exitGameButtonTexture, exitGameButtonTexturePressed, exitGameButtonRectangle, Color.Red, ExitGame);
             exitGameButton.Selected = false;
             mButtonList.Add(exitGameButton);
+
+            // Level Selection Button
+            Texture2D levelSelectionButtonTexture = tankControllerInstance.CM().Load<Texture2D>("menu_play_white");
+            Texture2D levelSelectionButtonTexturePressed = tankControllerInstance.CM().Load<Texture2D>("menu_quit_dark");
+
+            Rectangle levelSelectionButtonRectangle =
+                new Rectangle(
+                    ((int)((screenWidth - levelSelectionButtonTexture.Width) / 2)),
+                    (screenHeight) / 2 + startGameButtonTexture.Height * 2,
+                    levelSelectionButtonTexture.Width,
+                    levelSelectionButtonTexture.Height);
+
+            Button levelSelectionButton = new Button(levelSelectionButtonTexture, levelSelectionButtonTexturePressed, levelSelectionButtonRectangle, Color.Red, SelectLevel);
+            levelSelectionButton.Selected = false;
+            mButtonList.Add(levelSelectionButton);
+
             secondsLeft = 0.1f;
             mGameInstance.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_start", true);
         }
 
-        //Exits the game
+        public void SetDefaultMapFile(string mapFile)
+        {
+            defaultMapFile = mapFile;
+        }
+
+        private void SelectLevel()
+        {
+            gameInstance.SM().Transition(new LevelSelectionScene(this), false);
+        }
+
         private void ExitGame()
         {
             mGameInstance.SM().Transition(null);
         }
-        //Starts the game
+
         private void StartGame()
         {
-            mGameInstance.SM().Transition(new PlayerSelectionScene(), false);
+            mGameInstance.SM().Transition(new PlayerSelectionScene(defaultMapFile), false);
         }
+
         public override void Update(float pSeconds)
         {
             Escape();
@@ -133,10 +156,9 @@ namespace Tankontroller.Scenes
                         secondsLeft = 0.1f;
                     }
                 }
-
             }
         }
-        //Draws the start screen and buttons
+
         public override void Draw(float pSeconds)
         {
             mGameInstance.GDM().GraphicsDevice.Clear(Color.Black);
@@ -154,11 +176,12 @@ namespace Tankontroller.Scenes
 
             spriteBatch.End();
         }
+
         public override void Escape()
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                mGameInstance.SM().Transition(null);
+                ExitGame();
             }
         }
     }
