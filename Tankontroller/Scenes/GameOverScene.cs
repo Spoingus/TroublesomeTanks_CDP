@@ -52,7 +52,6 @@ namespace Tankontroller.Scenes
                 if (i != mWinner) //Repositon the losers
                 {
                     int centreY = mGameInstance.GDM().GraphicsDevice.Viewport.Height / 2 + textureHeight / 2;
-                    int loserTextureWidth = textureWidth / mPlayers.Count;
                     int loserTextureHeight = (int)(loserTextureWidth * ((float)254 / (float)540));
                     Rectangle newRectangle = new Rectangle(centreXOffset, centreY, loserTextureWidth, loserTextureHeight);
                     mPlayers[i].GUI.RepositionForGameOver(newRectangle);

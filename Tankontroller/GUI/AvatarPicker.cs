@@ -20,6 +20,7 @@ namespace Tankontroller.GUI
 
         private IController mController;
         private Avatar mCentreAvatar;
+        private static List<int> mBlockedIndexList; // Keeps track of already selected colours across Avatar Pickers
         private int mSelectionIndex;
         private bool mAvatarSet;
         private bool mColourSet;
@@ -80,6 +81,11 @@ namespace Tankontroller.GUI
 
             SetUpAvatarSelection();
             Reset();
+        }
+
+        public static void ResetBlockedIndexList()
+        {
+            mBlockedIndexList = new List<int>();
         }
 
         public void SetController(IController pController)
@@ -196,7 +202,7 @@ namespace Tankontroller.GUI
                 mAvatars.Add(avatar);
             }
         }
-        private void UpdateColorOptions(string pAvatarString, List<int> pBlockedIndex)
+        private void UpdateColorOptions(string pAvatarString)
         {
             int screenWidth = mBoundsRectangle.Width;
             int screenHeight = mBoundsRectangle.Height;
@@ -206,7 +212,7 @@ namespace Tankontroller.GUI
             for (int i = 0; i < colours.Count; i++)
             {
                 Avatar avatar;
-                if (pBlockedIndex.Contains(i))
+                if (mBlockedIndexList.Contains(i))
                 {
                     avatar = new Avatar(pAvatarString, rectangles[i], Color.DimGray);
                 }
@@ -232,9 +238,9 @@ namespace Tankontroller.GUI
                 avatar.Draw(pSpriteBatch, true, 0);
             }
         }
-        public void DrawSelection(SpriteBatch pSpriteBatch, List<int> pBlockedIndex)
+        public void DrawSelection(SpriteBatch pSpriteBatch)
         {
-            if (mAvatarSet && pBlockedIndex.Contains(mSelectionIndex))
+            if (mAvatarSet && mBlockedIndexList.Contains(mSelectionIndex))
             {
                 pSpriteBatch.Draw(mCircle, mSelectionRectangles[mSelectionIndex], Color.Black);
             }
@@ -251,22 +257,22 @@ namespace Tankontroller.GUI
             }
         }
 
-        public void Draw(SpriteBatch pSpriteBatch, List<int> pBlockedIndex)
+        public void Draw(SpriteBatch pSpriteBatch)
         {
             if (HasController())
             {
-                UpdateColorOptions(mCentreAvatar.GetName(), pBlockedIndex);
+                UpdateColorOptions(mCentreAvatar.GetName());
                 mCentreAvatar.Draw(pSpriteBatch, true, 0);
                 if (!mAvatarSet)
                 {
-                    DrawSelection(pSpriteBatch, pBlockedIndex);
+                    DrawSelection(pSpriteBatch);
                     DrawAvatars(pSpriteBatch);
                     pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
                     pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
                 }
                 else if (!mColourSet)
                 {
-                    DrawSelection(pSpriteBatch, pBlockedIndex);
+                    DrawSelection(pSpriteBatch);
                     DrawColours(pSpriteBatch);
                     pSpriteBatch.Draw(mRotateLeftTexture, mRotateLeftButton, Color.White);
                     pSpriteBatch.Draw(mRotateRightTexture, mRotateRightButton, Color.White);
@@ -299,7 +305,7 @@ namespace Tankontroller.GUI
         }
 
 
-        public void MakeSelection(List<int> pBlockedIndex)
+        public void MakeSelection()
         {
             if (HasController())
             {
@@ -307,7 +313,7 @@ namespace Tankontroller.GUI
                 {
                     mAvatarSet = true;
                     mSelectionIndex = 0;
-                    UpdateColorOptions(mCentreAvatar.GetName(), pBlockedIndex);
+                    UpdateColorOptions(mCentreAvatar.GetName());
                     mSelectionRectangles = GetSelectionRectangles(mColours.Count);
                     UpdateCentreAvatar();
                 }
@@ -317,18 +323,18 @@ namespace Tankontroller.GUI
                     {
                         mColourSet = true;
                         UpdateCentreAvatar();
-                        pBlockedIndex.Add(mSelectionIndex);
+                        mBlockedIndexList.Add(mSelectionIndex);
                     }
                 }
             }
         }
 
-        public void UndoSelection(List<int> pBlockedIndex)
+        public void UndoSelection()
         {
             if (mColourSet)
             {
                 mColourSet = false;
-                pBlockedIndex.Remove(mSelectionIndex);
+                mBlockedIndexList.Remove(mSelectionIndex);
                 UpdateCentreAvatar();
             }
             else if (mAvatarSet)
@@ -347,7 +353,7 @@ namespace Tankontroller.GUI
 
         public void Update(float pSeconds)
         {
-            if(!mColourSet) { UpdateCentreAvatar(); }
+            if (!mColourSet) { UpdateCentreAvatar(); }
             mJoinButtonFlashTimer -= pSeconds;
             mSelectionCoolDown -= pSeconds;
             if (mJoinButtonFlashTimer <= 0)
