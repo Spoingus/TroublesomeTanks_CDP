@@ -20,9 +20,11 @@ namespace Tankontroller.Scenes
         private Tankontroller mGameInstance;
         private int mCurrentScrollPosition;
         private float secondsLeft;
+        private StartScene mStartScene;
 
-        public LevelSelectionScene()
+        public LevelSelectionScene(StartScene startScene)
         {
+            mStartScene = startScene;
             mGameInstance = (Tankontroller)Tankontroller.Instance();
             spriteBatch = new SpriteBatch(mGameInstance.GDM().GraphicsDevice);
             int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
@@ -52,7 +54,8 @@ namespace Tankontroller.Scenes
 
         private void SelectMap(string mapFile)
         {
-            mGameInstance.SM().Transition(new PlayerSelectionScene(mapFile), true);
+            mStartScene.SetDefaultMapFile(mapFile);
+            mGameInstance.SM().Transition(mStartScene, false);
         }
 
         public override void Update(float pSeconds)
@@ -92,8 +95,74 @@ namespace Tankontroller.Scenes
             }
         }
 
+        public override void Draw(float pSeconds)
+        {
+            mGameInstance.GDM().GraphicsDevice.Clear(Color.Black);
+            spriteBatch.Begin();
+            spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
+            spriteBatch.End();
 
+            int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
+            int thumbnailWidth = 320;
+            int thumbnailHeight = 180;
+            int centreThumbWidth = 640;
+            int centreThumbHeight = 360;
+            int spacing = 20;
 
+            // Calculate the indices of the previous, current, and next thumbnails
+            int prevIndex = (mCurrentScrollPosition - 1 + mMapFiles.Count) % mMapFiles.Count;
+            int nextIndex = (mCurrentScrollPosition + 1) % mMapFiles.Count;
+
+            // Calculate positions and sizes for the thumbnails
+            Rectangle prevRect = new Rectangle(
+                (screenWidth / 2) - (thumbnailWidth / 2) - thumbnailWidth,
+                (screenHeight / 2) - (thumbnailHeight / 2),
+                thumbnailWidth,
+                thumbnailHeight
+            );
+
+            Rectangle currentRect = new Rectangle(
+                (screenWidth / 2) - (centreThumbWidth / 2),
+                (screenHeight / 2) - (centreThumbHeight / 2),
+                centreThumbWidth,
+                centreThumbHeight
+            );
+
+            Rectangle nextRect = new Rectangle(
+                (screenWidth / 2) - (thumbnailWidth / 2) + thumbnailWidth,
+                (screenHeight / 2) - (thumbnailHeight / 2),
+                thumbnailWidth,
+                thumbnailHeight
+            );
+
+            // Draw the previous and next thumbnails first
+            DrawThumbnail(mMapFiles[prevIndex], prevRect);
+            DrawThumbnail(mMapFiles[nextIndex], nextRect);
+
+            // Draw the current thumbnail last, in the center of the screen
+            DrawThumbnail(mMapFiles[mCurrentScrollPosition], currentRect);
+        }
+
+        void DrawThumbnail(string pMapFile, Rectangle pRectangle)
+        {
+            string thumbnailFile = pMapFile.Replace(".json", "_thumbnail.png");
+            if (File.Exists(thumbnailFile))
+            {
+                using (FileStream fileStream = new FileStream(thumbnailFile, FileMode.Open))
+                {
+                    spriteBatch.Begin();
+                    Texture2D thumbnailTexture = Texture2D.FromStream(mGameInstance.GDM().GraphicsDevice, fileStream);
+                    spriteBatch.Draw(thumbnailTexture, pRectangle, Color.White);
+                    spriteBatch.End();
+                }
+            }
+            else
+            {
+                MakeThumbnailTextureFromMapFile(pMapFile);
+                DrawThumbnail(pMapFile, pRectangle);
+            }
+        }
 
         void MakeThumbnailTextureFromMapFile(string pMapFile)
         {
@@ -226,87 +295,11 @@ namespace Tankontroller.Scenes
             spriteBatch.Draw(texture, new Rectangle(rect.X, rect.Y + offset, rect.Width, rect.Height), outlineColor);
         }
 
-
-
-
-        void DrawThumbnail(string pMapFile, Rectangle pRectangle)
-        {
-            string thumbnailFile = pMapFile.Replace(".json", "_thumbnail.png");
-            if (File.Exists(thumbnailFile))
-            {
-                using (FileStream fileStream = new FileStream(thumbnailFile, FileMode.Open))
-                {
-                    spriteBatch.Begin();
-                    Texture2D thumbnailTexture = Texture2D.FromStream(mGameInstance.GDM().GraphicsDevice, fileStream);
-                    spriteBatch.Draw(thumbnailTexture, pRectangle, Color.White);
-                    spriteBatch.End();
-                }
-            }
-            else
-            {
-                MakeThumbnailTextureFromMapFile(pMapFile);
-                DrawThumbnail(pMapFile, pRectangle);
-            }
-        }
-
-        public override void Draw(float pSeconds)
-        {
-            mGameInstance.GDM().GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
-            spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
-            spriteBatch.End();
-
-            int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
-            int thumbnailWidth = 320;
-            int thumbnailHeight = 180;
-            int centreThumbWidth = 640;
-            int centreThumbHeight = 360;
-            int spacing = 20;
-
-            // Calculate the indices of the previous, current, and next thumbnails
-            int prevIndex = (mCurrentScrollPosition - 1 + mMapFiles.Count) % mMapFiles.Count;
-            int nextIndex = (mCurrentScrollPosition + 1) % mMapFiles.Count;
-
-            // Calculate positions and sizes for the thumbnails
-            Rectangle prevRect = new Rectangle(
-                (screenWidth / 2) - (thumbnailWidth / 2) - thumbnailWidth,
-                (screenHeight / 2) - (thumbnailHeight / 2),
-                thumbnailWidth,
-                thumbnailHeight
-            );
-
-            Rectangle currentRect = new Rectangle(
-                (screenWidth / 2) - (centreThumbWidth / 2),
-                (screenHeight / 2) - (centreThumbHeight / 2),
-                centreThumbWidth,
-                centreThumbHeight
-            );
-
-            Rectangle nextRect = new Rectangle(
-                (screenWidth / 2) - (thumbnailWidth / 2) + thumbnailWidth,
-                (screenHeight / 2) - (thumbnailHeight / 2),
-                thumbnailWidth,
-                thumbnailHeight
-            );
-
-            // Draw the previous and next thumbnails first
-            DrawThumbnail(mMapFiles[prevIndex], prevRect);
-            DrawThumbnail(mMapFiles[nextIndex], nextRect);
-
-            // Draw the current thumbnail last, in the center of the screen
-            DrawThumbnail(mMapFiles[mCurrentScrollPosition], currentRect);
-        }
-
-
-
-
-
         public override void Escape()
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                mGameInstance.SM().Transition(null);
+                mGameInstance.SM().Transition(mStartScene, false);
             }
         }
     }
