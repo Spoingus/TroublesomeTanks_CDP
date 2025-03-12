@@ -39,49 +39,36 @@ namespace Tankontroller.Scenes
 
             mButtonList = new ButtonList();
 
-
-            //Start Game Button
             Texture2D startGameButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_play_white");
             Texture2D startGameButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_play_dark");
-
-            Rectangle startGameButtonRectangle =
-                new Rectangle(
-                    ((int)((screenWidth - startGameButtonTexture.Width) / 2) - (int)(startGameButtonTexture.Width * 0.75f)),
-                    (screenHeight) / 2 + startGameButtonTexture.Height,
-                    startGameButtonTexture.Width,
-                    startGameButtonTexture.Height);
-
-            Button startGameButton = new Button(startGameButtonTexture, startGameButtonTexturePressed, startGameButtonRectangle, Color.Red, StartGame);
-            startGameButton.Selected = true;
-            mButtonList.Add(startGameButton);
-
-            //Makes the exit game button
+            Texture2D levelSelectionButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_map_white");
+            Texture2D levelSelectionButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_map_dark");
             Texture2D exitGameButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_quit_white");
             Texture2D exitGameButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_quit_dark");
 
-            Rectangle exitGameButtonRectangle =
-                new Rectangle((screenWidth - exitGameButtonTexture.Width) / 2 + (int)(startGameButtonTexture.Width * 0.75f),
-                    (screenHeight) / 2 + exitGameButtonTexture.Width,
-                    exitGameButtonTexture.Width,
-                    exitGameButtonTexture.Height);
-            Button exitGameButton = new Button(exitGameButtonTexture, exitGameButtonTexturePressed, exitGameButtonRectangle, Color.Red, ExitGame);
-            exitGameButton.Selected = false;
-            mButtonList.Add(exitGameButton);
+            // Generate the button list
+            int buttonWidth = startGameButtonTexture.Width;
+            int buttonHeight = startGameButtonTexture.Height;
+            int buttonY = (screenHeight) / 2 + buttonHeight;
+            int buttonX = (screenWidth - buttonWidth) / 2 - (int)(startGameButtonTexture.Width * 1.25f);
+            Rectangle buttonRect = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
+
+            // Start button
+            Button startGameButton = new Button(startGameButtonTexture, startGameButtonTexturePressed, buttonRect, Color.Red, StartGame);
+            startGameButton.Selected = true;
+            mButtonList.Add(startGameButton);
 
             // Level Selection Button
-            Texture2D levelSelectionButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_map_white");
-            Texture2D levelSelectionButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_map_dark");
-
-            Rectangle levelSelectionButtonRectangle =
-                new Rectangle(
-                    ((int)((screenWidth - levelSelectionButtonTexture.Width) / 2)),
-                    (screenHeight) / 2 + startGameButtonTexture.Height * 2,
-                    levelSelectionButtonTexture.Width,
-                    levelSelectionButtonTexture.Height);
-
-            Button levelSelectionButton = new Button(levelSelectionButtonTexture, levelSelectionButtonTexturePressed, levelSelectionButtonRectangle, Color.Red, SelectLevel);
+            buttonRect.X += (int)(startGameButtonTexture.Width * 1.25f);
+            Button levelSelectionButton = new Button(levelSelectionButtonTexture, levelSelectionButtonTexturePressed, buttonRect, Color.Red, SelectLevel);
             levelSelectionButton.Selected = false;
             mButtonList.Add(levelSelectionButton);
+
+            //Makes the exit game button
+            buttonRect.X += (int)(startGameButtonTexture.Width * 1.25f);
+            Button exitGameButton = new Button(exitGameButtonTexture, exitGameButtonTexturePressed, buttonRect, Color.Red, ExitGame);
+            exitGameButton.Selected = false;
+            mButtonList.Add(exitGameButton);
 
             secondsLeft = 0.1f;
             mGameInstance.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_start", true);
