@@ -175,6 +175,11 @@ namespace Tankontroller.Managers
 
         public void Draw(SpriteBatch pSpriteBatch, Rectangle pDrawArea)
         {
+            if (mControllers.Count == 0)
+            {
+                pSpriteBatch.DrawString(TextFont, "No controllers detected", new Vector2(pDrawArea.X, pDrawArea.Y), Color.Black);
+                return;
+            }
             Rectangle conRect = new Rectangle(pDrawArea.X, pDrawArea.Y, pDrawArea.Width, Math.Min(pDrawArea.Height / mControllers.Count, pDrawArea.Height / 20));
             pDrawArea.Height = conRect.Height * mControllers.Count;
             pSpriteBatch.Draw(PixelTex, pDrawArea, new Color(Color.Black, 128));

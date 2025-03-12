@@ -85,7 +85,7 @@ namespace Tankontroller.Controller
         };
         protected Color mColour;
         protected Jack[] mJacks;
-        protected bool mConnected;
+        protected volatile bool mConnected;
 
         protected Controller()
         {
@@ -281,10 +281,14 @@ namespace Tankontroller.Controller
     //---------------------------------------------------------------------------------------------------
     public class ModularController : Controller
     {
+        private static readonly float LED_BRIGHTNESS = DGS.Instance.GetFloat("LED_BRIGHTNESS");
+
         private Hacktroller mHacktroller;
         public string COMPortName { get { return mHacktroller.PortName; } }
+
         private Thread UpdateThread;
-        private List<Tuple<byte, ControllerColor>> colourUpdates = new();
+        private Mutex mColourUpdateListLock = new();
+        private List<Tuple<byte, ControllerColor>> mColourUpdates = new();
 
         public ModularController(Hacktroller pHackTroller) : base()
         {
@@ -314,12 +318,16 @@ namespace Tankontroller.Controller
             if (pColour != mColour)
             {
                 mColour = pColour;
-                for (byte i = 7; i < 10; i++) // Set Centre LED colour
+                try
                 {
-                    float brightness = 0.6f;
-                    ControllerColor colour = new ControllerColor((byte)(mColour.R * brightness), (byte)(mColour.G * brightness), (byte)(mColour.B * brightness));
-                    colourUpdates.Add(new Tuple<byte, ControllerColor>(i, colour));
+                    mColourUpdateListLock.WaitOne();
+                    for (byte i = 7; i < 10; i++) // Set Centre LED colour
+                    {
+                        ControllerColor colour = new ControllerColor((byte)(mColour.R * LED_BRIGHTNESS), (byte)(mColour.G * LED_BRIGHTNESS), (byte)(mColour.B * LED_BRIGHTNESS));
+                        mColourUpdates.Add(new Tuple<byte, ControllerColor>(i, colour));
+                    }
                 }
+                finally { mColourUpdateListLock.ReleaseMutex(); }
             }
         }
 
@@ -414,10 +422,16 @@ namespace Tankontroller.Controller
                     }
                 }
 
-                if (colourUpdates.Count > 0)
+                if (mColourUpdates.Count > 0)
                 {
-                    List<Tuple<byte, ControllerColor>> data = colourUpdates.GetRange(0, colourUpdates.Count);
-                    colourUpdates.Clear();
+                    List<Tuple<byte, ControllerColor>> data = new();
+                    try
+                    {
+                        mColourUpdateListLock.WaitOne();
+                        data = mColourUpdates.GetRange(0, mColourUpdates.Count);
+                        mColourUpdates.Clear();
+                    }
+                    finally { mColourUpdateListLock.ReleaseMutex(); }
                     mHacktroller.SetColor(data);
                 }
             }
