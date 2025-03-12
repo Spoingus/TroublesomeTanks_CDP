@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
-
 
 namespace Tankontroller.Controller
 {
@@ -21,12 +20,13 @@ namespace Tankontroller.Controller
         bool AddCharge(Control pControl, float amount);
         float GetJackCharge(int pJackIndex);
         Control GetJackControl(int pJackIndex);
+        int GetJackIndex(Control pControl);
         void TransferJackCharge(IController pController);
         bool IsPressed(Control pControl);
         bool WasPressed(Control pControl);
         void ResetJacks();
-        void TurnOffLights();
-        void TurnOnLights();
+
+        void Disconnect();
         bool IsConnected();
 
         void SetColour(Color pColour);
@@ -60,7 +60,6 @@ namespace Tankontroller.Controller
             private bool mIsDown;
 
             public Control Control;
-            public int[] LED_IDS = new int[4];
             public float charge;
             public bool WasDown { get; private set; }
             public bool IsDown
@@ -86,19 +85,15 @@ namespace Tankontroller.Controller
         };
         protected Color mColour;
         protected Jack[] mJacks;
-        protected int[] mLedArray;
-        protected bool mLightsOn;
-        protected bool mConnected;
+        protected volatile bool mConnected;
 
         protected Controller()
         {
             mJacks = new Jack[7] { new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack(), new Jack() };
-            mLedArray = new int[4];
-            mLightsOn = true;
             mConnected = true;
         }
 
-        public void SetColour(Color pColour)
+        public virtual void SetColour(Color pColour)
         {
             mColour = pColour;
         }
@@ -108,16 +103,6 @@ namespace Tankontroller.Controller
             {
                 j.ResetCharge();
             }
-        }
-
-        public void TurnOffLights()
-        {
-            mLightsOn = false;
-            UpdateController();
-        }
-        public void TurnOnLights()
-        {
-            mLightsOn = true;
         }
 
         public Control GetJackControl(int pJackIndex)
@@ -131,6 +116,18 @@ namespace Tankontroller.Controller
         }
 
         public abstract void UpdateController();
+
+        public int GetJackIndex(Control pControl)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                if (mJacks[i].Control == pControl)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 
         public bool IsPressedWithCharge(Control pControl)
         {
@@ -199,6 +196,12 @@ namespace Tankontroller.Controller
         public bool IsConnected()
         {
             return mConnected;
+        }
+
+        public void Disconnect()
+        {
+            SetColour(new Color(0, 0, 0));
+            mConnected = false;
         }
     }
 
@@ -278,87 +281,57 @@ namespace Tankontroller.Controller
     //---------------------------------------------------------------------------------------------------
     public class ModularController : Controller
     {
+        private static readonly float LED_BRIGHTNESS = DGS.Instance.GetFloat("LED_BRIGHTNESS");
+
         private Hacktroller mHacktroller;
+        public string COMPortName { get { return mHacktroller.PortName; } }
+
+        private Thread UpdateThread;
+        private Mutex mColourUpdateListLock = new();
+        private List<Tuple<byte, ControllerColor>> mColourUpdates = new();
 
         public ModularController(Hacktroller pHackTroller) : base()
         {
+            SetHacktroller(pHackTroller);
+            SetColour(new Color(0, 0, 0));
+        }
 
-            mJacks[5].LED_IDS = new int[8] { 0, 1, 2, 3, 4, 5, 6, 7 };
-            mJacks[4].LED_IDS = new int[8] { 8, 9, 10, 11, 12, 13, 14, 15 };
-            mJacks[3].LED_IDS = new int[8] { 16, 17, 18, 19, 20, 21, 22, 23 };
-            mJacks[2].LED_IDS = new int[8] { 24, 25, 26, 27, 28, 29, 30, 31 };
-            mJacks[1].LED_IDS = new int[8] { 32, 33, 34, 35, 36, 37, 38, 39 };
-            mJacks[0].LED_IDS = new int[8] { 40, 41, 42, 43, 44, 45, 46, 47 };
-            mJacks[6].LED_IDS = new int[8] { 48, 49, 50, 51, 52, 53, 54, 55 };
-            mLedArray = new int[5] { 56, 57, 58, 59, 60 };
+        public void SetHacktroller(Hacktroller pHackTroller)
+        {
             mHacktroller = pHackTroller;
-
+            mConnected = true;
+            Thread.Sleep(10); // Give the Hacktroller time to connect (otherwise there's sometimes a semaphore timeout when writing)
             PullDataThread();
         }
 
-        public void PullDataThread()
+        private void PullDataThread()
         {
-            Thread.Sleep(10);
-            Thread UpdateController = new Thread(new ThreadStart(PullData));
-            UpdateController.Start();
+            if (UpdateThread == null || !UpdateThread.IsAlive)
+            {
+                UpdateThread = new Thread(new ThreadStart(PullData));
+                UpdateThread.Start();
+            }
         }
 
-        private async Task UpdateColors()
+        public override void SetColour(Color pColour)
         {
-            ControllerColor[] result = new ControllerColor[61];
-
-            for (int i = 0; i < result.Length; i++)
+            if (pColour != mColour)
             {
-                result[i].R = 0;
-                result[i].G = 0;
-                result[i].B = 0;
-            }
-            if (mLightsOn && mConnected)
-            {
-                foreach (Jack J in mJacks)
+                mColour = pColour;
+                try
                 {
-                    // red empty orange 33% yellow 66% green 100% split into 4 chunks so we get 8.25% splits
-                    // J.charge should be between 0 and DGS.MAX_CHARGE
-                    //int FullByte = 50;
-                    float brightness = 0.2f;
-                    float decimalCharge = J.charge / MAX_CHARGE;
-                    float remainingCharge = 8 * decimalCharge;
-                    foreach (int i in J.LED_IDS)
+                    mColourUpdateListLock.WaitOne();
+                    for (byte i = 7; i < 10; i++) // Set Centre LED colour
                     {
-                        if (remainingCharge >= 1)
-                        {
-                            result[i].R = (byte)(mColour.R * brightness);
-                            result[i].G = (byte)(mColour.G * brightness);
-                            result[i].B = (byte)(mColour.B * brightness);
-                        }
-                        else
-                        {
-                            result[i].R = 0;
-                            result[i].G = 0;
-                            result[i].B = 0;
-                        }
-                        remainingCharge--;
-                    }
-                    foreach (int i in mLedArray)
-                    {
-                        result[i].R = 30;
-                        result[i].G = 30;
-                        result[i].B = 30;
+                        ControllerColor colour = new ControllerColor((byte)(mColour.R * LED_BRIGHTNESS), (byte)(mColour.G * LED_BRIGHTNESS), (byte)(mColour.B * LED_BRIGHTNESS));
+                        mColourUpdates.Add(new Tuple<byte, ControllerColor>(i, colour));
                     }
                 }
-            }
-
-
-            await mHacktroller.SetColor(result);
-        }
-        Task updateColourTask = null;
-        public override void UpdateController()
-        {
-            if (mConnected && mLightsOn && (updateColourTask == null || updateColourTask.IsCompleted))
-            {
-                updateColourTask = Task.Run(async () => await UpdateColors());
+                finally { mColourUpdateListLock.ReleaseMutex(); }
             }
         }
+
+        public override void UpdateController() { }
 
         private static Control GetControlFromState(ControllerState pState)
         {
@@ -421,15 +394,13 @@ namespace Tankontroller.Controller
 
         private void PullData()
         {
-            while (mLightsOn && mConnected)
+            while (mConnected && mHacktroller.PortConnected)
             {
                 ControllerState[] ports = mHacktroller.GetPorts();
 
                 if (ports == null)
                 {
-                    mConnected = false;
-                    Tankontroller.Instance().GetControllers().Remove(this);
-                    return;
+                    continue;
                 }
                 for (int i = 0; i < ports.Length; ++i)
                 {
@@ -443,13 +414,30 @@ namespace Tankontroller.Controller
                     }
                     else
                     {
-                        if (control == mJacks[i].Control || control == Control.NONE)
+                        //if (control == mJacks[i].Control || control == Control.NONE)
                         {
                             mJacks[i].Control = control;
                             mJacks[i].IsDown = isDown;
                         }
                     }
                 }
+
+                if (mColourUpdates.Count > 0)
+                {
+                    List<Tuple<byte, ControllerColor>> data = new();
+                    try
+                    {
+                        mColourUpdateListLock.WaitOne();
+                        data = mColourUpdates.GetRange(0, mColourUpdates.Count);
+                        mColourUpdates.Clear();
+                    }
+                    finally { mColourUpdateListLock.ReleaseMutex(); }
+                    mHacktroller.SetColor(data);
+                }
+            }
+            if (mHacktroller != null && mHacktroller.PortConnected)
+            {
+                mHacktroller.ClosePort();
             }
         }
     }

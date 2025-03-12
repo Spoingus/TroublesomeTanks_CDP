@@ -17,7 +17,8 @@ namespace Tankontroller
         public Tank Tank { get; private set; }
         public IController Controller { get; private set; }
         public Color Colour { get; private set; }
-        
+
+        private int mCannonJackIndex = -1; // Due to flickering of the controller, we need to keep track of the last jack used to fire the cannon
 
         public Player(IController pController, Avatar pAvatar)
         {
@@ -123,13 +124,15 @@ namespace Tankontroller
                     Controller.DepleteCharge(Control.TURRET_RIGHT, TRACK_DEPLETION_RATE * pSeconds);
                 }
 
+                int currentJackIndex = Controller.GetJackIndex(Control.FIRE);
                 if (Controller.IsPressedWithCharge(Control.FIRE))
                 {
-                    Tank.PrimingWeapon(pSeconds);
+                    if (mCannonJackIndex == -1) mCannonJackIndex = currentJackIndex;
+                    else if (mCannonJackIndex == currentJackIndex) Tank.PrimingWeapon(pSeconds);
                 }
                 else
                 {
-                    if (Tank.IsFirePrimed())
+                    if (mCannonJackIndex == currentJackIndex && Tank.IsFirePrimed())
                     {
                         if (Controller.DepleteCharge(Control.FIRE, BULLET_CHARGE_DEPLETION))
                         {
@@ -138,8 +141,7 @@ namespace Tankontroller
                             bulletShot.Play();
                         }
                     }
-                    //if tank fire is held
-                    //tank fire special bullet
+                    mCannonJackIndex = -1;
                 }
 
                 if (Controller.IsPressed(Control.RECHARGE) && !Controller.WasPressed(Control.RECHARGE))

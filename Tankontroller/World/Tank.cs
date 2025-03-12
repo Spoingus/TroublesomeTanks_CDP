@@ -12,7 +12,9 @@ using Tankontroller.World.Particles;
 public enum BulletType
 {
     DEFAULT,
-    BOUNCY_EMP
+    BOUNCY_EMP,
+    MINE,
+    BOUNCY
 }
 
 namespace Tankontroller.World
@@ -328,10 +330,23 @@ namespace Tankontroller.World
             mFired = BLAST_DELAY;
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
-            Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
+            Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 40;
             if (bullet == BulletType.BOUNCY_EMP)
             {
                 m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED * 1.5f, mColour, 20.0f));
+                mbulletType = BulletType.DEFAULT;
+            }
+            else if (bullet == BulletType.MINE)
+            {
+                float backwardRotation = mRotation + MathHelper.ToRadians(180);
+                Vector2 backwardDirection = new Vector2((float)Math.Cos(backwardRotation), (float)Math.Sin(backwardRotation));
+                Vector2 behindTheTank = GetCannonWorldPosition() + backwardDirection * 40;
+                m_Bullets.Add(new MineBullet(behindTheTank, Vector2.Zero, mColour, 600.0f));
+                mbulletType = BulletType.DEFAULT;
+            }
+            else if (bullet == BulletType.BOUNCY)
+            {
+                m_Bullets.Add(new BouncyBullet(endOfCannon, cannonDirection * BULLET_SPEED * 3, mColour, 3.0f));
                 mbulletType = BulletType.DEFAULT;
             }
             else

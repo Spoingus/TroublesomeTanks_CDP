@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Ports;
-using System.Threading.Tasks;
+using System.Linq;
 
 //-----------------------------------------------------------------------------------------------
 // Hacktroller.cs
@@ -11,14 +12,6 @@ using System.Threading.Tasks;
 //-----------------------------------------------------------------------------------------------
 namespace Tankontroller.Controller
 {
-    /*      R1     R2    R3     Off   On
-            100k   47k   0      323   0
-            5k6    350   53
-            10k    369   91
-            15k    389   132
-            18k    400   154
-            33k    450   252*/
-
     //-----------------------------------------------------------------------------------------------
     // ControllerColor
     //
@@ -96,23 +89,16 @@ namespace Tankontroller.Controller
     // Hacktroller
     //
     // This class is used to interface with the Hacktroller device.
-    // It contains the following:
-    // - A SerialPort object to communicate with the device
-    // - A Random object to generate random numbers
-    // - A byte array to store the command to read the state of the pins
-    // - A byte array to store the command to set the colour of the LEDs
-    // - A byte array to store the frame buffer
-    // - An array of PortState objects to store the state of the pins
-    // - A static array of stateMap objects to map the pin readings to ControllerStates
-    // - A static array of PinState objects to store the state of the pins
-    // - A static int to store the tolerance for the pin readings
     //-----------------------------------------------------------------------------------------------
     public class Hacktroller
     {
         SerialPort port;
+        public string PortName { get { return port.PortName; } }
+        public bool PortConnected { get { return port.IsOpen; } }
 
         static int numPins = 7;
-        static byte[] SetColorCommand = new byte[] { (byte)'P', 0 };
+        static byte SetColorCommand = (byte)'P';
+        static byte[] SetIDCommand = new byte[] { (byte)'U', (byte)' ' };
         static byte[] GetPortCommand = new byte[] { (byte)'R' };
 
         static byte[] frameBuffer = new byte[61 * 3];
@@ -163,7 +149,7 @@ namespace Tankontroller.Controller
 
         public Hacktroller(string portName)
         {
-            port = new SerialPort(portName, 19200);//, Parity.None, 8, StopBits.One);
+            port = new SerialPort(portName, 19200);
             port.Open();
 
             port.DtrEnable = true;
@@ -178,6 +164,27 @@ namespace Tankontroller.Controller
             for (int i = 0; i < frameBuffer.Length; i++)
             {
                 frameBuffer[i] = 20;
+            }
+        }
+
+        public void ClosePort()
+        {
+            port.Close();
+        }
+
+        public void SetID(string pID)
+        {
+            if (pID.Length > 9)
+            {
+                pID = pID.Substring(0, 10);
+                try
+                {
+                    port.DiscardInBuffer();
+                    port.Write(SetIDCommand, 0, 2);
+                    port.Write(pID);
+                }
+                catch
+                { }
             }
         }
 
@@ -218,40 +225,33 @@ namespace Tankontroller.Controller
             return portStates;
         }
 
-
-        public async Task<bool> SetColor(ControllerColor[] colourArray)
+        public bool SetColor(List<Tuple<byte, ControllerColor>> colourData)
         {
-            byte[] colourWriteCommand = SetColorCommand;
-            byte[] writeColour = new byte[3];
-
-
-            // My ugly protocol does not support sending panel items larger than 254 pixels 
-            if (colourArray.Length > 254)
+            // List can't be larger than 255 as it is sent as a byte (There are only 10 LEDs on a controller anyways)
+            if (colourData.Count > 254)
                 return false;
 
-            colourWriteCommand[1] = (byte)colourArray.Length;
-
-            // Write the command
-            await port.BaseStream.WriteAsync(colourWriteCommand, 0, 2);
+            // Initialise the write array
+            byte[] writeArray = new byte[colourData.Count * 4 + 3]; // Each command is 4 bytes long, plus 3 bytes (command, command count, and bytecheck at end)
+            writeArray[0] = SetColorCommand;
+            writeArray[1] = (byte)colourData.Count;
 
             byte check = 0;
-
-            foreach (ControllerColor c in colourArray)
+            for (int i = 0; i < colourData.Count; ++i)
             {
-                // HACK think this is RBG instead of RGB so have swapped subscripts around
-                check += c.R;
-                writeColour[0] = c.R;
-                check += c.G;
-                writeColour[2] = c.G;
-                check += c.B;
-                writeColour[1] = c.B;
-                await port.BaseStream.WriteAsync(writeColour, 0, 3);
+                int index = i * 4 + 2;
+                Tuple<byte, ControllerColor> data = colourData[i];
+                writeArray[index] = data.Item1;
+                writeArray[index + 1] = data.Item2.R;
+                writeArray[index + 2] = data.Item2.B; // HACK think this is RBG instead of RGB so have swapped subscripts around
+                writeArray[index + 3] = data.Item2.G;
+                check += data.Item2.R;
+                check += data.Item2.G;
+                check += data.Item2.B;
             }
+            writeArray[writeArray.Length - 1] = check; // Check byte is the sum of all the RGB values
 
-            // Write out the checksum
-
-            writeColour[0] = check;
-            await port.BaseStream.WriteAsync(writeColour, 0, 1);
+            port.Write(writeArray, 0, writeArray.Length);
             return true;
         }
     }
