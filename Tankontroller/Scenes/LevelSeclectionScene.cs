@@ -93,6 +93,8 @@ namespace Tankontroller.Scenes
         }
 
 
+
+
         void MakeThumbnailTextureFromMapFile(string pMapFile)
         {
             string mapContent = File.ReadAllText(pMapFile);
