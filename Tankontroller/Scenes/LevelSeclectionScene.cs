@@ -13,7 +13,7 @@ namespace Tankontroller.Scenes
 {
     public class LevelSelectionScene : IScene
     {
-        private Texture2D mBackgroundTexture;
+        private static readonly Texture2D mBackgroundTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_01");
         private Rectangle mBackgroundRectangle;
         private ButtonList mButtonList;
         private List<string> mMapFiles;
@@ -30,7 +30,6 @@ namespace Tankontroller.Scenes
             int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
 
-            mBackgroundTexture = mGameInstance.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
             mButtonList = new ButtonList();
@@ -44,7 +43,6 @@ namespace Tankontroller.Scenes
             for (int i = 0; i < filePaths.Length; i++)
             {
                 filePaths[i] = filePaths[i].Replace(mapsDirectory + "\\", "");
-                filePaths[i] = "Maps/" + filePaths[i];
             }
             mMapFiles = new List<string>(filePaths);
 
@@ -55,15 +53,15 @@ namespace Tankontroller.Scenes
         private void SelectMap(string mapFile)
         {
             mStartScene.SetDefaultMapFile(mapFile);
-            mGameInstance.SM().Transition(mStartScene, false);
+            mGameInstance.SM().Transition(mStartScene, true);
         }
 
         public override void Update(float pSeconds)
         {
             Escape();
-            mGameInstance.DetectControllers();
+            mGameInstance.GetControllerManager().DetectControllers();
 
-            foreach (IController controller in mGameInstance.GetControllers())
+            foreach (IController controller in mGameInstance.GetControllerManager().GetControllers())
             {
                 controller.UpdateController();
                 secondsLeft -= pSeconds;
@@ -166,7 +164,7 @@ namespace Tankontroller.Scenes
 
         void MakeThumbnailTextureFromMapFile(string pMapFile)
         {
-            string mapContent = File.ReadAllText(pMapFile);
+            string mapContent = File.ReadAllText("Maps\\" + pMapFile);
             MapData mapData = JsonSerializer.Deserialize<MapData>(mapContent);
 
             int thumbnailWidth = 640;
@@ -299,7 +297,7 @@ namespace Tankontroller.Scenes
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                mGameInstance.SM().Transition(mStartScene, false);
+                mGameInstance.SM().Transition(mStartScene, true);
             }
         }
     }

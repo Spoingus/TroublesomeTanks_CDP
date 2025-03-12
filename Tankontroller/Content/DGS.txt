@@ -1,7 +1,10 @@
 ﻿// WINDOW
-bool IS_FULL_SCREEN = false;
+bool IS_FULL_SCREEN = true;
 int SCREENWIDTH = 1920;
 int SCREENHEIGHT = 1000;
+
+// MAP
+string DEFAULT_MAP_FILE = Default.json;
 
 // CONTROLLERS
 bool SHOW_LIST_ON_MAIN_MENU = true;
@@ -47,4 +50,3 @@ Color COLOUR_DUST = dcdcdc;
 // DEBUG
 bool ADD_KEYBOARD_CONTROLLER_1 = false;
 bool ADD_KEYBOARD_CONTROLLER_2 = false;
-

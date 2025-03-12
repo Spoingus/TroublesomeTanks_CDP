@@ -10,18 +10,19 @@ namespace Tankontroller.Scenes
     public class StartScene : IScene
     {
         private static readonly bool SHOW_LIST_ON_MAIN_MENU = DGS.Instance.GetBool("SHOW_LIST_ON_MAIN_MENU");
+        private static readonly string DEFAULT_MAP_FILE = DGS.Instance.GetString("DEFAULT_MAP_FILE");
         IGame mGameInstance = Tankontroller.Instance();
 
         ButtonList mButtonList = null;
-        Texture2D mForgroundTexture = null;
-        Texture2D mBackgroundTexture = null;
+        private static readonly Texture2D mForgroundTexture = Tankontroller.Instance().CM().Load<Texture2D>("menu_white");
+        private static readonly Texture2D mBackgroundTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_01");
+        private static readonly Texture2D mTitleTexture = Tankontroller.Instance().CM().Load<Texture2D>("menu_title");
         Rectangle mBackgroundRectangle;
-        Texture2D mTitleTexture = null;
         Rectangle mTitleRectangle;
         Rectangle mControllerInfoRect;
         private float secondsLeft;
 
-        private string defaultMapFile = "Maps/1-3_player_map.json"; // Default map file
+        private string defaultMapFile = DEFAULT_MAP_FILE; // Default map file
 
 
         public StartScene()
@@ -30,11 +31,8 @@ namespace Tankontroller.Scenes
             int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
 
-            mBackgroundTexture = mGameInstance.CM().Load<Texture2D>("background_01");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
-            mForgroundTexture = mGameInstance.CM().Load<Texture2D>("menu_white");
-            mTitleTexture = mGameInstance.CM().Load<Texture2D>("menu_title");
             mTitleRectangle = new Rectangle((screenWidth / 2) - (644 / 2), (screenHeight / 2) - (128 / 2), 644, 128);
 
             mControllerInfoRect = new Rectangle(0, 0, screenWidth / 5, screenHeight);
@@ -71,8 +69,8 @@ namespace Tankontroller.Scenes
             mButtonList.Add(exitGameButton);
 
             // Level Selection Button
-            Texture2D levelSelectionButtonTexture = tankControllerInstance.CM().Load<Texture2D>("menu_play_white");
-            Texture2D levelSelectionButtonTexturePressed = tankControllerInstance.CM().Load<Texture2D>("menu_quit_dark");
+            Texture2D levelSelectionButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_map_white");
+            Texture2D levelSelectionButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_map_dark");
 
             Rectangle levelSelectionButtonRectangle =
                 new Rectangle(
@@ -96,7 +94,7 @@ namespace Tankontroller.Scenes
 
         private void SelectLevel()
         {
-            gameInstance.SM().Transition(new LevelSelectionScene(this), false);
+            mGameInstance.SM().Transition(new LevelSelectionScene(this), false);
         }
 
         private void ExitGame()
