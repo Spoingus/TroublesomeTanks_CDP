@@ -225,7 +225,7 @@ namespace Tankontroller.Controller
             return portStates;
         }
 
-        public bool SetColor(Dictionary<byte, ControllerColor> colourData)
+        public bool SetColor(List<Tuple<byte, ControllerColor>> colourData)
         {
             // List can't be larger than 255 as it is sent as a byte (There are only 10 LEDs on a controller anyways)
             if (colourData.Count > 254)
@@ -240,14 +240,14 @@ namespace Tankontroller.Controller
             for (int i = 0; i < colourData.Count; ++i)
             {
                 int index = i * 4 + 2;
-                KeyValuePair<byte, ControllerColor> data = colourData.ElementAt(i);
-                writeArray[index] = data.Key;
-                writeArray[index + 1] = data.Value.R;
-                writeArray[index + 2] = data.Value.B; // HACK think this is RBG instead of RGB so have swapped subscripts around
-                writeArray[index + 3] = data.Value.G;
-                check += data.Value.R;
-                check += data.Value.G;
-                check += data.Value.B;
+                Tuple<byte, ControllerColor> data = colourData[i];
+                writeArray[index] = data.Item1;
+                writeArray[index + 1] = data.Item2.R;
+                writeArray[index + 2] = data.Item2.B; // HACK think this is RBG instead of RGB so have swapped subscripts around
+                writeArray[index + 3] = data.Item2.G;
+                check += data.Item2.R;
+                check += data.Item2.G;
+                check += data.Item2.B;
             }
             writeArray[writeArray.Length - 1] = check; // Check byte is the sum of all the RGB values
 

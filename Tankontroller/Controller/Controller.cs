@@ -20,6 +20,7 @@ namespace Tankontroller.Controller
         bool AddCharge(Control pControl, float amount);
         float GetJackCharge(int pJackIndex);
         Control GetJackControl(int pJackIndex);
+        int GetJackIndex(Control pControl);
         void TransferJackCharge(IController pController);
         bool IsPressed(Control pControl);
         bool WasPressed(Control pControl);
@@ -115,6 +116,18 @@ namespace Tankontroller.Controller
         }
 
         public abstract void UpdateController();
+
+        public int GetJackIndex(Control pControl)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                if (mJacks[i].Control == pControl)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 
         public bool IsPressedWithCharge(Control pControl)
         {
@@ -403,13 +416,9 @@ namespace Tankontroller.Controller
 
                 if (colourUpdates.Count > 0)
                 {
-                    Dictionary<byte, ControllerColor> result = new();
-                    foreach (var update in colourUpdates)
-                    {
-                        result.Add(update.Item1, update.Item2);
-                    }
+                    List<Tuple<byte, ControllerColor>> data = colourUpdates.GetRange(0, colourUpdates.Count);
                     colourUpdates.Clear();
-                    mHacktroller.SetColor(result);
+                    mHacktroller.SetColor(data);
                 }
             }
             if (mHacktroller != null && mHacktroller.PortConnected)
