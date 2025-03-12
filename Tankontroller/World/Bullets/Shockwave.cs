@@ -1,18 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using Tankontroller.World.Particles;
 
-namespace Tankontroller.World
+namespace Tankontroller.World.Bullets
 {
     class Shockwave : Bullet
     {
+        private static readonly Texture2D ShockWaveTexture = Tankontroller.Instance().CM().Load<Texture2D>("Shockwave");
         public Shockwave(Vector2 pPosition, Vector2 pVelocity, Color pColour, float pLifeTime) : base(pPosition, pVelocity, pColour, pLifeTime) { }
-        private new float BULLET_RADIUS = 1.0f;
         public override void Update(float pSeconds)
         {
-            BULLET_RADIUS += 1.0f;
+            Radius += 0.5f;
+            LifeTime -= pSeconds;
             base.Update(pSeconds);
         }
         public override bool DoCollision(Rectangle pRectangle)
@@ -23,17 +22,9 @@ namespace Tankontroller.World
         {
             return false;
         }
+
         public override bool DoCollision(Tank pTank)
         {
-
-            float distance = Vector2.Distance(Position, pTank.GetWorldPosition());
-            if (distance < BULLET_RADIUS)
-            {
-                Vector2 CollisionNormal = Vector2.Normalize(Position - pTank.GetWorldPosition());
-                ExplosionInitialisationPolicy explosion = new ExplosionInitialisationPolicy(Position, CollisionNormal, Colour);
-                Particles.ParticleManager.Instance().InitialiseParticles(explosion, 20);
-                return true;
-            }
             return false;
         }
         public override bool DoCollision(Bullet pBullet)
@@ -42,11 +33,13 @@ namespace Tankontroller.World
         }
         public override bool LifeTimeExpired()
         {
-            if(BULLET_RADIUS >= 30.0f)
-            {
-                return true;
-            }
-            return false;
+            return (LifeTime <= 0);
+        }
+        public override void Draw(SpriteBatch pBatch, Texture2D pTexture)
+        {
+            Color ShockWaveColour = Color.Yellow;
+            ShockWaveColour.A = (byte)(0.0f);
+            Particle.DrawCircle(pBatch, ShockWaveTexture, (int)Radius, Position, ShockWaveColour);
         }
     }
 }

@@ -61,10 +61,10 @@ namespace Tankontroller.World.Particles
         static public void DrawCircle(SpriteBatch pBatch, Texture2D pTexture, int pRadius, Vector2 pPos, Color pColour)
         {
             Rectangle rectangle = new Rectangle();
-            rectangle.Width = pRadius;
-            rectangle.Height = pRadius;
-            rectangle.X = (int)pPos.X - pRadius / 2;
-            rectangle.Y = (int)pPos.Y - pRadius / 2;
+            rectangle.Width = pRadius * 2;
+            rectangle.Height = pRadius * 2;
+            rectangle.X = (int)pPos.X - pRadius;
+            rectangle.Y = (int)pPos.Y - pRadius;
             pBatch.Draw(pTexture, rectangle, pColour);
         }
 
@@ -241,17 +241,18 @@ namespace Tankontroller.World.Particles
             {
                 float lifetime = m_Rng.Next(1000, 2001) * 0.00015f;
                 Vector2 velocity = Vector2.Transform(m_Normal, Matrix.CreateRotationZ((float)(m_Rng.NextDouble() * Math.PI - Math.PI / 2))) * m_Rng.Next(90, 121);
-                pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(3, 11), m_Rng.Next(25, 46), m_Colour, lifetime);
+                pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(1, 7), m_Rng.Next(25, 46), m_Colour, lifetime);
             }
         }
     }
 
     public class DustInitialisationPolicy : IParticleInitialisationPolicy
     {
-        private static readonly Color COLOUR_DUST = DGS.Instance.GetColour("COLOUR_DUST");
+        //private static readonly Color COLOUR_DUST = DGS.Instance.GetColour("COLOUR_DUST");
         private Vector2 m_Point1;
         private Vector2 m_Point2;
         private Random m_Rng = new Random();
+        private Color[] m_Colours = new Color[4];
 
         /// <summary>
         /// DustInitialisationPolicy creates particles at a random point on a line between two points.
@@ -262,6 +263,10 @@ namespace Tankontroller.World.Particles
         {
             m_Point1 = pPoint1;
             m_Point2 = pPoint2;
+            m_Colours[0] = Color.LightGray;
+            m_Colours[1] = new Color(200, 200, 200, 255);
+            m_Colours[2] = new Color(190, 190, 190, 255);
+            m_Colours[3] = new Color(175, 175, 175, 255);
         }
 
         public void InitiateParticles(Particle[] pParticles)
@@ -270,7 +275,7 @@ namespace Tankontroller.World.Particles
             {
                 Vector2 position = m_Point1 + (m_Point2 - m_Point1) * (float)m_Rng.NextDouble();
                 float lifetime = m_Rng.Next(250, 751) * 0.001f;
-                pParticles[i].Initiate(position, Vector2.Zero, 1, m_Rng.Next(5, 15), COLOUR_DUST, lifetime);
+                pParticles[i].Initiate(position, Vector2.Zero, 0.5f, m_Rng.Next(5, 15), m_Colours[m_Rng.Next(4)], lifetime);
             }
         }
     }
@@ -295,7 +300,7 @@ namespace Tankontroller.World.Particles
                 Vector2 position = m_Position;
                 position.X += m_Rng.Next(-2, 2);
                 position.Y += m_Rng.Next(-2, 2);
-                pParticles[i].Initiate(position, Vector2.Zero, m_Rng.Next(2, 4), 0, m_Colour, lifetime);
+                pParticles[i].Initiate(position, Vector2.Zero, m_Rng.Next(1, 2), 0, m_Colour, lifetime);
             }
         }
     }
@@ -304,13 +309,16 @@ namespace Tankontroller.World.Particles
     {
         private Vector2 m_Position;
         private float m_LifeTime;
-        private float m_VelocityScale;
+        //private float m_VelocityScale;
         private Random m_Rng = new Random();
+        private Color[] m_Colours = new Color[2];
 
         public EMPBlastInitPolicy(Vector2 pPosition, float pLifeTime)
         {
             m_Position = pPosition;
             m_LifeTime = pLifeTime;
+            m_Colours[0] = Color.Yellow;
+            m_Colours[1] = Color.Gold;
         }
 
         public void InitiateParticles(Particle[] pParticles)
@@ -319,7 +327,51 @@ namespace Tankontroller.World.Particles
             {
                 m_LifeTime = m_LifeTime * (float)(1.0 - (m_Rng.NextDouble() * 0.01));
                 Vector2 velocity = Vector2.Transform(new Vector2(0, 1), Matrix.CreateRotationZ((float)(m_Rng.NextDouble() * 2 * Math.PI))) * m_Rng.Next(90, 121);
-                pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(3, 11), m_Rng.Next(0, 2), Color.Yellow, m_LifeTime);
+                // normalize the velocity
+                velocity.Normalize();
+                // apply speed
+                velocity = velocity * 30;
+                pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(1, 7), m_Rng.Next(0, 2), m_Colours[m_Rng.Next(2)], m_LifeTime);
+            }
+        }
+    }
+    public class MineBlastInitPolicy : IParticleInitialisationPolicy
+    {
+        private Vector2 m_Position;
+        private float m_LifeTime;
+        private Random m_Rng = new Random();
+        private Color[] m_SmokeColours = new Color[2];
+        private Color[] m_BlastColours = new Color[2];
+
+        public MineBlastInitPolicy(Vector2 pPosition, float pLifeTime)
+        {
+            m_Position = pPosition;
+            m_LifeTime = pLifeTime;
+            m_SmokeColours[0] = Color.DarkSlateGray;
+            m_SmokeColours[1] = new Color(47,50,50,1);
+            m_BlastColours[0] = Color.Orange;
+            m_BlastColours[1] = Color.MonoGameOrange;
+        }
+
+        public void InitiateParticles(Particle[] pParticles)
+        {
+            for (int i = 0; i < pParticles.Length; i++)
+            {
+                m_LifeTime = m_LifeTime * (float)(1.0 - (m_Rng.NextDouble() * 0.01));
+                Vector2 velocity = Vector2.Transform(new Vector2(0, 1), Matrix.CreateRotationZ((float)(m_Rng.NextDouble() * 2 * Math.PI))) * m_Rng.Next(90, 121);
+                velocity.Normalize();
+               
+                if (i <= (pParticles.Length / 2))
+                {
+                    velocity = velocity * 40;
+                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(1, 7), m_Rng.Next(15, 25), m_SmokeColours[m_Rng.Next(2)], m_LifeTime);
+                }
+                else
+                {
+                    velocity = velocity * 20;
+                    pParticles[i].Initiate(m_Position, velocity, m_Rng.Next(0, 6), m_Rng.Next(10, 20), m_BlastColours[m_Rng.Next(2)], m_LifeTime + 0.4f);
+                }
+
             }
         }
     }

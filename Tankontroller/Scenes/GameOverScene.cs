@@ -45,7 +45,8 @@ namespace Tankontroller.Scenes
             }
             int textureWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width / 2;
             int textureHeight = (int)(textureWidth * ((float)254 / (float)540));
-            int centreXOffset = 0;
+            int loserTextureWidth = textureWidth / 2;
+            int centreXOffset = loserTextureWidth / 2;
             for (int i = 0; i < mPlayers.Count; i++)
             {
                 if (i != mWinner) //Repositon the losers

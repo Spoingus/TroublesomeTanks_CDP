@@ -3,14 +3,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.World.Particles;
 
-namespace Tankontroller.World
+namespace Tankontroller.World.Bullets
 {
     public abstract class Bullet
     {
-        public float BULLET_RADIUS { get; protected set; }
+        public float Radius { get; protected set; }
         public Vector2 Position { get; protected set; }
         public Vector2 Velocity { get; protected set; }
-        public  Color Colour { get; private set; }
+        public Color Colour { get; private set; }
         public float LifeTime { get; protected set; }
 
         public Bullet(Vector2 pPosition, Vector2 pVelocity, Color pColour, float lifeTime)
@@ -18,7 +18,7 @@ namespace Tankontroller.World
             Position = pPosition;
             Velocity = pVelocity;
             Colour = pColour;
-            BULLET_RADIUS = 10.0f;
+            Radius = 5.0f;
             LifeTime = lifeTime;
         }
 
@@ -57,7 +57,7 @@ namespace Tankontroller.World
 
         public virtual bool Collide(Bullet pBullet) // This is unused but I'm keeping it for potential implementation
         {
-            if (Vector2.Distance(Position, pBullet.Position) < 2 * BULLET_RADIUS)
+            if (Vector2.Distance(Position, pBullet.Position) < 2 * Radius)
             {
                 return true;
             }
@@ -94,8 +94,8 @@ namespace Tankontroller.World
 
         public virtual void Draw(SpriteBatch pBatch, Texture2D pTexture)
         {
-            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
-            Particle.DrawCircle(pBatch, pTexture, (int)BULLET_RADIUS, Position, Colour);
+            Particle.DrawCircle(pBatch, pTexture, (int)Radius + 2 * Particle.EDGE_THICKNESS, Position, Color.Black);
+            Particle.DrawCircle(pBatch, pTexture, (int)Radius, Position, Colour);
         }
     }
 }

@@ -69,7 +69,6 @@ void setup() {
   }
 }
 
-
 void printAllSamples() {
   Serial.print("maxSample = ");
   Serial.println(maxSample);
@@ -130,6 +129,7 @@ void sendData() {
     check = check + id;
   }
   Serial.write(check);
+  
 }
 
 // the loop routine runs over and over again forever:
@@ -213,6 +213,7 @@ void averageSamples() {
   }
   for (int portIndex = 0; portIndex < NUM_PORTS; portIndex++) {
     values[portIndex] = values[portIndex] / maxSample;
+    
   }
 }
 void printValues() {

@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Tankontroller.Managers;
+using Tankontroller.World.Bullets;
 using Tankontroller.World.Particles;
 
+public enum BulletType
+{
+    DEFAULT,
+    BOUNCY_EMP,
+    MINE,
+    BOUNCY
+}
 
 namespace Tankontroller.World
 {
@@ -28,11 +39,14 @@ namespace Tankontroller.World
         static private readonly Texture2D mCannonTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannon");
         static private readonly Texture2D mCannonFireTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannonFire");
 
+        
+
         private Vector2[] TANK_CORNERS = { new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, TANK_WIDTH / 2), new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, TANK_WIDTH / 2) };
 
         private List<Bullet> m_Bullets;
 
         private int m_Health;
+        public BulletType mbulletType { get; protected set; }
 
         private float mRotation;
         private float mOldRotation;
@@ -48,11 +62,15 @@ namespace Tankontroller.World
         private int m_LeftTrackFrame;
         private int m_RightTrackFrame;
 
+        private bool mIsInsideShockwave = false; // Needed so that Player knows to deplete charge from shockwave
+
         public Tank(Vector2 pPos, float pRotation, float pScale) : this(pPos.X, pPos.Y, pRotation, pScale) { }
 
         public Tank(float pXPosition, float pYPosition, float pRotation, float pScale)
         {
             m_Health = MAX_HEALTH;
+            mbulletType = BulletType.DEFAULT;
+
             mColour = Color.White;
             m_Bullets = new List<Bullet>();
             mFired = 0;
@@ -75,7 +93,14 @@ namespace Tankontroller.World
         private void ChangeLeftTrackFrame(int pAmount)
         {
             m_LeftTrackFrame += pAmount;
-            m_LeftTrackFrame = Math.Clamp(m_LeftTrackFrame, 1, 14);
+            if(m_LeftTrackFrame < 1)
+            {
+                m_LeftTrackFrame = 14;
+            }
+            else if (m_LeftTrackFrame > 14)
+            {
+                m_LeftTrackFrame = 1;
+            }
             DustInitialisationPolicy dust = new DustInitialisationPolicy(GetLeftFrontCorner(), GetLeftBackCorner());
             ParticleManager.Instance().InitialiseParticles(dust, 4);
         }
@@ -83,7 +108,14 @@ namespace Tankontroller.World
         private void ChangeRightTrackFrame(int pAmount)
         {
             m_RightTrackFrame += pAmount;
-            m_RightTrackFrame = Math.Clamp(m_RightTrackFrame, 1, 14);
+            if (m_RightTrackFrame < 1)
+            {
+                m_RightTrackFrame = 14;
+            }
+            else if (m_RightTrackFrame > 14)
+            {
+                m_RightTrackFrame = 1;
+            }
             DustInitialisationPolicy dust = new DustInitialisationPolicy(GetRightFrontCorner(), GetRightBackCorner());
             ParticleManager.Instance().InitialiseParticles(dust, 4);
         }
@@ -95,6 +127,16 @@ namespace Tankontroller.World
         public Color Colour()
         {
             return mColour;
+        }
+
+        public bool IsInsideShockwave()
+        {
+            if (mIsInsideShockwave)
+            {
+                mIsInsideShockwave = false;
+                return true;
+            }
+            return false;
         }
 
         public void Rotate(float pRotate)
@@ -262,7 +304,15 @@ namespace Tankontroller.World
             }
             return result;
         }
-
+        public bool TankInRadius(float pBulletRadius, Vector2 pPoint)
+        {
+            float distance = Vector2.Distance(new Vector2(mPosition.X, mPosition.Y), pPoint);
+            if (distance < (pBulletRadius - 10 ))
+            {
+                return true;
+            }
+            return false;
+        }
 
         public void PrimingWeapon(float pSeconds)
         {
@@ -274,14 +324,40 @@ namespace Tankontroller.World
             return m_TimePrimed > 0;
         }
 
-        public void Fire()
+        public void Fire(BulletType bullet)
         {
             m_TimePrimed = 0;
             mFired = BLAST_DELAY;
             float cannonRotation = GetCannonWorldRotation();
             Vector2 cannonDirection = new Vector2((float)Math.Cos(cannonRotation), (float)Math.Sin(cannonRotation));
             Vector2 endOfCannon = GetCannonWorldPosition() + cannonDirection * 30;
-            m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED, 20.0f));
+            if (bullet == BulletType.BOUNCY_EMP)
+            {
+                m_Bullets.Add(new BouncyEMPBullet(endOfCannon, cannonDirection * BULLET_SPEED * 1.5f, mColour, 20.0f));
+                mbulletType = BulletType.DEFAULT;
+            }
+            else if (bullet == BulletType.MINE)
+            {
+                float backwardRotation = mRotation + MathHelper.ToRadians(180);
+                Vector2 backwardDirection = new Vector2((float)Math.Cos(backwardRotation), (float)Math.Sin(backwardRotation));
+                Vector2 behindTheTank = GetCannonWorldPosition() + backwardDirection * 40;
+                m_Bullets.Add(new MineBullet(behindTheTank, Vector2.Zero, mColour, 600.0f));
+                mbulletType = BulletType.DEFAULT;
+            }
+            else if (bullet == BulletType.BOUNCY)
+            {
+                m_Bullets.Add(new BouncyBullet(endOfCannon, cannonDirection * BULLET_SPEED * 3, mColour, 3.0f));
+                mbulletType = BulletType.DEFAULT;
+            }
+            else
+            {
+                m_Bullets.Add(new DefaultBullet(endOfCannon, cannonDirection * BULLET_SPEED, mColour, 1.0f));
+            }
+        }
+
+        public void SetBulletType(BulletType pBulletType)
+        {
+            mbulletType = pBulletType;
         }
 
         public void PutBack()
@@ -290,145 +366,70 @@ namespace Tankontroller.World
             mRotation = mOldRotation;
         }
 
-        public bool Collide(Tank pTank)
-        {
-            Vector2[] thisTankCorners = new Vector2[4];
-            Vector2[] otherTankCorners = new Vector2[4];
-            GetCorners(thisTankCorners);
-            pTank.GetCorners(otherTankCorners);
-            for (int i = 0; i < 4; i++)
-            {
-                if (PointIsInTank(otherTankCorners[i]) || pTank.PointIsInTank(thisTankCorners[i]))
-                {
-                    PutBack();
-                    pTank.PutBack();
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool Collide(RectWall pWall)
-        {
-            Rectangle rectangle = pWall.Rectangle;
-            Vector2[] tankCorners = new Vector2[4];
-            GetCorners(tankCorners);
-
-            foreach (Vector2 corner in tankCorners)
-            {
-                if (rectangle.Contains(corner))
-                {
-                    PutBack();
-                    return true;
-                }
-            }
-            // Check if any of the corners of the wall are within the tank
-            if (PointIsInTank(new Vector2(rectangle.Left, rectangle.Top)) ||
-               PointIsInTank(new Vector2(rectangle.Right, rectangle.Top)) ||
-               PointIsInTank(new Vector2(rectangle.Left, rectangle.Bottom)) ||
-               PointIsInTank(new Vector2(rectangle.Right, rectangle.Bottom)))
-            {
-                PutBack();
-                return true;
-            }
-            return false;
-        }
-        public bool Collide(Bullet pBullet)
-        {
-            if (pBullet.Collide(this))
-            {
-                if (pBullet is not BouncyEMPBullet)
-                {
-                    TakeDamage();
-                }
-                Random rand = new Random();
-                int clang = rand.Next(1, 4);
-                string tankClang = "Sounds/Tank_Clang" + clang;
-                SoundEffectInstance tankClangSound = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance(tankClang);
-                tankClangSound.Play();
-                return true;
-            }
-            return false;
-        }
-
-        public bool CheckBulletCollisions(Tank pTank)
+        public void CheckBullets(List<Tank> pTanks, Rectangle pPlayArea, List<RectWall> pWalls)
         {
             for (int i = 0; i < m_Bullets.Count; ++i)
             {
-                if (pTank == this && !(m_Bullets[i] is BouncyEMPBullet))
+                bool bulletRemoved = false;
+
+                // Check collision with tanks
+                for (int j = 0; j < pTanks.Count; ++j)
                 {
-                    continue;
+                    if (CollisionManager.Collide(m_Bullets[i], pTanks[j]))
+                    {
+                        if (m_Bullets[i] is BouncyEMPBullet)
+                        {
+                            m_Bullets[i].DoCollision(pTanks[j]);
+                            m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 5.0f));
+                            m_Bullets.RemoveAt(i);
+                            bulletRemoved = true;
+                            break;
+                        }
+                        if (m_Bullets[i] is Shockwave)
+                        {
+                            pTanks[j].mIsInsideShockwave = true;
+                        }
+                        if (m_Bullets[i].DoCollision(pTanks[j]))
+                        {
+                            m_Bullets.RemoveAt(i);
+                            pTanks[j].TakeDamage();
+                            bulletRemoved = true;
+                            break;
+                        }
+                    }
                 }
-                if (m_Bullets[i] is Shockwave)
+
+                if (bulletRemoved) continue;
+
+                // Check collision with play area
+                if (CollisionManager.Collide(m_Bullets[i], pPlayArea, true))
                 {
-                    
-                }
-                if (pTank.Collide(m_Bullets[i]))
-                {
-                    if (m_Bullets[i].DoCollision(pTank))
+                    if (m_Bullets[i].DoCollision(pPlayArea))
                     {
                         m_Bullets.RemoveAt(i);
+                        continue;
                     }
-                    return true;
                 }
-            }
-            return false;
-        }
-        public bool CheckBulletCollisions(RectWall pWall)
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
-                if (m_Bullets[i].Collide(pWall))
-                {
-                    if (m_Bullets[i].DoCollision(pWall))
-                    {
-                        m_Bullets.RemoveAt(i);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool CheckBulletCollisionsWithPlayArea(Rectangle pRect)
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
-                if (m_Bullets[i].CollideWithPlayArea(pRect))
-                {
-                    if (m_Bullets[i].DoCollision(pRect))
-                    {
-                        m_Bullets.RemoveAt(i);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
 
-        public bool CollideWithPlayArea(Rectangle pRectangle)
-        {
-            Vector2[] tankCorners = new Vector2[4];
-            GetCorners(tankCorners);
-            foreach (Vector2 corner in tankCorners)
-            {
-                if (!pRectangle.Contains(corner))
+                // Check collision with walls
+                for (int j = 0; j < pWalls.Count; ++j)
                 {
-                    PutBack();
-                    return true;
+                    if (CollisionManager.Collide(m_Bullets[i], pWalls[j].Rectangle, false))
+                    {
+                        if (m_Bullets[i].DoCollision(pWalls[j]))
+                        {
+                            m_Bullets.RemoveAt(i);
+                            bulletRemoved = true;
+                            break;
+                        }
+                    }
                 }
-            }
-            return false;
-        }
 
-        public void CheckBulletLifeTime()
-        {
-            for (int i = 0; i < m_Bullets.Count; ++i)
-            {
+                if (bulletRemoved) continue;
+
+                // Check bullet lifetime
                 if (m_Bullets[i].LifeTimeExpired())
                 {
-                    if (m_Bullets[i] is BouncyEMPBullet)
-                    {
-                        m_Bullets.Add(new Shockwave(m_Bullets[i].Position, Vector2.Zero, Color.Aqua, 1.0f));
-                    }
                     m_Bullets.RemoveAt(i);
                 }
             }
@@ -442,6 +443,16 @@ namespace Tankontroller.World
                 m_Health = 0;
             }
         }
+
+        public void Heal()
+        {
+            m_Health++;
+            if (m_Health > MAX_HEALTH)
+            {
+                m_Health = MAX_HEALTH;
+            }
+        }
+
 
         public void Update(float pSeconds)
         {

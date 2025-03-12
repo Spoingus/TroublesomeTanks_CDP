@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
+using System;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
 using Tankontroller.World;
@@ -18,6 +17,7 @@ namespace Tankontroller
         public Tank Tank { get; private set; }
         public IController Controller { get; private set; }
         public Color Colour { get; private set; }
+        
 
         public Player(IController pController, Avatar pAvatar)
         {
@@ -46,6 +46,16 @@ namespace Tankontroller
 
         public bool DoTankControls(float pSeconds)
         {
+            bool insideShockwave = Tank.IsInsideShockwave();
+            //float shockwaveScalar = insideShockwave ? 5.0f : 1.0f; // Potentially the shockwave could only affect controls that are in use
+            if (insideShockwave)
+            {
+                foreach (Control control in Enum.GetValues<Control>())
+                {
+                    Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * 3.0f * pSeconds);
+                }
+            }
+
             bool tankMoved = false;
             if (Tank.Health() > 0)
             {
@@ -123,11 +133,13 @@ namespace Tankontroller
                     {
                         if (Controller.DepleteCharge(Control.FIRE, BULLET_CHARGE_DEPLETION))
                         {
-                            Tank.Fire();
+                            Tank.Fire(Tank.mbulletType);
                             SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
                             bulletShot.Play();
                         }
                     }
+                    //if tank fire is held
+                    //tank fire special bullet
                 }
 
                 if (Controller.IsPressed(Control.RECHARGE) && !Controller.WasPressed(Control.RECHARGE))
