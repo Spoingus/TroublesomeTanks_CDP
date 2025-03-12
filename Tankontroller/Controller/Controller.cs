@@ -403,13 +403,9 @@ namespace Tankontroller.Controller
 
                 if (colourUpdates.Count > 0)
                 {
-                    Dictionary<byte, ControllerColor> result = new();
-                    foreach (var update in colourUpdates)
-                    {
-                        result.Add(update.Item1, update.Item2);
-                    }
+                    List<Tuple<byte, ControllerColor>> data = colourUpdates.GetRange(0, colourUpdates.Count);
                     colourUpdates.Clear();
-                    mHacktroller.SetColor(result);
+                    mHacktroller.SetColor(data);
                 }
             }
             if (mHacktroller != null && mHacktroller.PortConnected)
