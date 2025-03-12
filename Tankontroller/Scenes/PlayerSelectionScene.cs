@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Tankontroller.Controller;
 using Tankontroller.GUI;
+using Tankontroller.Managers;
 
 
 namespace Tankontroller.Scenes
@@ -17,6 +18,8 @@ namespace Tankontroller.Scenes
     //-------------------------------------------------------------------------------------------------
     public class PlayerSelectionScene : IScene
     {
+        private string mapFile;
+        
         Texture2D mBackgroundTexture = null;
         Rectangle mBackgroundRectangle;
         Texture2D[] mCountDownTextures = new Texture2D[6];
@@ -26,11 +29,10 @@ namespace Tankontroller.Scenes
         float mCountdown;
         bool mPlayersWereReady;
 
-
-        public List<int> blockedIndex = new List<int>();
-
-        public PlayerSelectionScene()
+        public PlayerSelectionScene(string mapFile)
         {
+            this.mapFile = mapFile;
+            
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
 
             spriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
@@ -40,7 +42,9 @@ namespace Tankontroller.Scenes
             mBackgroundTexture = game.CM().Load<Texture2D>("background_06");
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
 
-            game.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            game.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_start", true);
+
+            AvatarPicker.ResetBlockedIndexList();
             prepareAvatarPickers();
             mPlayersWereReady = false;
             prepareCountDown();
@@ -94,7 +98,7 @@ namespace Tankontroller.Scenes
             mAvatarPickers.Add(new AvatarPicker(rectangle));
         }
 
-        private List<Player> getReadyPlayers()
+        private List<Player> GetReadyPlayers()
         {
             List<Player> players = new List<Player>();
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
@@ -110,7 +114,7 @@ namespace Tankontroller.Scenes
         private void StartGame()
         {
             IGame game = Tankontroller.Instance();
-            game.SM().Transition(new GameScene(getReadyPlayers()), true);
+            game.SM().Transition(new GameScene(GetReadyPlayers(), mapFile), true);
         }
 
         private AvatarPicker getEmptyAvatarPicker()
@@ -168,14 +172,13 @@ namespace Tankontroller.Scenes
         public override void Update(float pSeconds)
         {
             IGame game = Tankontroller.Instance();
-            game.DetectControllers();
+            game.GetControllerManager().DetectControllers();
 
             Escape();
             UpdateAvatarPickers(pSeconds);
 
-            for (int i = 0; i < game.GetControllerCount(); i++)
+            foreach (IController controller in game.GetControllerManager().GetControllers())
             {
-                IController controller = game.GetController(i);
                 controller.UpdateController();
                 AvatarPicker avatarPicker = getAvatarPickerFromController(controller);
 
@@ -188,11 +191,11 @@ namespace Tankontroller.Scenes
                     }
                     if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE))
                     {
-                        avatarPicker.MakeSelection(blockedIndex);
+                        avatarPicker.MakeSelection();
                     }
                     if (controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
                     {
-                        avatarPicker.UndoSelection(blockedIndex);
+                        avatarPicker.UndoSelection();
                     }
                     if (controller.IsPressed(Control.TURRET_RIGHT))
                     {
@@ -238,6 +241,7 @@ namespace Tankontroller.Scenes
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Tankontroller.Instance().SM().Transition(null);
+                ControllerManager.Instance.SetAllControllersLEDsOff();
             }
         }
 
@@ -245,7 +249,7 @@ namespace Tankontroller.Scenes
         {
             foreach (AvatarPicker avatarPicker in mAvatarPickers)
             {
-                avatarPicker.Draw(pSpriteBatch, blockedIndex);
+                avatarPicker.Draw(pSpriteBatch);
             }
         }
         private void DrawCountDown(SpriteBatch pSpriteBatch)

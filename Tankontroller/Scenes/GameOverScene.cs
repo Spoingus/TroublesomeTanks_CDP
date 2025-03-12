@@ -12,7 +12,7 @@ namespace Tankontroller.Scenes
     public class GameOverScene : IScene
     {
         private static readonly float DISPLAY_TIME = DGS.Instance.GetFloat("SECONDS_TO_DISPLAY_GAMEOVER_SCREEN");
-        Tankontroller tankControllerInstance = (Tankontroller)Tankontroller.Instance();
+        IGame mGameInstance = Tankontroller.Instance();
         private List<Player> mPlayers;
         Texture2D mBackgroundTexture = null;
         Rectangle mRectangle;
@@ -21,16 +21,16 @@ namespace Tankontroller.Scenes
         public GameOverScene(Texture2D pBackgroundTexture, List<Player> pPlayers, int pWinner)
         {
             mBackgroundTexture = pBackgroundTexture;
-            spriteBatch = new SpriteBatch(tankControllerInstance.GDM().GraphicsDevice);
-            int screenWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height;
+            spriteBatch = new SpriteBatch(mGameInstance.GDM().GraphicsDevice);
+            int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
+            int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
             int height = screenHeight / 2;
             int width = (int)(mBackgroundTexture.Width * (float)height / mBackgroundTexture.Height);
             int x = (screenWidth - width) / 2;
             int y = (screenHeight - height) / 2;
             mRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
             secondsLeft = DISPLAY_TIME;
-            tankControllerInstance.ReplaceCurrentMusicInstance("Music/Music_start", true);
+            mGameInstance.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_start", true);
             mPlayers = pPlayers;
             mWinner = pWinner;
             RepositionGUIs();
@@ -43,15 +43,15 @@ namespace Tankontroller.Scenes
             {
                 loserCount -= 1;
             }
-            int textureWidth = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width / 2;
+            int textureWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width / 2;
             int textureHeight = (int)(textureWidth * ((float)254 / (float)540));
-            int centreXOffset = 0;
+            int loserTextureWidth = textureWidth / 2;
+            int centreXOffset = loserTextureWidth / 2;
             for (int i = 0; i < mPlayers.Count; i++)
             {
                 if (i != mWinner) //Repositon the losers
                 {
-                    int centreY = tankControllerInstance.GDM().GraphicsDevice.Viewport.Height / 2 + textureHeight / 2;
-                    int loserTextureWidth = textureWidth / mPlayers.Count;
+                    int centreY = mGameInstance.GDM().GraphicsDevice.Viewport.Height / 2 + textureHeight / 2;
                     int loserTextureHeight = (int)(loserTextureWidth * ((float)254 / (float)540));
                     Rectangle newRectangle = new Rectangle(centreXOffset, centreY, loserTextureWidth, loserTextureHeight);
                     mPlayers[i].GUI.RepositionForGameOver(newRectangle);
@@ -59,7 +59,7 @@ namespace Tankontroller.Scenes
                 }
                 else //Reposition the winner
                 {
-                    int centreX = tankControllerInstance.GDM().GraphicsDevice.Viewport.Width / 2 - textureWidth / 2;
+                    int centreX = mGameInstance.GDM().GraphicsDevice.Viewport.Width / 2 - textureWidth / 2;
                     int centreY = textureHeight / 2;
                     Rectangle newRectangle = new Rectangle(centreX, centreY, textureWidth, textureHeight);
                     mPlayers[mWinner].GUI.RepositionForGameOver(newRectangle);
@@ -72,6 +72,7 @@ namespace Tankontroller.Scenes
             if (secondsLeft <= 0.0f)
             {
                 IGame game = Tankontroller.Instance();
+                game.GetControllerManager().SetAllControllersLEDsOff();
                 game.SM().Transition(null);
             }
         }

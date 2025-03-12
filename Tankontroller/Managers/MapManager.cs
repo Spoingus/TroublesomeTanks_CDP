@@ -118,7 +118,7 @@ namespace Tankontroller
         {
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-            string fullPath = Path.Combine(projectDirectory, filePath);
+            string fullPath = Path.Combine(projectDirectory, "Maps", filePath);
 
             string jsonString = File.ReadAllText(fullPath);
             return ParseJson(jsonString);

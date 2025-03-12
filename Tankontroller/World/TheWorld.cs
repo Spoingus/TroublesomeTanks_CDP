@@ -13,7 +13,9 @@ using Tankontroller.World.Pickups;
 public enum PickupType
 {
     HEALTH,
-    EMP
+    EMP,
+    MINE,
+    BOUNCY_BULLET
 }
 
 namespace Tankontroller.World
@@ -25,6 +27,10 @@ namespace Tankontroller.World
         private static readonly Color GROUND_COLOUR = DGS.Instance.GetColour("COLOUR_GROUND");
         private static readonly bool PICKUP_SPAWN = DGS.Instance.GetBool("PICKUPS_ON");
         private static readonly float PICKUP_SPAWN_TIME = DGS.Instance.GetFloat("PICKUP_SPAWN_RATE");
+        private static readonly bool HEALTH_PICKUP = DGS.Instance.GetBool("ADD_PICKUP_HEALTH");
+        private static readonly bool EMP_PICKUP = DGS.Instance.GetBool("ADD_PICKUP_EMP");
+        private static readonly bool MINE_PICKUP = DGS.Instance.GetBool("ADD_PICKUP_MINE");
+        private static readonly bool BOUNCY_BULLET_PICKUP = DGS.Instance.GetBool("ADD_PICKUP_BOUNCYBULLET");
 
         private Rectangle mPlayArea;
         private Rectangle mPlayAreaOutline;
@@ -33,6 +39,7 @@ namespace Tankontroller.World
         private List<Vector2> mPickupSpawnPositions = new List<Vector2>();
         private List<Pickup> mPickups = new List<Pickup>();
         private float mPickupSpawnTimer = PICKUP_SPAWN_TIME;
+        private List<PickupType> mActivatedPickups = new List<PickupType>();
 
         public Rectangle PlayArea { get { return mPlayArea; } }
 
@@ -43,6 +50,7 @@ namespace Tankontroller.World
             mPlayArea = pPlayArea;
             mPickupSpawnPositions = pPickupSpawnPositions;
             mPlayAreaOutline = new Rectangle(mPlayArea.X - 5, mPlayArea.Y - 5, mPlayArea.Width + 10, mPlayArea.Height + 10);
+            CheckActivatedPickups();
         }
 
         public List<Tank> GetTanksForPlayers(int pPlayerCount)
@@ -58,7 +66,7 @@ namespace Tankontroller.World
         public void AddPickup()
         {
             mPickupSpawnTimer = PICKUP_SPAWN_TIME;
-            if (PICKUP_SPAWN)
+            if (PICKUP_SPAWN && mActivatedPickups.Count() > 0)
             {
                 int randPos = new Random().Next(0, mPickupSpawnPositions.Count());
                 //Checks for any pickups at this position to prevent spawn overlap
@@ -69,16 +77,50 @@ namespace Tankontroller.World
                         return;
                     }
                 }
-                int randPickup = new Random().Next(0, Enum.GetNames(typeof(PickupType)).Length);
-                if ((PickupType)randPickup == PickupType.HEALTH)
+
+                int randPickup = new Random().Next(0, mActivatedPickups.Count());
+                if (mActivatedPickups[randPickup] == PickupType.HEALTH)
                 {
                     HealthPickup mHealthPickup = new HealthPickup(mPickupSpawnPositions[randPos]);
                     mPickups.Add(mHealthPickup);
                 }
-                else if ((PickupType)randPickup == PickupType.EMP)
+                else if (mActivatedPickups[randPickup] == PickupType.EMP)
                 {
                     EMPPickup mEMPPickup = new EMPPickup(mPickupSpawnPositions[randPos]);
                     mPickups.Add(mEMPPickup);
+                }
+                else if (mActivatedPickups[randPickup] == PickupType.MINE)
+                {
+                    MinePickup mMinePickup = new MinePickup(mPickupSpawnPositions[randPos]);
+                    mPickups.Add(mMinePickup);
+                }
+                else if (mActivatedPickups[randPickup] == PickupType.BOUNCY_BULLET)
+                {
+                    BouncyBulletPickup mBouncyBulletPickup = new BouncyBulletPickup(mPickupSpawnPositions[randPos]);
+                    mPickups.Add(mBouncyBulletPickup);
+                }
+            }
+        }
+
+        public void CheckActivatedPickups()
+        {
+            foreach (PickupType p in Enum.GetValues(typeof(PickupType)))
+            {
+                if(p == PickupType.HEALTH && HEALTH_PICKUP)
+                {
+                    mActivatedPickups.Add(p);
+                }
+                else if (p == PickupType.EMP && EMP_PICKUP)
+                {
+                    mActivatedPickups.Add(p);
+                }
+                else if (p == PickupType.MINE && MINE_PICKUP)
+                {
+                    mActivatedPickups.Add(p);
+                }
+                else if (p == PickupType.BOUNCY_BULLET && BOUNCY_BULLET_PICKUP)
+                {
+                    mActivatedPickups.Add(p);
                 }
             }
         }
