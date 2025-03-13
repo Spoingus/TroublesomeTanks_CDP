@@ -23,7 +23,7 @@ namespace Tankontroller.GUI
         private Color m_Color { get; set; }
         private BulletType m_BulletType { get; set; }
 
-        public TeamGUI(Avatar pAvatar,Rectangle pRectangle,IController pController)
+        public TeamGUI(Avatar pAvatar, Rectangle pRectangle, IController pController)
         {
             mController = pController;
             m_Avatar = pAvatar;
@@ -135,16 +135,15 @@ namespace Tankontroller.GUI
         {
             DrawAvatar(pSpriteBatch, pHealth);
             DrawHealthBar(pSpriteBatch, pHealth);
-            for (int j = 0; j < 7; j++)
+            for (int port = 0; port < 7; port++)
             {
-                int port = PortMapping.GetPortForPlayer(j);
                 float currentCharge = mController.GetJackCharge(port);
                 Control currentControl = mController.GetJackControl(port);
                 bool hasCharge = currentControl == Control.FIRE ? currentCharge >= Player.BULLET_CHARGE_DEPLETION : currentCharge > 0;
 
-                m_PowerBars[j].Draw(pSpriteBatch, currentCharge, hasCharge);
-                m_JackIcons[j].Draw(pSpriteBatch, currentControl);
-                m_PortNumLabels[j].Draw(pSpriteBatch, j, m_Color);
+                m_PowerBars[port].Draw(pSpriteBatch, currentCharge, hasCharge);
+                m_JackIcons[port].Draw(pSpriteBatch, currentControl);
+                m_PortNumLabels[port].Draw(pSpriteBatch, port, m_Color);
             }
             DrawHeldBullet(pSpriteBatch, pBulletType);
         }
