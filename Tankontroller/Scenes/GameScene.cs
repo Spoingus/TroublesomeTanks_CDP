@@ -179,6 +179,13 @@ namespace Tankontroller.Scenes
                 {
                     mControllersConnected = mControllersConnected && p.Controller.IsConnected();
                 }
+                if (mControllersConnected)
+                {
+                    foreach (Player p in m_Teams)
+                    {
+                        p.Controller.SetColour(p.Tank.Colour());
+                    }
+                }
             }
         }
         public override void Escape()
