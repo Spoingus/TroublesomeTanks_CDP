@@ -19,7 +19,7 @@
     { "Position": [ "8", "50" ], "Rotation": "0" },
     { "Position": [ "92", "50" ], "Rotation": "180" },
     { "Position": [ "50", "7" ], "Rotation": "90" },
-    { "Position": [ "50", "7" ], "Rotation": "270" }
+    { "Position": [ "50", "93" ], "Rotation": "270" }
   ],
   "Pickups": [
     { "Position": [ "27", "40" ] },
