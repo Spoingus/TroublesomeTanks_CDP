@@ -24,6 +24,7 @@ const int NUM_CONNECTION_TYPES = 17;
 const int NUM_PORTS = 7;
 const int NUM_SAMPLES = 1;
 const int TOLERANCE = 10;
+const int PORT_MAP[] = { 5, 4, 3, 2, 1, 0, 6 }; // Maps the port number to the actual order they appear on the box
 int samples[NUM_PORTS * NUM_SAMPLES];
 int values[NUM_PORTS];
 const int resistances[] = {
@@ -116,7 +117,7 @@ void sendData() {
     // Get the value and divide to make a single byte*/
     //  int data = analogRead(ports[i]) >> 2;
     //Serial.println(data);
-    byte id = connections[portIndex];
+    byte id = connections[PORT_MAP[portIndex]];
 #if TEST_MODE == 1
     //   data = i;
 #endif
@@ -129,7 +130,6 @@ void sendData() {
     check = check + id;
   }
   Serial.write(check);
-  
 }
 
 // the loop routine runs over and over again forever:
@@ -213,7 +213,6 @@ void averageSamples() {
   }
   for (int portIndex = 0; portIndex < NUM_PORTS; portIndex++) {
     values[portIndex] = values[portIndex] / maxSample;
-    
   }
 }
 void printValues() {
