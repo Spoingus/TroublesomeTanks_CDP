@@ -33,6 +33,7 @@ classDiagram
     IScene <|-- PlayerSelectionScene
     IScene <|-- StartScene
     IScene <|-- TransitionScene
+    IScene <|-- LevelSelectionScene
     SceneManager <-- IScene
     <<Interface>> IScene
 
@@ -47,11 +48,13 @@ classDiagram
         +Rectangle mRectangle
     }
     class GameScene{
-        +Setup4Player() void
-        +SetupNot4Player() void
-        +SetupPlayers() void
+        +Reset()
+        +RemainingTeams()
     }
     class GameOverScene{
+        +TheWorld mWorld
+        +List<Player> mTeams
+        +Texture2D mBackGroundTexture
         +RepositionGUIs() void
     }
     class PlayerSelectionScene{
@@ -59,12 +62,21 @@ classDiagram
         +UpdateAvatarPickers() void
     }
     class StartScene{
+        +string defaultMapFile
+        +SetDefaultMapFile(string mapFile)
+        +SelectLevel()
         +ExitGame() void
         +StartGame() void
     }
     class TransitionScene{
-        +GeneratePreviousTexture() void
-        +GenerateNextTexture() void
+        +RenderTarget2D GenerateSceneTexture(IScene pscene)
+    }
+    class LevelSelectionScene{
+        +List<Texture2D> mThumbnailTextures
+        +List<string> mMapFiles
+        +SelectMap(string mapFile)
+        +MakeThumbnailFromMapFile(string pMapFile)
+        +DrawOutline(Rectangle rect, string textureName)
     }
 ```
 ### GUIs - Class Diagram
