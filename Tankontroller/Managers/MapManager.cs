@@ -117,8 +117,7 @@ namespace Tankontroller
         public static TheWorld LoadMapFromJson(string filePath)
         {
             string workingDirectory = Environment.CurrentDirectory;
-            string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-            string fullPath = Path.Combine(projectDirectory, "Maps", filePath);
+            string fullPath = Path.Combine(workingDirectory, "Maps", filePath);
 
             string jsonString = File.ReadAllText(fullPath);
             return ParseJson(jsonString);
