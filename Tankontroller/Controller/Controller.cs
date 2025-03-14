@@ -397,11 +397,11 @@ namespace Tankontroller.Controller
             while (mConnected && mHacktroller.PortConnected)
             {
                 ControllerState[] ports = mHacktroller.GetPorts();
-
                 if (ports == null)
                 {
                     continue;
                 }
+
                 for (int i = 0; i < ports.Length; ++i)
                 {
                     Control control = GetControlFromState(ports[i]);
@@ -439,6 +439,8 @@ namespace Tankontroller.Controller
             {
                 mHacktroller.ClosePort();
             }
+            mColour = new Color(0, 0, 0);
+            mConnected = false;
         }
     }
 }
