@@ -9,11 +9,23 @@ namespace Tankontroller.World.Pickups
         public Texture2D m_Texture { get; protected set; }
         public Vector2 m_Position { get; protected set; }
 
-        protected Pickup(Texture2D pTexture, Rectangle pRectangle, Vector2 pPosition) { m_Pickup_Rect = pRectangle; m_Texture = pTexture; m_Position = pPosition; }
+        public int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
+        public int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
+        public float mScalerX;
+        public float mScalerY;
+
+        protected Pickup(Texture2D pTexture, Rectangle pRectangle, Vector2 pPosition) {
+            mScalerX = ((float)screenWidth / 200f);
+            mScalerY = ((float)screenHeight / 200f);
+            pRectangle = new Rectangle((int)((pRectangle.X / 10) * mScalerX), (int)((pRectangle.Y / 10) * mScalerY), (int)(pRectangle.Width/10  * mScalerX), (int)(pRectangle.Height/ 10 * mScalerY));
+            m_Pickup_Rect = pRectangle;
+            m_Texture = pTexture;
+            m_Position = pPosition;
+        }
 
         public virtual void Draw(SpriteBatch pSpriteBatch)
         {
-             pSpriteBatch.Draw(m_Texture, m_Pickup_Rect, Color.DeepPink);
+            pSpriteBatch.Draw(m_Texture, m_Pickup_Rect, Color.DeepPink);
         }
 
         public virtual bool PickUpCollision(Tank pTank) { return false; }

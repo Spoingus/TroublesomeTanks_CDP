@@ -1,7 +1,7 @@
 ﻿// WINDOW
 bool IS_FULL_SCREEN = true;
 int SCREENWIDTH = 1920;
-int SCREENHEIGHT = 1000;
+int SCREENHEIGHT = 1080;
 
 // MAP
 string DEFAULT_MAP_FILE = Default.json;
@@ -37,7 +37,7 @@ float BULLET_CHARGE_DEPLETION = 95;
 bool PICKUPS_ON = true;
 float PICKUP_SPAWN_RATE = 20;
 bool ADD_PICKUP_HEALTH = true;
-bool ADD_PICKUP_BOUNCYEMP = true;
+bool ADD_PICKUP_EMP = true;
 bool ADD_PICKUP_MINE = true;
 bool ADD_PICKUP_BOUNCYBULLET = true;
 

@@ -11,7 +11,8 @@ namespace Tankontroller.World.Pickups
         public BouncyBulletPickup(Vector2 pPositon) : base(Tankontroller.Instance().CM().Load<Texture2D>("circle"), new Rectangle(400, 500, 40, 40), new Vector2(0, 0))
         {
             m_Position = pPositon;
-            m_Pickup_Rect = new Rectangle((int)m_Position.X - (m_Pickup_Rect.Width / 2), (int)m_Position.Y - (m_Pickup_Rect.Height / 2), 50, 50);
+            m_Pickup_Rect = new Rectangle((int)m_Position.X - (m_Pickup_Rect.Width / 2), (int)m_Position.Y - (m_Pickup_Rect.Height / 2), (int)(5f * mScalerX), (int)(5f * mScalerX));
+            
         }
 
         public override void Draw(SpriteBatch pSpriteBatch)
