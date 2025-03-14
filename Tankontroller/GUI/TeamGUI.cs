@@ -23,6 +23,9 @@ namespace Tankontroller.GUI
         private Color m_Color { get; set; }
         private BulletType m_BulletType { get; set; }
 
+        private int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
+        private int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
+
         public TeamGUI(Avatar pAvatar, Rectangle pRectangle, IController pController)
         {
             mController = pController;
@@ -35,9 +38,6 @@ namespace Tankontroller.GUI
 
         private void RepositionPowerBar(Rectangle pRectangle)
         {
-            int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
-            int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
-
             int powerBarWidth = screenWidth / 4 /* 25% of screen width */ * 9 / 16 /* Just Under Three quarters */ / 8;
             // This is also used as BOTH width and height for square icon and label textures
             int powerBarHeight = screenHeight / 100 * 14;
@@ -102,23 +102,25 @@ namespace Tankontroller.GUI
         public void DrawHeldBullet(SpriteBatch pSpriteBatch, BulletType pBulletType)
         {
             //TODO: fix the positons of the circle and the bullet
-            Vector2 pos = new Vector2(m_Avatar.m_Rectangle.X + m_Avatar.m_Rectangle.Width - 35, m_Avatar.m_Rectangle.Y + m_Avatar.m_Rectangle.Height - 35);
-            DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("BulletSlot"), 65, pos, Color.White);
+            float scaler = ((float)screenWidth / 200f);
+            Vector2 pos = new Vector2(m_Avatar.m_Rectangle.X + m_Avatar.m_Rectangle.Width - (3.5f * scaler), m_Avatar.m_Rectangle.Y + m_Avatar.m_Rectangle.Height - (3.5f * scaler));
+            float radius = 6.5f * scaler;
+            DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("BulletSlot"), (int)radius, pos, Color.White);
             if (pBulletType == BulletType.BOUNCY_EMP)
             {
-                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("EMP"), 65, pos, Color.White);
+                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("EMP"), (int)radius, pos, Color.White);
             }
             else if (pBulletType == BulletType.MINE)
             {
-                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("MinePickup"), 60, pos, Color.White);
+                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("MinePickup"), (int)radius, pos, Color.White);
             }
             else if (pBulletType == BulletType.BOUNCY_BULLET)
             {
-                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("BouncyBulletPickup"), 60, pos, Color.White);
+                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("BouncyBulletPickup"), (int)radius, pos, Color.White);
             }
             else
             {
-                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("Empty"), 65, pos, Color.White);
+                DrawCircle(pSpriteBatch, Tankontroller.Instance().CM().Load<Texture2D>("Empty"), (int)radius, pos, Color.White);
             }
         }
         public void DrawCircle(SpriteBatch pBatch, Texture2D pTexture, int pRadius, Vector2 pPos, Color pColour)
