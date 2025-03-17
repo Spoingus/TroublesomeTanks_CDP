@@ -24,7 +24,7 @@ namespace Tankontroller.World.Bullets
             Vector2 collisonNormal = GetCollisionNormal(pRectangle);
             if (numOfBounces <= 0)
             {
-                CreateExplosion(collisonNormal);
+                CreateExplosion(-collisonNormal);
                 return true;
             }
             Velocity = Vector2.Reflect(Velocity, collisonNormal);
