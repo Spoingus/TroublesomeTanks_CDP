@@ -346,7 +346,7 @@ namespace Tankontroller.World
             }
             else if (bullet == BulletType.BOUNCY_BULLET)
             {
-                m_Bullets.Add(new BouncyBullet(endOfCannon, cannonDirection * BULLET_SPEED * 3, mColour, 3.0f));
+                m_Bullets.Add(new BouncyBullet(endOfCannon, cannonDirection * BULLET_SPEED, mColour, 2.0f));
                 mbulletType = BulletType.DEFAULT;
             }
             else
