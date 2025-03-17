@@ -134,14 +134,20 @@ namespace Tankontroller.World
             // Check collisions for each tank
             for (int tankIndex = 0; tankIndex < mTanks.Count; tankIndex++)
             {
+                
                 mTanks[tankIndex].Update(pSeconds);
 
                 mTanks[tankIndex].CheckBullets(mTanks, mPlayArea, mWalls);
 
-                //test pickup collision
+                // Pickup collision
                 foreach (Pickup p in mPickups)
                 {
-                    if (p.PickUpCollision(mTanks[tankIndex]))
+                    // This is to avoid any dead tanks from picking up a pickup
+                    if (mTanks[tankIndex].Health() == 0)
+                    {
+                        continue;
+                    }
+                    else if (p.PickUpCollision(mTanks[tankIndex]))
                     {
                         mPickups.Remove(p);
                         break;
@@ -182,6 +188,12 @@ namespace Tankontroller.World
             pSpriteBatch.Draw(mPixelTexture, mPlayArea, GROUND_COLOUR);
 
             TrackSystem.GetInstance().Draw(pSpriteBatch);
+
+            foreach (Pickup p in mPickups)
+            {
+                p.Draw(pSpriteBatch);
+            }
+
             ParticleManager.Instance().Draw(pSpriteBatch);
 
             //Draws the tanks (on top of tracks but below particles)
@@ -204,11 +216,6 @@ namespace Tankontroller.World
             foreach (RectWall w in mWalls)
             {
                 w.Draw(pSpriteBatch);
-            }
-
-            foreach (Pickup p in mPickups)
-            {
-                p.Draw(pSpriteBatch);
             }
         }
     }
