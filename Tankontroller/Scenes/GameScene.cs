@@ -84,6 +84,26 @@ namespace Tankontroller.Scenes
 
             spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
 
+            // World draws play area, walls, tanks, bullets, and particle effects
+            m_World.Draw(spriteBatch);
+
+            // Draw grey rectangle behind the player health UI
+            Texture2D texture = new Texture2D(Tankontroller.Instance().GDM().GraphicsDevice, 1, 1);
+            texture.SetData(new[] { Color.Gray });
+
+
+            Rectangle guiRectangle = new Rectangle(5, 5, mBackgroundRectangle.Width - 5, 280);
+            // Draw black rectangle behind the grey rectangle
+            Texture2D outlineTexture = new Texture2D(Tankontroller.Instance().GDM().GraphicsDevice, 1, 1);
+            outlineTexture.SetData(new[] { Color.Black });
+            Rectangle outlineRectangle = new Rectangle(guiRectangle.Left - 5, guiRectangle.Top - 5, guiRectangle.Width + 10, guiRectangle.Height + 10);
+
+            spriteBatch.Draw(outlineTexture, outlineRectangle, Color.Black);
+            spriteBatch.Draw(texture, guiRectangle, Color.Gray);
+
+
+
+
             //Draws the GUI for each player
             foreach (Player player in m_Teams)
             {
@@ -94,7 +114,7 @@ namespace Tankontroller.Scenes
             }
 
             // World draws play area, walls, tanks, bullets, and particle effects
-            m_World.Draw(spriteBatch);
+            //m_World.Draw(spriteBatch);
 
             if (!mControllersConnected)
             {

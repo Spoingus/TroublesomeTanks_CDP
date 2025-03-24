@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tankontroller.Managers;
+using Tankontroller.World.Bullets;
 using Tankontroller.World.Particles;
 using Tankontroller.World.Pickups;
 
@@ -41,6 +42,9 @@ namespace Tankontroller.World
         private float mPickupSpawnTimer = PICKUP_SPAWN_TIME;
         private List<PickupType> mActivatedPickups = new List<PickupType>();
 
+        //fortnite zone
+        private FortniteZone mFortniteZone;
+
         public Rectangle PlayArea { get { return mPlayArea; } }
 
         public TheWorld(Rectangle pPlayArea, List<RectWall> pWalls, List<Tank> pTanks, List<Vector2> pPickupSpawnPositions)
@@ -50,6 +54,7 @@ namespace Tankontroller.World
             mPlayArea = pPlayArea;
             mPickupSpawnPositions = pPickupSpawnPositions;
             mPlayAreaOutline = new Rectangle(mPlayArea.X - 5, mPlayArea.Y - 5, mPlayArea.Width + 10, mPlayArea.Height + 10);
+            mFortniteZone = new FortniteZone(new Vector2(mPlayArea.X + mPlayArea.Width / 2, mPlayArea.Y + mPlayArea.Height / 2), Color.Pink, 99999);
             CheckActivatedPickups();
         }
 
@@ -125,22 +130,37 @@ namespace Tankontroller.World
             }
         }
 
+        private float mDamageCooldown = 4.0f; // Cooldown time in seconds
+        private float mDamageTimer = 4.0f;
+
         public void Update(float pSeconds)
         {
             mPickupSpawnTimer -= pSeconds;
-            if(mPickupSpawnTimer <= 0) { AddPickup(); }
+            if (mPickupSpawnTimer <= 0) { AddPickup(); }
             Particles.ParticleManager.Instance().Update(pSeconds);
+
+            //update fortnite zone
+            mFortniteZone.Update(pSeconds);
 
             // Check collisions for each tank
             for (int tankIndex = 0; tankIndex < mTanks.Count; tankIndex++)
             {
-                
                 mTanks[tankIndex].Update(pSeconds);
-
                 mTanks[tankIndex].CheckBullets(mTanks, mPlayArea, mWalls);
 
-                // Pickup collision
-                foreach (Pickup p in mPickups)
+                //check if tank is in the zone
+                if (!CollisionManager.Collide(mFortniteZone, mTanks[tankIndex]))
+                {
+                    if (mDamageTimer <= 0)
+                    {
+                        mTanks[tankIndex].TakeDamage();
+                        mDamageTimer = mDamageCooldown; // Reset the damage timer
+                    }
+                    mDamageTimer -= pSeconds;
+                }
+
+                    // Pickup collision
+                    foreach (Pickup p in mPickups)
                 {
                     // This is to avoid any dead tanks from picking up a pickup
                     if (mTanks[tankIndex].Health() == 0)
@@ -177,7 +197,7 @@ namespace Tankontroller.World
                 }
 
                 // Collisions with the play area
-                if (CollisionManager.Collide(mTanks[tankIndex], mPlayArea, true)) // True tp check inside the play area
+                if (CollisionManager.Collide(mTanks[tankIndex], mPlayArea, true)) // True to check inside the play area
                     mTanks[tankIndex].PutBack();
             }
         }
@@ -186,6 +206,9 @@ namespace Tankontroller.World
         {
             pSpriteBatch.Draw(mPixelTexture, mPlayAreaOutline, Color.Black);
             pSpriteBatch.Draw(mPixelTexture, mPlayArea, GROUND_COLOUR);
+
+            //draw fortnite zone
+            mFortniteZone.Draw(pSpriteBatch, m_BulletTexture);
 
             TrackSystem.GetInstance().Draw(pSpriteBatch);
 

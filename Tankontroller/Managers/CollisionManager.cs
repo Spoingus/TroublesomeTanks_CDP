@@ -29,7 +29,7 @@ namespace Tankontroller.Managers
             pTank_2.GetCorners(Tank2Corners);
             for (int i = 0; i < 4; i++)
             {
-                if(pTank.PointIsInTank(Tank2Corners[i]) || pTank_2.PointIsInTank(Tank1Corners[i]))
+                if (pTank.PointIsInTank(Tank2Corners[i]) || pTank_2.PointIsInTank(Tank1Corners[i]))
                 {
                     return true;
                 }
@@ -44,12 +44,14 @@ namespace Tankontroller.Managers
             pTank.GetCorners(tankCorners);
 
             // if the inverse case is true, then we want to check if the tank is outside the rectangle
-            if (inverse) {
+            if (inverse)
+            {
                 foreach (Vector2 corner in tankCorners)
                     if (!pRectangle.Contains(corner))
                         return true;
             }
-            else {
+            else
+            {
                 foreach (Vector2 corner in tankCorners)
                 {
                     if (pRectangle.Contains(corner))
@@ -77,18 +79,43 @@ namespace Tankontroller.Managers
             {
                 return true;
             }
+
+            // Check if any of the tank's corners are within the bullet's radius
+            Vector2[] tankCorners = new Vector2[4];
+            pTank.GetCorners(tankCorners);
+            foreach (Vector2 corner in tankCorners)
+            {
+                if (Vector2.Distance(corner, pBullet.Position) <= pBullet.Radius)
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
-        
+
         static public bool Collide(Bullet pBullet, Rectangle pRectangle, bool inverse) //Bullet and Rectangle Collision
         {
             //if the inverse case is true, then we want to check if the bullet is outside the rectangle
-            if (inverse) {
+            if (inverse)
+            {
                 if (!pRectangle.Contains(pBullet.Position))
                     return true;
             }
-            else {
+            else
+            {
                 if (pRectangle.Contains(pBullet.Position))
+                    return true;
+
+                // Check if the bullet's radius intersects with the rectangle
+                Rectangle expandedRectangle = new Rectangle(
+                    pRectangle.X - (int)pBullet.Radius,
+                    pRectangle.Y - (int)pBullet.Radius,
+                    pRectangle.Width + (int)(2 * pBullet.Radius),
+                    pRectangle.Height + (int)(2 * pBullet.Radius)
+                );
+
+                if (expandedRectangle.Contains(pBullet.Position))
                     return true;
             }
             return false;
