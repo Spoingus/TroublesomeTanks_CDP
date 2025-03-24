@@ -293,14 +293,14 @@ namespace Tankontroller.Controller
         public ModularController(Hacktroller pHackTroller) : base()
         {
             SetHacktroller(pHackTroller);
-            SetColour(new Color(0, 0, 0));
         }
 
         public void SetHacktroller(Hacktroller pHackTroller)
         {
             mHacktroller = pHackTroller;
             mConnected = true;
-            Thread.Sleep(10); // Give the Hacktroller time to connect (otherwise there's sometimes a semaphore timeout when writing)
+            mColour = Color.Black; // Incase the colour is already white
+            SetColour(Color.White);
             PullDataThread();
         }
 
@@ -394,6 +394,7 @@ namespace Tankontroller.Controller
 
         private void PullData()
         {
+            Thread.Sleep(10); // Give the Hacktroller time to connect (otherwise there's sometimes a semaphore timeout when writing)
             while (mConnected && mHacktroller.PortConnected)
             {
                 ControllerState[] ports = mHacktroller.GetPorts();

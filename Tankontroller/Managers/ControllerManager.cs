@@ -51,11 +51,11 @@ namespace Tankontroller.Managers
             }
         }
 
-        public void SetAllControllersLEDsOff()
+        public void SetAllTheLEDsWhite()
         {
             foreach (IController controller in GetControllers())
             {
-                controller.SetColour(new Color(0, 0, 0));
+                controller.SetColour(Color.White);
             }
         }
 
