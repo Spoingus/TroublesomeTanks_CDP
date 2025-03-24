@@ -48,11 +48,11 @@ namespace Tankontroller
         public bool DoTankControls(float pSeconds)
         {
             bool insideShockwave = Tank.IsInsideShockwave();
-            //float shockwaveScalar = insideShockwave ? 5.0f : 1.0f; // Potentially the shockwave could only affect controls that are in use
             if (insideShockwave)
             {
                 foreach (Control control in Enum.GetValues<Control>())
                 {
+                    if (control == Control.NONE) continue; // Shockwave should only affect controls that plugged in
                     Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * 3.0f * pSeconds);
                 }
             }
