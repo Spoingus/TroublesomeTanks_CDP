@@ -464,7 +464,7 @@ namespace Tankontroller.World
             {
                 bullet.Update(pSeconds);
             }
-        }
+        } 
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
@@ -488,7 +488,9 @@ namespace Tankontroller.World
             }
             else //If a tank has no health, its drawn as a destroyed tank
             {
-                pSpriteBatch.Draw(mBrokenTexture, GetWorldPosition(), null, Colour(), GetRotation(), new Vector2(mBrokenTexture.Width / 2, mBrokenTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
+
+                Color blend = Color.Lerp(mColour, Color.SlateGray, 0.75f);
+                pSpriteBatch.Draw(mBrokenTexture, GetWorldPosition(), null, blend, GetRotation(), new Vector2(mBrokenTexture.Width / 2, mBrokenTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
             }
         }
 
