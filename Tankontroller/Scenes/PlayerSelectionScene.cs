@@ -19,7 +19,7 @@ namespace Tankontroller.Scenes
     public class PlayerSelectionScene : IScene
     {
         private string mapFile;
-        
+
         Texture2D mBackgroundTexture = null;
         Rectangle mBackgroundRectangle;
         Texture2D[] mCountDownTextures = new Texture2D[6];
@@ -32,7 +32,7 @@ namespace Tankontroller.Scenes
         public PlayerSelectionScene(string mapFile)
         {
             this.mapFile = mapFile;
-            
+
             Tankontroller game = (Tankontroller)Tankontroller.Instance();
 
             spriteBatch = new SpriteBatch(game.GDM().GraphicsDevice);
@@ -174,7 +174,6 @@ namespace Tankontroller.Scenes
             IGame game = Tankontroller.Instance();
             game.GetControllerManager().DetectControllers();
 
-            Escape();
             UpdateAvatarPickers(pSeconds);
 
             foreach (IController controller in game.GetControllerManager().GetControllers())
@@ -235,13 +234,15 @@ namespace Tankontroller.Scenes
             {
                 mPlayersWereReady = false;
             }
+
+            Escape(); // This check should be at the end to avoid overwriting the controller colour
         }
         public override void Escape()
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
+                ControllerManager.Instance.SetAllTheLEDsWhite();
                 Tankontroller.Instance().SM().Transition(null);
-                ControllerManager.Instance.SetAllControllersLEDsOff();
             }
         }
 

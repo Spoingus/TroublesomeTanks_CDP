@@ -344,7 +344,6 @@ namespace Tankontroller.GUI
             }
             else
             {
-                mController.SetColour(new Color(0, 0, 0));
                 mController = null;
             }
         }

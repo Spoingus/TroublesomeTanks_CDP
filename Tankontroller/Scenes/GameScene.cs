@@ -192,7 +192,7 @@ namespace Tankontroller.Scenes
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                mGameInstance.GetControllerManager().SetAllControllersLEDsOff();
+                mGameInstance.GetControllerManager().SetAllTheLEDsWhite();
                 mGameInstance.SM().Transition(null);
             }
         }

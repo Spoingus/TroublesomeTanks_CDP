@@ -7,7 +7,7 @@ int SCREENHEIGHT = 1080;
 string DEFAULT_MAP_FILE = Default.json;
 
 // CONTROLLERS
-bool SHOW_LIST_ON_MAIN_MENU = true;
+bool SHOW_LIST_ON_MAIN_MENU = false;
 float LED_BRIGHTNESS = 0.6;
 
 // SCENES
