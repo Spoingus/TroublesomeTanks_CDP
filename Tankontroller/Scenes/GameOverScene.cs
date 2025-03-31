@@ -1,7 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using Tankontroller.Controller;
+using Tankontroller.GUI;
 using Tankontroller.World;
 
 namespace Tankontroller.Scenes
@@ -19,6 +22,11 @@ namespace Tankontroller.Scenes
         Rectangle mRectangle;
         int mWinner;
         private float secondsLeft;
+        private float secondsTillButtonAppears = 8.0f;
+        private Texture2D mContinueButtonTexture;
+        private Rectangle mContinueButtonRectangle;
+        private Texture2D mContinueTextTexture;
+        private Rectangle mContinueTextRectangle;
         public GameOverScene(Texture2D pBackgroundTexture, List<Player> pPlayers, int pWinner)
         {
             mBackgroundTexture = pBackgroundTexture;
@@ -30,6 +38,11 @@ namespace Tankontroller.Scenes
             int x = (screenWidth - width) / 2;
             int y = (screenHeight - height) / 2;
             mRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
+            Tankontroller game = (Tankontroller)Tankontroller.Instance();
+            mContinueButtonTexture = game.CM().Load<Texture2D>("fire");
+            mContinueButtonRectangle = new Rectangle(10, screenHeight / 2, mContinueButtonTexture.Width / 2, mContinueButtonTexture.Height / 2);
+            mContinueTextTexture = game.CM().Load<Texture2D>("back");
+            mContinueTextRectangle = new Rectangle(20 + mContinueButtonTexture.Width / 2, screenHeight / 2 + mContinueButtonTexture.Height / 4, mContinueTextTexture.Width, mContinueTextTexture.Height);
             secondsLeft = DISPLAY_TIME;
             mGameInstance.GetSoundManager().ReplaceCurrentMusicInstance("Music/Music_start", true);
             mPlayers = pPlayers;
@@ -70,6 +83,24 @@ namespace Tankontroller.Scenes
         public override void Update(float pSeconds)
         {
             secondsLeft -= pSeconds;
+            secondsTillButtonAppears -= pSeconds;
+
+            mGameInstance.GetControllerManager().DetectControllers();
+
+            if (secondsTillButtonAppears <= 0.0f)
+            {
+                foreach (IController controller in mGameInstance.GetControllerManager().GetControllers())
+                {
+                    controller.UpdateController();
+                    if (controller.IsPressed(Control.FIRE))
+                    {
+                        IGame game = Tankontroller.Instance();
+                        game.GetControllerManager().SetAllTheLEDsWhite();
+                        game.SM().Transition(null);
+                    }
+                }
+            }
+
             if (secondsLeft <= 0.0f)
             {
                 IGame game = Tankontroller.Instance();
@@ -85,9 +116,22 @@ namespace Tankontroller.Scenes
             spriteBatch.Draw(mBackgroundTexture, mRectangle, Color.White);
             for (int i = 0; i < mPlayers.Count; i++)
             {
-                mPlayers[i].GUI.DrawAvatar(spriteBatch, Tank.MAX_HEALTH);
+                if (i == mWinner)
+                {
+                    mPlayers[i].GUI.DrawAvatar(spriteBatch, Tank.MAX_HEALTH);
+                    mPlayers[i].GUI.DrawHealthBar(spriteBatch, mPlayers[i].Tank.Health());
+                }
+                else { 
+                mPlayers[i].GUI.DrawAvatar(spriteBatch, 1);
                 mPlayers[i].GUI.DrawHealthBar(spriteBatch, mPlayers[i].Tank.Health());
+                }
             }
+            if (secondsTillButtonAppears <= 0.0f)
+            {
+                spriteBatch.Draw(mContinueButtonTexture, mContinueButtonRectangle, Color.White);
+                spriteBatch.Draw(mContinueTextTexture, mContinueTextRectangle, Color.White);
+            }
+
             spriteBatch.End();
         }
         public override void Escape()

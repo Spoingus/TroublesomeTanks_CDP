@@ -9,8 +9,6 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     // TeamGUI
     //
-    // This class is used to draw and update the GUI for a player. It calls the draw method on the
-    // the players Avatar and healthbar.
     //-------------------------------------------------------------------------------------------------
     public class TeamGUI
     {
@@ -38,8 +36,7 @@ namespace Tankontroller.GUI
 
         private void RepositionPowerBar(Rectangle pRectangle)
         {
-            int powerBarWidth = screenWidth / 4 /* 25% of screen width */ * 9 / 16 /* Just Under Three quarters */ / 8;
-            // This is also used as BOTH width and height for square icon and label textures
+            int powerBarWidth = screenWidth / 4  * 9 / 16  / 8;
             int powerBarHeight = screenHeight / 100 * 14;
 
             int powerBar_yValueOffset = -10 + screenWidth / 100 * 2;
@@ -88,15 +85,28 @@ namespace Tankontroller.GUI
 
         public void RepositionForGameOver(Rectangle pRectangle)
         {
-            Rectangle healthRect = new Rectangle(new Point(pRectangle.X + (pRectangle.Height / 3), pRectangle.Y + (pRectangle.Height - 15)), new Point(pRectangle.Width, pRectangle.Height / 4));
+            Rectangle healthRect = new Rectangle(new Point(pRectangle.X + (pRectangle.Width / 3), pRectangle.Y + (pRectangle.Height - 15)), new Point(pRectangle.Width, pRectangle.Height / 6));
             m_HealthBar.Reposition(healthRect);
             m_Avatar.Reposition(pRectangle);
         }
 
         public void DrawAvatar(SpriteBatch pSpriteBatch, int pHealth)
         {
-            int avatarIndex = Tank.MAX_HEALTH - pHealth; // index 0 is full health, index 4 is no health
-            m_Avatar.Draw(pSpriteBatch, pHealth > 0, avatarIndex);
+            float avatarIndex = Tank.MAX_HEALTH / 2.0f;
+            int roundedUp = (int)Math.Ceiling(avatarIndex); // rounds up
+            //m_Avatar.Draw(pSpriteBatch, pHealth > 0, avatarIndex);
+            if (pHealth == 1)
+            {
+                m_Avatar.Draw(pSpriteBatch, pHealth > 0, 2);
+            }
+            else if (pHealth <= roundedUp) //below half but above 1 
+            {
+                m_Avatar.Draw(pSpriteBatch, pHealth > 0, 1);
+            }
+            else if (pHealth > roundedUp) //above half
+            {
+                m_Avatar.Draw(pSpriteBatch, pHealth > 0, 0);
+            }
         }
 
         public void DrawHeldBullet(SpriteBatch pSpriteBatch, BulletType pBulletType)
