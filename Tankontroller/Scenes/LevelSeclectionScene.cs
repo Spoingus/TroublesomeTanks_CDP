@@ -15,22 +15,20 @@ namespace Tankontroller.Scenes
     {
         private static readonly bool ONLY_KEYBOARD_ON_MAP_SELECT = DGS.Instance.GetBool("ONLY_KEYBOARD_ON_MAP_SELECT");
         private static readonly Texture2D mBackgroundTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_01");
+        private static readonly SpriteFont mSpriteFont = Tankontroller.Instance().CM().Load<SpriteFont>("TitleFont");
         private Rectangle mBackgroundRectangle;
-        private ButtonList mButtonList;
+        private Vector2 mTitlePos;
         private List<string> mMapFiles;
         private Tankontroller mGameInstance;
         private int mCurrentScrollPosition;
-        private float secondsLeft;
         private MainMenuScene mStartScene;
 
         private List<Texture2D> mThumbnailTextures = new List<Texture2D>();
         Rectangle currentRect;
         Rectangle prevRect;
         Rectangle nextRect;
-        int thumbnailWidth = 320;
-        int thumbnailHeight = 180;
-        int centreThumbWidth = 640;
-        int centreThumbHeight = 360;
+        int mThumbnailWidth = 320;
+        int mThumbnailHeight = 180;
 
         public LevelSelectionScene(MainMenuScene startScene)
         {
@@ -41,8 +39,9 @@ namespace Tankontroller.Scenes
             int screenHeight = mGameInstance.GDM().GraphicsDevice.Viewport.Height;
 
             mBackgroundRectangle = new Rectangle(0, 0, screenWidth, screenHeight);
-
-            mButtonList = new ButtonList();
+            mTitlePos = new Vector2(screenWidth / 2, screenHeight / 5);
+            mThumbnailWidth = screenWidth * 96 / 100 / 4;
+            mThumbnailHeight = screenHeight * 73 / 100 / 4;
 
             // Get the list of map files
             string mapsDirectory = Path.Combine(Environment.CurrentDirectory, "Maps");
@@ -76,28 +75,27 @@ namespace Tankontroller.Scenes
 
             // Calculate positions and sizes for the thumbnails
             prevRect = new Rectangle(
-                (screenWidth / 2) - (thumbnailWidth / 2) - thumbnailWidth,
-                (screenHeight / 2) - (thumbnailHeight / 2),
-                thumbnailWidth,
-                thumbnailHeight
+                (screenWidth / 2) - (mThumbnailWidth / 2) - mThumbnailWidth,
+                (screenHeight / 2) - (mThumbnailHeight / 2),
+                mThumbnailWidth,
+                mThumbnailHeight
             );
 
             currentRect = new Rectangle(
-                (screenWidth / 2) - (centreThumbWidth / 2),
-                (screenHeight / 2) - (centreThumbHeight / 2),
-                centreThumbWidth,
-                centreThumbHeight
+                (screenWidth / 2) - (mThumbnailWidth),
+                (screenHeight / 2) - (mThumbnailHeight),
+                mThumbnailWidth * 2,
+                mThumbnailHeight * 2
             );
 
             nextRect = new Rectangle(
-                (screenWidth / 2) - (thumbnailWidth / 2) + thumbnailWidth,
-                (screenHeight / 2) - (thumbnailHeight / 2),
-                thumbnailWidth,
-                thumbnailHeight
+                (screenWidth / 2) - (mThumbnailWidth / 2) + mThumbnailWidth,
+                (screenHeight / 2) - (mThumbnailHeight / 2),
+                mThumbnailWidth,
+                mThumbnailHeight
             );
 
             mCurrentScrollPosition = 0;
-            secondsLeft = 0.1f;
         }
 
         private void SelectMap(string mapFile)
@@ -141,7 +139,10 @@ namespace Tankontroller.Scenes
             mGameInstance.GDM().GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
             spriteBatch.Draw(mBackgroundTexture, mBackgroundRectangle, Color.White);
-
+            string mapName = mMapFiles[mCurrentScrollPosition].Substring(0, mMapFiles[mCurrentScrollPosition].Length - 5);
+            Vector2 titlePos = mTitlePos - (mSpriteFont.MeasureString(mapName) / 2);
+            //spriteBatch.DrawString(mSpriteFont, mapName, titlePos, Color.White, 0.0f, Vector2.One, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(mSpriteFont, mapName, titlePos, Color.White);
             // Calculate the indices of the previous, current, and next thumbnails
             int prevIndex = (mCurrentScrollPosition - 1 + mMapFiles.Count) % mMapFiles.Count;
             int nextIndex = (mCurrentScrollPosition + 1) % mMapFiles.Count;
@@ -158,8 +159,8 @@ namespace Tankontroller.Scenes
             string mapContent = File.ReadAllText(pMapFile);
             MapData mapData = JsonSerializer.Deserialize<MapData>(mapContent);
 
-            int thumbnailWidth = 640;
-            int thumbnailHeight = 360;
+            int thumbnailWidth = mThumbnailWidth * 2;
+            int thumbnailHeight = mThumbnailHeight * 2;
             RenderTarget2D renderTarget = new RenderTarget2D(mGameInstance.GDM().GraphicsDevice, thumbnailWidth, thumbnailHeight);
 
             mGameInstance.GDM().GraphicsDevice.SetRenderTarget(renderTarget);
@@ -167,7 +168,7 @@ namespace Tankontroller.Scenes
 
             int screenWidth = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Width;
             int screenHeight = Tankontroller.Instance().GDM().GraphicsDevice.Viewport.Height;
-            Rectangle playArea = new Rectangle(screenWidth * 2 / 100, screenHeight * 2 / 100, screenWidth * 96 / 100, screenHeight * 96 / 100);
+            Rectangle playArea = new Rectangle(0, 0, thumbnailWidth, thumbnailHeight);
 
             spriteBatch.Begin();
 
@@ -278,13 +279,7 @@ namespace Tankontroller.Scenes
         {
             int offset = 2; // Outline thickness
             Texture2D texture = mGameInstance.CM().Load<Texture2D>(textureName);
-            Color outlineColor = Color.Black;
-
-            // Draw the outline by offsetting the position
-            spriteBatch.Draw(texture, new Rectangle(rect.X - offset, rect.Y, rect.Width, rect.Height), outlineColor);
-            spriteBatch.Draw(texture, new Rectangle(rect.X + offset, rect.Y, rect.Width, rect.Height), outlineColor);
-            spriteBatch.Draw(texture, new Rectangle(rect.X, rect.Y - offset, rect.Width, rect.Height), outlineColor);
-            spriteBatch.Draw(texture, new Rectangle(rect.X, rect.Y + offset, rect.Width, rect.Height), outlineColor);
+            spriteBatch.Draw(texture, new Rectangle(rect.X - offset, rect.Y - offset, rect.Width + (offset * 2), rect.Height + (offset * 2)), Color.Black);
         }
 
         public override void Escape()
