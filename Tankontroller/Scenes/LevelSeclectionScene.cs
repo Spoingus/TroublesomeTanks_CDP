@@ -13,6 +13,7 @@ namespace Tankontroller.Scenes
 {
     public class LevelSelectionScene : IScene
     {
+        private static readonly bool ONLY_KEYBOARD_ON_MAP_SELECT = DGS.Instance.GetBool("ONLY_KEYBOARD_ON_MAP_SELECT");
         private static readonly Texture2D mBackgroundTexture = Tankontroller.Instance().CM().Load<Texture2D>("background_01");
         private Rectangle mBackgroundRectangle;
         private ButtonList mButtonList;
@@ -113,31 +114,24 @@ namespace Tankontroller.Scenes
             foreach (IController controller in mGameInstance.GetControllerManager().GetControllers())
             {
                 controller.UpdateController();
-                secondsLeft -= pSeconds;
 
-                if (controller.IsPressed(Control.LEFT_TRACK_FORWARDS) || controller.IsPressed(Control.TURRET_LEFT))
+                if (ONLY_KEYBOARD_ON_MAP_SELECT && !(controller is KeyboardController))
                 {
-                    if (secondsLeft <= 0.0f)
-                    {
-                        mCurrentScrollPosition = (mCurrentScrollPosition - 1 + mMapFiles.Count) % mMapFiles.Count;
-                        secondsLeft = 0.5f;
-                    }
+                    continue; // If enabled in DSG skip any controller that isn't a keyboard
                 }
-                if (controller.IsPressed(Control.LEFT_TRACK_BACKWARDS) || controller.IsPressed(Control.TURRET_RIGHT))
+
+                if (controller.IsPressed(Control.TURRET_LEFT) && !controller.WasPressed(Control.TURRET_LEFT))
                 {
-                    if (secondsLeft <= 0.0f)
-                    {
-                        mCurrentScrollPosition = (mCurrentScrollPosition + 1) % mMapFiles.Count;
-                        secondsLeft = 0.5f;
-                    }
+                    mCurrentScrollPosition = (mCurrentScrollPosition - 1 + mMapFiles.Count) % mMapFiles.Count;
                 }
-                if (controller.IsPressed(Control.FIRE) || controller.IsPressed(Control.RECHARGE))
+                if (controller.IsPressed(Control.TURRET_RIGHT) && !controller.WasPressed(Control.TURRET_RIGHT))
                 {
-                    if (secondsLeft <= 0.0f)
-                    {
-                        SelectMap(mMapFiles[mCurrentScrollPosition]);
-                        secondsLeft = 0.1f;
-                    }
+                    mCurrentScrollPosition = (mCurrentScrollPosition + 1) % mMapFiles.Count;
+                }
+                if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE) ||
+                    controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
+                {
+                    SelectMap(mMapFiles[mCurrentScrollPosition]);
                 }
             }
         }
