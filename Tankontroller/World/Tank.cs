@@ -307,7 +307,7 @@ namespace Tankontroller.World
         public bool TankInRadius(float pBulletRadius, Vector2 pPoint)
         {
             float distance = Vector2.Distance(new Vector2(mPosition.X, mPosition.Y), pPoint);
-            if (distance < (pBulletRadius - 10 ))
+            if (distance < (pBulletRadius - 10))
             {
                 return true;
             }
@@ -488,8 +488,7 @@ namespace Tankontroller.World
             }
             else //If a tank has no health, its drawn as a destroyed tank
             {
-
-                Color blend = Color.Lerp(mColour, Color.SlateGray, 0.75f);
+                Color blend = Color.Lerp(mColour, Color.SlateGray, 0.75f); // Adds a bit of grey to the colour
                 pSpriteBatch.Draw(mBrokenTexture, GetWorldPosition(), null, blend, GetRotation(), new Vector2(mBrokenTexture.Width / 2, mBrokenTexture.Height / 2), m_Scale, SpriteEffects.None, 0.0f);
             }
         }

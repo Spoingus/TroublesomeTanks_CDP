@@ -61,30 +61,6 @@
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_engineer_bw_03.png
 
-#begin Avatars/avatar_engineer_bw_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_engineer_bw_04.png
-
-#begin Avatars/avatar_engineer_bw_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_engineer_bw_05.png
-
 #begin Avatars/avatar_engineer_colour_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -120,30 +96,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_engineer_colour_03.png
-
-#begin Avatars/avatar_engineer_colour_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_engineer_colour_04.png
-
-#begin Avatars/avatar_engineer_colour_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_engineer_colour_05.png
 
 #begin Avatars/avatar_engineer.png
 /importer:TextureImporter
@@ -193,30 +145,6 @@
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_robo_bw_03.png
 
-#begin Avatars/avatar_robo_bw_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_robo_bw_04.png
-
-#begin Avatars/avatar_robo_bw_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_robo_bw_05.png
-
 #begin Avatars/avatar_robo_colour_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -252,30 +180,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_robo_colour_03.png
-
-#begin Avatars/avatar_robo_colour_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_robo_colour_04.png
-
-#begin Avatars/avatar_robo_colour_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_robo_colour_05.png
 
 #begin Avatars/avatar_robo.png
 /importer:TextureImporter
@@ -325,30 +229,6 @@
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_winterjack_bw_03.png
 
-#begin Avatars/avatar_winterjack_bw_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_winterjack_bw_04.png
-
-#begin Avatars/avatar_winterjack_bw_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_winterjack_bw_05.png
-
 #begin Avatars/avatar_winterjack_colour_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -384,30 +264,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_winterjack_colour_03.png
-
-#begin Avatars/avatar_winterjack_colour_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_winterjack_colour_04.png
-
-#begin Avatars/avatar_winterjack_colour_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_winterjack_colour_05.png
 
 #begin Avatars/avatar_winterjack.png
 /importer:TextureImporter
@@ -457,30 +313,6 @@
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_yeti_bw_03.png
 
-#begin Avatars/avatar_yeti_bw_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_yeti_bw_04.png
-
-#begin Avatars/avatar_yeti_bw_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_yeti_bw_05.png
-
 #begin Avatars/avatar_yeti_colour_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -516,30 +348,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Avatars/avatar_yeti_colour_03.png
-
-#begin Avatars/avatar_yeti_colour_04.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_yeti_colour_04.png
-
-#begin Avatars/avatar_yeti_colour_05.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Avatars/avatar_yeti_colour_05.png
 
 #begin Avatars/avatar_yeti.png
 /importer:TextureImporter

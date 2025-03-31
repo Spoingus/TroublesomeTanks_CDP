@@ -7,22 +7,12 @@ namespace Tankontroller.GUI
     //-------------------------------------------------------------------------------------------------
     // Avatar
     //
-    // This class is used to represent the avatar of a player. It displays the player's avatar in the game.
-    // It contains the following:
-    // - A list of black and white / colour layers of the avatar
-    // - A white pixel texture
-    // - A rectangle representing the position of the avatar
-    // - An array of rectangles representing the position of the avatar's layers
-    // - A colour representing the player's colour
-    // - A name representing the player's name
-    // - A method to draw the avatar
-    // - A method to draw the bounds of the avatar
-    // - A method to reposition the avatar
+    // 
     //-------------------------------------------------------------------------------------------------
 
     public class Avatar
     {
-        private const int LAYER_COUNT = 5;
+        private const int LAYER_COUNT = 3;
         private Texture2D[] m_BlackAndWhiteLayer = new Texture2D[LAYER_COUNT];
         private Texture2D[] m_ColourLayer = new Texture2D[LAYER_COUNT];
         public Rectangle m_Rectangle { get; protected set; }
