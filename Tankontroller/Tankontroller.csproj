@@ -44,7 +44,7 @@
     <None Update="Maps\Mars.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Maps\OldMap.json">
+    <None Update="Maps\Classic.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Maps\Test_Map.json">

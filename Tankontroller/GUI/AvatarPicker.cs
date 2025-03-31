@@ -317,7 +317,7 @@ namespace Tankontroller.GUI
                 }
                 else if (!mColourSet)
                 {
-                    if (mColours[mSelectionIndex].GetColour() != Color.DimGray)
+                    if (!mBlockedIndexList.Contains(mSelectionIndex))
                     {
                         mColourSet = true;
                         UpdateCentreAvatar();

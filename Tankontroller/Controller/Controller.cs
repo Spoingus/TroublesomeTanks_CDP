@@ -97,7 +97,7 @@ namespace Tankontroller.Controller
         {
             mColour = pColour;
         }
-        public void ResetJacks()
+        public virtual void ResetJacks()
         {
             foreach (Jack j in mJacks)
             {
@@ -329,6 +329,63 @@ namespace Tankontroller.Controller
                 }
                 finally { mColourUpdateListLock.ReleaseMutex(); }
             }
+        }
+
+        public void SetAllJackLEDs(Color pColour)
+        {
+            try
+            {
+                mColourUpdateListLock.WaitOne();
+                for (byte i = 0; i < 7; i++)
+                {
+                    mColourUpdates.Add(new Tuple<byte, ControllerColor>(i, new ControllerColor(pColour.R, pColour.G, pColour.B)));
+                }
+            }
+            finally { mColourUpdateListLock.ReleaseMutex(); }
+        }
+
+        public void UpdateJackLED(Control pControl)
+        {
+            int jackIndex = GetJackIndex(pControl);
+            SetJackLED(jackIndex, GetJackCharge(jackIndex) / MAX_CHARGE);
+        }
+
+        public void SetJackLED(int pJackIndex, float pChargeRatio)
+        {
+            pChargeRatio = MathHelper.Clamp(pChargeRatio, 0.0f, 1.0f);
+
+            // Calculate colour gradient for charge
+            // Green (1.0) -> Yellow (0.5) -> Red (0.0)
+            byte red, green; // blue is always 0
+            if (pChargeRatio > 0.5f)
+            {
+                // Transition from green to yellow
+                red = (byte)(255 * (1f - 2f * (pChargeRatio - 0.5f)));
+                green = 255;
+            }
+            else
+            {
+                // Transition from yellow to red
+                red = 255;
+                green = (byte)(255 * (2f * pChargeRatio));
+            }
+
+            // Apply brightness
+            red = (byte)(red * LED_BRIGHTNESS);
+            green = (byte)(green * LED_BRIGHTNESS);
+            ControllerColor result = new ControllerColor(red, green, 0);
+            try
+            {
+                mColourUpdateListLock.WaitOne();
+                mColourUpdates.Add(new Tuple<byte, ControllerColor>((byte)pJackIndex, result));
+            }
+            finally { mColourUpdateListLock.ReleaseMutex(); }
+        }
+
+        public override void ResetJacks()
+        {
+            SetAllJackLEDs(Color.Green); // Green means full charge
+            base.ResetJacks();
         }
 
         public override void UpdateController() { }

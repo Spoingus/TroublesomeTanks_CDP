@@ -56,6 +56,10 @@ namespace Tankontroller.Managers
             foreach (IController controller in GetControllers())
             {
                 controller.SetColour(Color.White);
+                if (controller is ModularController modularController)
+                {
+                    modularController.SetAllJackLEDs(new Color(0, 0, 0));
+                }
             }
         }
 
