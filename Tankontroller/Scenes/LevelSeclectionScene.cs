@@ -27,8 +27,8 @@ namespace Tankontroller.Scenes
         Rectangle currentRect;
         Rectangle prevRect;
         Rectangle nextRect;
-        int mThumbnailWidth = 320;
-        int mThumbnailHeight = 180;
+        int mThumbnailWidth;
+        int mThumbnailHeight;
 
         public LevelSelectionScene(MainMenuScene startScene)
         {
@@ -183,12 +183,9 @@ namespace Tankontroller.Scenes
             // Draw outlines for walls
             foreach (var wall in mapData.Walls)
             {
-                Rectangle wallRect = new Rectangle(
-                    (int)(playArea.X + (playArea.Width * (float.Parse(wall.Position[0]) / 100))),
-                    (int)(playArea.Y + (playArea.Height * (float.Parse(wall.Position[1]) / 100))),
-                    (int)(playArea.Width * (float.Parse(wall.Size[0]) / 100)),
-                    (int)(playArea.Height * (float.Parse(wall.Size[1]) / 100))
-                );
+                Vector2 pos = new Vector2(float.Parse(wall.Position[0]), float.Parse(wall.Position[1]));
+                Vector2 size = new Vector2(float.Parse(wall.Size[0]), float.Parse(wall.Size[1]));
+                Rectangle wallRect = GetRect(playArea, pos, size);
                 DrawOutline(wallRect, wall.Texture);
             }
 
@@ -225,12 +222,9 @@ namespace Tankontroller.Scenes
             // Draw walls
             foreach (var wall in mapData.Walls)
             {
-                Rectangle wallRect = new Rectangle(
-                    (int)(playArea.X + (playArea.Width * (float.Parse(wall.Position[0]) / 100))),
-                    (int)(playArea.Y + (playArea.Height * (float.Parse(wall.Position[1]) / 100))),
-                    (int)(playArea.Width * (float.Parse(wall.Size[0]) / 100)),
-                    (int)(playArea.Height * (float.Parse(wall.Size[1]) / 100))
-                );
+                Vector2 pos = new Vector2(float.Parse(wall.Position[0]), float.Parse(wall.Position[1]));
+                Vector2 size = new Vector2(float.Parse(wall.Size[0]), float.Parse(wall.Size[1]));
+                Rectangle wallRect = GetRect(playArea, pos, size);
                 spriteBatch.Draw(mGameInstance.CM().Load<Texture2D>(wall.Texture), wallRect, DGS.Instance.GetColour("COLOUR_WALLS"));
             }
 
@@ -273,6 +267,16 @@ namespace Tankontroller.Scenes
 
             //add the thumbnail texture to the list
             mThumbnailTextures.Add(thumbnailTexture);
+        }
+
+        Rectangle GetRect(Rectangle pPlayArea, Vector2 pPos, Vector2 pSize)
+        {
+            return new Rectangle(
+                   (int)(pPlayArea.X + (pPlayArea.Width * (pPos.X / 100.0))),
+                   (int)(pPlayArea.Y + (pPlayArea.Height * (pPos.Y / 100.0))),
+                   (int)(pPlayArea.Width * (pSize.X / 100.0)),
+                   (int)(pPlayArea.Height * (pSize.Y / 100.0))
+               );
         }
 
         void DrawOutline(Rectangle rect, string textureName)
