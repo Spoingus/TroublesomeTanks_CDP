@@ -73,15 +73,6 @@ namespace Tankontroller.Scenes
                 m_Teams[i].GamePreparation(tanks[i], new Rectangle((int)(i * spacePerPlayer + (spacePerPlayer - textureWidth) * 0.5f), 0, textureWidth, textureHeight));
             }
 
-            // Set Jack LEDs for each player
-            foreach (Player p in m_Teams)
-            {
-                if (p.Controller is ModularController controller)
-                {
-                    controller.SetAllJackLEDs(Color.White);
-                }
-            }
-
             Reset();
         }
 
