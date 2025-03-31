@@ -91,9 +91,17 @@ namespace Tankontroller.Managers
 
         public void Update(float pSeconds)
         {
-            if (mScenes.Count > 0)
+            try
             {
-                Top.Update(pSeconds);
+                if (mScenes.Count > 0)
+                {
+                    Top.Update(pSeconds);
+                }
+            }
+            catch (System.Exception e)
+            {
+                mScenes.Clear();
+                mScenes.Add(new ErrorMessageScene(e));
             }
         }
 

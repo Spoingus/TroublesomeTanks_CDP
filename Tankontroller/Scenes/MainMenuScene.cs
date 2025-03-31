@@ -7,9 +7,10 @@ using Tankontroller.GUI;
 
 namespace Tankontroller.Scenes
 {
-    public class StartScene : IScene
+    public class MainMenuScene : IScene
     {
         private static readonly bool SHOW_LIST_ON_MAIN_MENU = DGS.Instance.GetBool("SHOW_LIST_ON_MAIN_MENU");
+        private static readonly bool ONLY_KEYBOARD_ON_MAIN_MENU = DGS.Instance.GetBool("ONLY_KEYBOARD_ON_MAIN_MENU");
         private static readonly string DEFAULT_MAP_FILE = DGS.Instance.GetString("DEFAULT_MAP_FILE");
         IGame mGameInstance = Tankontroller.Instance();
 
@@ -25,7 +26,7 @@ namespace Tankontroller.Scenes
         private string defaultMapFile = DEFAULT_MAP_FILE; // Default map file
 
 
-        public StartScene()
+        public MainMenuScene()
         {
             spriteBatch = new SpriteBatch(mGameInstance.GDM().GraphicsDevice);
             int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;
@@ -102,44 +103,27 @@ namespace Tankontroller.Scenes
             foreach (IController controller in mGameInstance.GetControllerManager().GetControllers())
             {
                 controller.UpdateController();
-                secondsLeft -= pSeconds;
 
-                if (controller.IsPressedWithCharge(Control.LEFT_TRACK_FORWARDS) || controller.IsPressed(Control.TURRET_LEFT))
+                if (ONLY_KEYBOARD_ON_MAIN_MENU && !(controller is KeyboardController))
                 {
-                    if (secondsLeft <= 0.0f)
-                    {
-                        mButtonList.SelectPreviousButton();
-                        secondsLeft = 0.5f;
-                    }
-                }
-                if (controller.IsPressed(Control.LEFT_TRACK_BACKWARDS) || controller.IsPressed(Control.TURRET_RIGHT))
-                {
-                    if (secondsLeft <= 0.0f)
-                    {
-                        mButtonList.SelectNextButton();
-                        secondsLeft = 0.5f;
-                    }
+                    continue; // If enabled in DSG skip any controller that isn't a keyboard
                 }
 
-                if (controller.IsPressed(Control.FIRE))
+                if (controller.IsPressed(Control.TURRET_LEFT) && !controller.WasPressed(Control.TURRET_LEFT))
                 {
-                    if (secondsLeft <= 0.0f)
-                    {
-                        SoundEffectInstance buttonPress = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Button_Push");
-                        buttonPress.Play();
-                        mButtonList.PressSelectedButton();
-                        secondsLeft = 0.1f;
-                    }
+                    mButtonList.SelectPreviousButton();
                 }
-                if (controller.IsPressed(Control.RECHARGE))
+                if (controller.IsPressed(Control.TURRET_RIGHT) && !controller.WasPressed(Control.TURRET_RIGHT))
                 {
-                    if (secondsLeft <= 0.0f)
-                    {
-                        SoundEffectInstance buttonPress = mGameInstance.GetSoundManager().GetSoundEffectInstance("Sounds/Button_Push");
-                        buttonPress.Play();
-                        mButtonList.PressSelectedButton();
-                        secondsLeft = 0.1f;
-                    }
+                    mButtonList.SelectNextButton();
+                }
+
+                if (controller.IsPressed(Control.FIRE) && !controller.WasPressed(Control.FIRE) ||
+                    controller.IsPressed(Control.RECHARGE) && !controller.WasPressed(Control.RECHARGE))
+                {
+                    SoundEffectInstance buttonPress = mGameInstance.GetSoundManager().GetSoundEffectInstance("Sounds/Button_Push");
+                    buttonPress.Play();
+                    mButtonList.PressSelectedButton();
                 }
             }
         }

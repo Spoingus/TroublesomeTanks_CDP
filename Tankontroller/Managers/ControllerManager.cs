@@ -61,7 +61,8 @@ namespace Tankontroller.Managers
 
         public void DisconnectAllControllers()
         {
-            mDetectControllerTask.Wait(); // Wait for any controller detection to finish otherwise it may detect a controller that is disconnected
+            if (mDetectControllerTask != null)
+                mDetectControllerTask.Wait(); // Wait for any controller detection to finish otherwise it may detect a controller that is disconnected
             foreach (IController controller in GetControllers())
             {
                 controller.Disconnect();

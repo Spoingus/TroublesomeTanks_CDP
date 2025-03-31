@@ -39,7 +39,7 @@ namespace Tankontroller.Scenes
             if (secondsLeft <= 0.0f)
             {
                 IGame game = Tankontroller.Instance();
-                game.SM().Transition(new StartScene());
+                game.SM().Transition(new MainMenuScene());
             }
         }
 
