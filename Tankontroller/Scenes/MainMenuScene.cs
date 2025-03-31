@@ -7,7 +7,7 @@ using Tankontroller.GUI;
 
 namespace Tankontroller.Scenes
 {
-    public class StartScene : IScene
+    public class MainMenuScene : IScene
     {
         private static readonly bool SHOW_LIST_ON_MAIN_MENU = DGS.Instance.GetBool("SHOW_LIST_ON_MAIN_MENU");
         private static readonly string DEFAULT_MAP_FILE = DGS.Instance.GetString("DEFAULT_MAP_FILE");
@@ -25,7 +25,7 @@ namespace Tankontroller.Scenes
         private string defaultMapFile = DEFAULT_MAP_FILE; // Default map file
 
 
-        public StartScene()
+        public MainMenuScene()
         {
             spriteBatch = new SpriteBatch(mGameInstance.GDM().GraphicsDevice);
             int screenWidth = mGameInstance.GDM().GraphicsDevice.Viewport.Width;

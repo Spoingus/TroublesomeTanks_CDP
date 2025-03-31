@@ -20,7 +20,7 @@ namespace Tankontroller.Scenes
         private Tankontroller mGameInstance;
         private int mCurrentScrollPosition;
         private float secondsLeft;
-        private StartScene mStartScene;
+        private MainMenuScene mStartScene;
 
         private List<Texture2D> mThumbnailTextures = new List<Texture2D>();
         Rectangle currentRect;
@@ -31,7 +31,7 @@ namespace Tankontroller.Scenes
         int centreThumbWidth = 640;
         int centreThumbHeight = 360;
 
-        public LevelSelectionScene(StartScene startScene)
+        public LevelSelectionScene(MainMenuScene startScene)
         {
             mStartScene = startScene;
             mGameInstance = (Tankontroller)Tankontroller.Instance();
