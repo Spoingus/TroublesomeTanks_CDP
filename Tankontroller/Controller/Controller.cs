@@ -331,6 +331,38 @@ namespace Tankontroller.Controller
             }
         }
 
+        public void SetAllJackLEDs(Color pColour)
+        {
+            try
+            {
+                mColourUpdateListLock.WaitOne();
+                for (byte i = 0; i < 7; i++)
+                {
+                    mColourUpdates.Add(new Tuple<byte, ControllerColor>(i, new ControllerColor(pColour.R, pColour.G, pColour.B)));
+                }
+            }
+            finally { mColourUpdateListLock.ReleaseMutex(); }
+        }
+
+        public void UpdateJackLED(Control pControl)
+        {
+            int jackIndex = GetJackIndex(pControl);
+            SetJackLED(jackIndex, GetJackCharge(jackIndex) / MAX_CHARGE);
+        }
+
+        public void SetJackLED(int pJackIndex, float pChargeRatio)
+        {
+            try
+            {
+                float ratio = LED_BRIGHTNESS * pChargeRatio;
+                Color colour = Color.White;
+                ControllerColor result = new ControllerColor((byte)(colour.R * ratio), (byte)(colour.G * ratio), (byte)(colour.B * ratio));
+                mColourUpdateListLock.WaitOne();
+                mColourUpdates.Add(new Tuple<byte, ControllerColor>((byte)pJackIndex, result));
+            }
+            finally { mColourUpdateListLock.ReleaseMutex(); }
+        }
+
         public override void UpdateController() { }
 
         private static Control GetControlFromState(ControllerState pState)
