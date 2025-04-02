@@ -44,6 +44,8 @@ namespace Tankontroller.Scenes
             Texture2D startGameButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_play_dark");
             Texture2D levelSelectionButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_map_white");
             Texture2D levelSelectionButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_map_dark");
+            Texture2D pickupinfoButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_pickup_white");
+            Texture2D pickupinfoButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_pickup_dark");
             Texture2D exitGameButtonTexture = mGameInstance.CM().Load<Texture2D>("menu_quit_white");
             Texture2D exitGameButtonTexturePressed = mGameInstance.CM().Load<Texture2D>("menu_quit_dark");
 
@@ -51,7 +53,7 @@ namespace Tankontroller.Scenes
             int buttonWidth = startGameButtonTexture.Width;
             int buttonHeight = startGameButtonTexture.Height;
             int buttonY = (screenHeight) / 2 + buttonHeight;
-            int buttonX = (screenWidth - buttonWidth) / 2 - (int)(startGameButtonTexture.Width * 1.25f);
+            int buttonX = (screenWidth - buttonWidth) / 2 - (int)(startGameButtonTexture.Width * 1.875f);
             Rectangle buttonRect = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
 
             // Start button
@@ -64,6 +66,12 @@ namespace Tankontroller.Scenes
             Button levelSelectionButton = new Button(levelSelectionButtonTexture, levelSelectionButtonTexturePressed, buttonRect, Color.Red, SelectLevel);
             levelSelectionButton.Selected = false;
             mButtonList.Add(levelSelectionButton);
+
+            // Pickup Scene button
+            buttonRect.X += (int)(startGameButtonTexture.Width * 1.25f);
+            Button pickupinfoButton = new Button(pickupinfoButtonTexture, pickupinfoButtonTexturePressed, buttonRect, Color.Red, PickupInfo);
+            pickupinfoButton.Selected = false;
+            mButtonList.Add(pickupinfoButton);
 
             //Makes the exit game button
             buttonRect.X += (int)(startGameButtonTexture.Width * 1.25f);
@@ -83,6 +91,11 @@ namespace Tankontroller.Scenes
         private void SelectLevel()
         {
             mGameInstance.SM().Transition(new LevelSelectionScene(this), false);
+        }
+
+        private void PickupInfo()
+        {
+            mGameInstance.SM().Transition(new PickupAndBulletScene(this), false);
         }
 
         private void ExitGame()
