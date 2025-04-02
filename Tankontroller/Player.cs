@@ -108,9 +108,19 @@ namespace Tankontroller
 
                     // Deplete the charge for the tracks
                     Control control = leftTrackForward ? Control.LEFT_TRACK_FORWARDS : Control.LEFT_TRACK_BACKWARDS;
-                    if (leftMoved) Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    if (leftMoved)
+                    {
+                        Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                        if (Controller is ModularController modular)
+                            modular.UpdateJackLED(control);
+                    }
                     control = rightTrackForward ? Control.RIGHT_TRACK_FORWARDS : Control.RIGHT_TRACK_BACKWARDS;
-                    if (rightMoved) Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    if (rightMoved)
+                    {
+                        Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                        if (Controller is ModularController modular)
+                            modular.UpdateJackLED(control);
+                    }
                 }
 
                 if (Controller.IsPressedWithCharge(Control.TURRET_LEFT))
