@@ -20,6 +20,12 @@ namespace Tankontroller
 
         private int mCannonJackIndex = -1; // Due to flickering of the controller, we need to keep track of the last jack used to fire the cannon
 
+        // Variables to control Controller LED flashing when in EMP shockwave
+        private const float FLASH_TIME = 0.5f;
+        private readonly Color FLASH_COLOUR = new Color(0, 0, 0);
+        private float mFlashTimer = FLASH_TIME;
+        private bool mFlashSet = false;
+
         public Player(IController pController, Avatar pAvatar)
         {
             Controller = pController;
@@ -47,9 +53,24 @@ namespace Tankontroller
 
         public bool DoTankControls(float pSeconds)
         {
+            mFlashTimer -= pSeconds;
+            if (mFlashSet && mFlashTimer <= 0.0f)
+            {
+                mFlashSet = false;
+                mFlashTimer = FLASH_TIME;
+                Controller.SetColour(Colour);
+            }
+
+            // Deplete charge if player is inside EMP shockwave
             bool insideShockwave = Tank.IsInsideShockwave();
             if (insideShockwave)
             {
+                if (!mFlashSet && mFlashTimer <= 0.0f)
+                {
+                    mFlashSet = true;
+                    mFlashTimer = FLASH_TIME;
+                    Controller.SetColour(FLASH_COLOUR);
+                }
                 foreach (Control control in Enum.GetValues<Control>())
                 {
                     if (control == Control.NONE) continue; // Shockwave should only affect controls that plugged in
@@ -75,57 +96,59 @@ namespace Tankontroller
                     // Move the tank
                     if (leftTrackForward && rightTrackForward)
                     {
-                        Tank.BothTracksForward();
+                        Tank.BothTracksForward(pSeconds);
                     }
                     else if (leftTrackBackward && rightTrackBackward)
                     {
-                        Tank.BothTracksBackward();
+                        Tank.BothTracksBackward(pSeconds);
                     }
                     else if (leftTrackForward && rightTrackBackward)
                     {
-                        Tank.BothTracksOpposite(true);
+                        Tank.BothTracksOpposite(true, pSeconds);
                     }
                     else if (leftTrackBackward && rightTrackForward)
                     {
-                        Tank.BothTracksOpposite(false);
+                        Tank.BothTracksOpposite(false, pSeconds);
                     }
                     else if (leftTrackForward)
                     {
-                        Tank.LeftTrackForward();
+                        Tank.LeftTrackForward(pSeconds);
                     }
                     else if (leftTrackBackward)
                     {
-                        Tank.LeftTrackBackward();
+                        Tank.LeftTrackBackward(pSeconds);
                     }
                     else if (rightTrackForward)
                     {
-                        Tank.RightTrackForward();
+                        Tank.RightTrackForward(pSeconds);
                     }
                     else if (rightTrackBackward)
                     {
-                        Tank.RightTrackBackward();
+                        Tank.RightTrackBackward(pSeconds);
                     }
 
                     // Deplete the charge for the tracks
                     Control control = leftTrackForward ? Control.LEFT_TRACK_FORWARDS : Control.LEFT_TRACK_BACKWARDS;
-                    if (leftMoved) Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    if (leftMoved)
+                    {
+                        Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    }
                     control = rightTrackForward ? Control.RIGHT_TRACK_FORWARDS : Control.RIGHT_TRACK_BACKWARDS;
-                    if (rightMoved) Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    if (rightMoved)
+                    {
+                        Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
+                    }
                 }
 
                 if (Controller.IsPressedWithCharge(Control.TURRET_LEFT))
                 {
-                    Tank.CannonLeft();
+                    Tank.CannonLeft(pSeconds);
                     Controller.DepleteCharge(Control.TURRET_LEFT, TRACK_DEPLETION_RATE * pSeconds);
-                    if (Controller is ModularController modular)
-                        modular.UpdateJackLED(Control.TURRET_LEFT);
                 }
                 else if (Controller.IsPressedWithCharge(Control.TURRET_RIGHT))
                 {
-                    Tank.CannonRight();
+                    Tank.CannonRight(pSeconds);
                     Controller.DepleteCharge(Control.TURRET_RIGHT, TRACK_DEPLETION_RATE * pSeconds);
-                    if (Controller is ModularController modular)
-                        modular.UpdateJackLED(Control.TURRET_RIGHT);
                 }
 
                 int currentJackIndex = Controller.GetJackIndex(Control.FIRE);
@@ -143,8 +166,6 @@ namespace Tankontroller
                             Tank.Fire(Tank.mbulletType);
                             SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
                             bulletShot.Play();
-                            if (Controller is ModularController modular)
-                                modular.UpdateJackLED(Control.FIRE);
                         }
                     }
                     mCannonJackIndex = -1;
@@ -153,8 +174,6 @@ namespace Tankontroller
                 if (Controller.IsPressed(Control.RECHARGE) && !Controller.WasPressed(Control.RECHARGE))
                 {
                     Controller.AddCharge(Control.RECHARGE, CHARGE_AMOUNT);
-                    if (Controller is ModularController modular)
-                        modular.UpdateJackLED(Control.RECHARGE);
                 }
             }
             return tankMoved;

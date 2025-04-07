@@ -78,12 +78,12 @@ namespace Tankontroller
 
                 Dictionary<Keys, int> Player1PortMap = new Dictionary<Keys, int>
                 {
-                    { Keys.D1, 5 },
-                    { Keys.D2, 4 },
-                    { Keys.D3, 3 },
-                    { Keys.D4, 2 },
-                    { Keys.D5, 1 },
-                    { Keys.D6, 0 },
+                    { Keys.D1, 0 },
+                    { Keys.D2, 1 },
+                    { Keys.D3, 2 },
+                    { Keys.D4, 3 },
+                    { Keys.D5, 4 },
+                    { Keys.D6, 5 },
                     { Keys.D7, 6 },
                 };
 
@@ -106,12 +106,12 @@ namespace Tankontroller
 
                 Dictionary<Keys, int> Player2PortMap = new Dictionary<Keys, int>
                 {
-                    { Keys.F1, 5 },
-                    { Keys.F2, 4 },
-                    { Keys.F3, 3 },
-                    { Keys.F4, 2 },
-                    { Keys.F5, 1 },
-                    { Keys.F6, 0 },
+                    { Keys.F1, 0 },
+                    { Keys.F2, 1 },
+                    { Keys.F3, 2 },
+                    { Keys.F4, 3 },
+                    { Keys.F5, 4 },
+                    { Keys.F6, 5 },
                     { Keys.F7, 6 },
                 };
 

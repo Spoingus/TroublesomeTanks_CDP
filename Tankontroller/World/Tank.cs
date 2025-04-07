@@ -39,7 +39,7 @@ namespace Tankontroller.World
         static private readonly Texture2D mCannonTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannon");
         static private readonly Texture2D mCannonFireTexture = Tankontroller.Instance().CM().Load<Texture2D>("cannonFire");
 
-        
+
 
         private Vector2[] TANK_CORNERS = { new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, -TANK_WIDTH / 2), new Vector2(-TANK_HEIGHT / 2, TANK_WIDTH / 2), new Vector2(TANK_HEIGHT / 2 - TANK_FRONT_BUFFER, TANK_WIDTH / 2) };
 
@@ -93,7 +93,7 @@ namespace Tankontroller.World
         private void ChangeLeftTrackFrame(int pAmount)
         {
             m_LeftTrackFrame += pAmount;
-            if(m_LeftTrackFrame < 1)
+            if (m_LeftTrackFrame < 1)
             {
                 m_LeftTrackFrame = 14;
             }
@@ -225,55 +225,55 @@ namespace Tankontroller.World
         public float GetCannonWorldRotation() { return mCannonRotation; }
         public Vector2 GetCannonWorldPosition() { return GetWorldPosition(); }
 
-        public void CannonLeft() { mCannonRotation -= BASE_TURRET_ROTATION_ANGLE; }
-        public void CannonRight() { mCannonRotation += BASE_TURRET_ROTATION_ANGLE; }
+        public void CannonLeft(float pSeconds) { mCannonRotation -= BASE_TURRET_ROTATION_ANGLE * pSeconds; }
+        public void CannonRight(float pSeconds) { mCannonRotation += BASE_TURRET_ROTATION_ANGLE * pSeconds; }
 
 
-        public void LeftTrackForward()
+        public void LeftTrackForward(float pSeconds)
         {
-            Rotate(BASE_TANK_ROTATION_ANGLE);
+            Rotate(BASE_TANK_ROTATION_ANGLE * pSeconds);
             ChangeLeftTrackFrame(1);
-            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE, true);
+            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE * pSeconds, true);
         }
-        public void RightTrackForward()
+        public void RightTrackForward(float pSeconds)
         {
-            Rotate(-BASE_TANK_ROTATION_ANGLE);
-            AdvancedTrackRotation(-BASE_TANK_ROTATION_ANGLE, true);
+            Rotate(-BASE_TANK_ROTATION_ANGLE * pSeconds);
+            AdvancedTrackRotation(-BASE_TANK_ROTATION_ANGLE * pSeconds, true);
             ChangeRightTrackFrame(1);
         }
-        public void LeftTrackBackward()
+        public void LeftTrackBackward(float pSeconds)
         {
-            Rotate(-BASE_TANK_ROTATION_ANGLE);
+            Rotate(-BASE_TANK_ROTATION_ANGLE * pSeconds);
             ChangeLeftTrackFrame(-1);
-            AdvancedTrackRotation(-BASE_TANK_ROTATION_ANGLE, false);
+            AdvancedTrackRotation(-BASE_TANK_ROTATION_ANGLE * pSeconds, false);
         }
-        public void RightTrackBackward()
+        public void RightTrackBackward(float pSeconds)
         {
-            Rotate(BASE_TANK_ROTATION_ANGLE);
+            Rotate(BASE_TANK_ROTATION_ANGLE * pSeconds);
             ChangeRightTrackFrame(-1);
-            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE, false);
+            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE * pSeconds, false);
         }
-        public void BothTracksForward()
+        public void BothTracksForward(float pSeconds)
         {
-            Translate(TANK_SPEED);
+            Translate(TANK_SPEED * pSeconds);
             ChangeLeftTrackFrame(1);
             ChangeRightTrackFrame(1);
         }
-        public void BothTracksBackward()
+        public void BothTracksBackward(float pSeconds)
         {
-            Translate(-TANK_SPEED);
+            Translate(-TANK_SPEED * pSeconds);
             ChangeLeftTrackFrame(-1);
             ChangeRightTrackFrame(-1);
         }
-        public void BothTracksOpposite(bool clockwise)
+        public void BothTracksOpposite(bool clockwise, float pSeconds)
         {
-            float angle = 2 * BASE_TANK_ROTATION_ANGLE;
+            float angle = 2 * BASE_TANK_ROTATION_ANGLE * pSeconds;
             angle = clockwise ? angle : -angle;
             Rotate(angle);
 
             ChangeLeftTrackFrame(clockwise ? 1 : -1);
             ChangeRightTrackFrame(clockwise ? -1 : 1);
-            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE, false);
+            AdvancedTrackRotation(BASE_TANK_ROTATION_ANGLE * pSeconds, false);
         }
 
         private void AdvancedTrackRotation(float pAngle, bool pForwards)
@@ -464,7 +464,7 @@ namespace Tankontroller.World
             {
                 bullet.Update(pSeconds);
             }
-        } 
+        }
 
         public void Draw(SpriteBatch pSpriteBatch)
         {
