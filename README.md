@@ -15,12 +15,17 @@ The Tankontroller application is wht needs to be run to launch the game.
 
 ## The Controls
 
-### Tank Controller
-
 ### Keyboard
 
+These are the controls for the keyboard which can support two players. One player is in red and the other is in blue:
 
+![Layout of the keyboard controls](Tankontroller/Content/keyboard_controls.png)
 
+### Controller Controls
+
+These are the controls for one of the custom controllers:
+
+![Layout of Controller controls](Tankontroller/Content/controller_controls.png)
 
 # Troublesome Tanks - Commercial Development Practice
 
