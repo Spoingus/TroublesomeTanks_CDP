@@ -111,15 +111,11 @@ namespace Tankontroller
                     if (leftMoved)
                     {
                         Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
-                        if (Controller is ModularController modular)
-                            modular.UpdateJackLED(control);
                     }
                     control = rightTrackForward ? Control.RIGHT_TRACK_FORWARDS : Control.RIGHT_TRACK_BACKWARDS;
                     if (rightMoved)
                     {
                         Controller.DepleteCharge(control, TRACK_DEPLETION_RATE * pSeconds);
-                        if (Controller is ModularController modular)
-                            modular.UpdateJackLED(control);
                     }
                 }
 
@@ -127,15 +123,11 @@ namespace Tankontroller
                 {
                     Tank.CannonLeft();
                     Controller.DepleteCharge(Control.TURRET_LEFT, TRACK_DEPLETION_RATE * pSeconds);
-                    if (Controller is ModularController modular)
-                        modular.UpdateJackLED(Control.TURRET_LEFT);
                 }
                 else if (Controller.IsPressedWithCharge(Control.TURRET_RIGHT))
                 {
                     Tank.CannonRight();
                     Controller.DepleteCharge(Control.TURRET_RIGHT, TRACK_DEPLETION_RATE * pSeconds);
-                    if (Controller is ModularController modular)
-                        modular.UpdateJackLED(Control.TURRET_RIGHT);
                 }
 
                 int currentJackIndex = Controller.GetJackIndex(Control.FIRE);
@@ -153,8 +145,6 @@ namespace Tankontroller
                             Tank.Fire(Tank.mbulletType);
                             SoundEffectInstance bulletShot = Tankontroller.Instance().GetSoundManager().GetSoundEffectInstance("Sounds/Tank_Gun");
                             bulletShot.Play();
-                            if (Controller is ModularController modular)
-                                modular.UpdateJackLED(Control.FIRE);
                         }
                     }
                     mCannonJackIndex = -1;
@@ -163,8 +153,6 @@ namespace Tankontroller
                 if (Controller.IsPressed(Control.RECHARGE) && !Controller.WasPressed(Control.RECHARGE))
                 {
                     Controller.AddCharge(Control.RECHARGE, CHARGE_AMOUNT);
-                    if (Controller is ModularController modular)
-                        modular.UpdateJackLED(Control.RECHARGE);
                 }
             }
             return tankMoved;

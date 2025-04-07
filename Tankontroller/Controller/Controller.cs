@@ -142,7 +142,7 @@ namespace Tankontroller.Controller
             return false;
         }
 
-        public bool AddCharge(Control pControl, float pAmount)
+        public virtual bool AddCharge(Control pControl, float pAmount)
         {
             for (int i = 0; i < 7; ++i)
             {
@@ -344,7 +344,14 @@ namespace Tankontroller.Controller
             finally { mColourUpdateListLock.ReleaseMutex(); }
         }
 
-        public void UpdateJackLED(Control pControl)
+        public override bool AddCharge(Control pControl, float amount)
+        {
+            bool result = base.AddCharge(pControl, amount);
+            if (result) UpdateJackLED(pControl); // Update the LED for the jack that was depleted
+            return result;
+        }
+
+        private void UpdateJackLED(Control pControl)
         {
             int jackIndex = GetJackIndex(pControl);
             if (jackIndex != -1)
