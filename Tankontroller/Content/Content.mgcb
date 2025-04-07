@@ -1160,7 +1160,7 @@
 /processorParam:TextureFormat=Color
 /build:healthpickup.png
 
-#begin keyboard controls.png
+#begin keyboard_controls.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -1170,7 +1170,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:keyboard controls.png
+/build:keyboard_controls.png
 
 #begin leftTrackBackwards.png
 /importer:TextureImporter
