@@ -347,7 +347,10 @@ namespace Tankontroller.Controller
         public void UpdateJackLED(Control pControl)
         {
             int jackIndex = GetJackIndex(pControl);
-            SetJackLED(jackIndex, GetJackCharge(jackIndex) / MAX_CHARGE);
+            if (jackIndex != -1)
+            {
+                SetJackLED(jackIndex, GetJackCharge(jackIndex) / MAX_CHARGE);
+            }
         }
 
         public void SetJackLED(int pJackIndex, float pChargeRatio)
