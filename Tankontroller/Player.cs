@@ -96,35 +96,35 @@ namespace Tankontroller
                     // Move the tank
                     if (leftTrackForward && rightTrackForward)
                     {
-                        Tank.BothTracksForward();
+                        Tank.BothTracksForward(pSeconds);
                     }
                     else if (leftTrackBackward && rightTrackBackward)
                     {
-                        Tank.BothTracksBackward();
+                        Tank.BothTracksBackward(pSeconds);
                     }
                     else if (leftTrackForward && rightTrackBackward)
                     {
-                        Tank.BothTracksOpposite(true);
+                        Tank.BothTracksOpposite(true, pSeconds);
                     }
                     else if (leftTrackBackward && rightTrackForward)
                     {
-                        Tank.BothTracksOpposite(false);
+                        Tank.BothTracksOpposite(false, pSeconds);
                     }
                     else if (leftTrackForward)
                     {
-                        Tank.LeftTrackForward();
+                        Tank.LeftTrackForward(pSeconds);
                     }
                     else if (leftTrackBackward)
                     {
-                        Tank.LeftTrackBackward();
+                        Tank.LeftTrackBackward(pSeconds);
                     }
                     else if (rightTrackForward)
                     {
-                        Tank.RightTrackForward();
+                        Tank.RightTrackForward(pSeconds);
                     }
                     else if (rightTrackBackward)
                     {
-                        Tank.RightTrackBackward();
+                        Tank.RightTrackBackward(pSeconds);
                     }
 
                     // Deplete the charge for the tracks
@@ -142,12 +142,12 @@ namespace Tankontroller
 
                 if (Controller.IsPressedWithCharge(Control.TURRET_LEFT))
                 {
-                    Tank.CannonLeft();
+                    Tank.CannonLeft(pSeconds);
                     Controller.DepleteCharge(Control.TURRET_LEFT, TRACK_DEPLETION_RATE * pSeconds);
                 }
                 else if (Controller.IsPressedWithCharge(Control.TURRET_RIGHT))
                 {
-                    Tank.CannonRight();
+                    Tank.CannonRight(pSeconds);
                     Controller.DepleteCharge(Control.TURRET_RIGHT, TRACK_DEPLETION_RATE * pSeconds);
                 }
 
