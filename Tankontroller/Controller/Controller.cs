@@ -218,6 +218,8 @@ namespace Tankontroller.Controller
     {
         private Dictionary<Keys, Control> m_KeyMap;
         private Dictionary<Keys, int> m_PortMap;
+        private Control m_SpareControl;
+        private KeyboardState mPreviousKeyboardState = Keyboard.GetState();
 
         public KeyboardController(Dictionary<Keys, Control> pKeyMap, Dictionary<Keys, int> pPortMap) : base()
         {
@@ -231,27 +233,20 @@ namespace Tankontroller.Controller
             mJacks[4].Control = Control.FIRE;
             mJacks[5].Control = Control.TURRET_LEFT;
             mJacks[6].Control = Control.TURRET_RIGHT;
+            m_SpareControl = Control.RECHARGE;
         }
 
         public override void UpdateController()
         {
             KeyboardState keyboardState = Keyboard.GetState();
-            int rechargeJack = 0;
-
-            for (int i = 0; i < mJacks.Length; i++)
-            {
-                if (mJacks[i].Control == Control.RECHARGE)
-                {
-                    rechargeJack = i;
-                }
-            }
 
             foreach (KeyValuePair<Keys, int> kvp in m_PortMap)
             {
-                if (keyboardState.IsKeyDown(kvp.Key))
+                if (keyboardState.IsKeyDown(kvp.Key) && !mPreviousKeyboardState.IsKeyDown(kvp.Key))
                 {
-                    mJacks[rechargeJack].Control = mJacks[kvp.Value].Control;
-                    mJacks[kvp.Value].Control = Control.RECHARGE;
+                    Control temp = mJacks[kvp.Value].Control;
+                    mJacks[kvp.Value].Control = m_SpareControl;
+                    m_SpareControl = temp;
                     break;
                 }
             }
@@ -266,6 +261,8 @@ namespace Tankontroller.Controller
                     }
                 }
             }
+
+            mPreviousKeyboardState = keyboardState;
         }
     }
 
