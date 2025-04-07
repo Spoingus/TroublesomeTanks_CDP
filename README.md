@@ -1,3 +1,27 @@
+# Troublesome Tanks!
+
+Troublesome tanks is a top down tank shooter where up to four teams of three compete against each other in the hopes of becoming the most troubling tank. However, its never that simple. With the custom controller created by Spooky Elephant, each team has to manage the power of their tank by plugging/unplugging each part of the tank and using their charger to stay topped up on power. Can you maintain strong team work and leverage the powerful pickups to your advantage or will your team become a pile of scrap metal!
+
+## How to Setup and Play
+
+Download the latest release version of Troublesome Tanksfrom the release tab on the main repository and extract the files. The two main items of interest is the Tankontroller application file and the DGS.txt file in the Content folder. The DGS file allows for changes to be made to certain areas of the game, such as:
+
+- Change the resolution
+- Adjust the tank properties such as speed and health
+- Change if pickups will spawn as well as what type of pickups can spawn
+- What controllers can be used on the main menu and if a keyboard controller is needed
+
+The Tankontroller application is wht needs to be run to launch the game.
+
+## The Controls
+
+### Tank Controller
+
+### Keyboard
+
+
+
+
 # Troublesome Tanks - Commercial Development Practice
 
 ## Description:
