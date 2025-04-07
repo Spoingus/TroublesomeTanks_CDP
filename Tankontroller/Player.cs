@@ -20,6 +20,12 @@ namespace Tankontroller
 
         private int mCannonJackIndex = -1; // Due to flickering of the controller, we need to keep track of the last jack used to fire the cannon
 
+        // Variables to control Controller LED flashing when in EMP shockwave
+        private const float FLASH_TIME = 0.5f;
+        private readonly Color FLASH_COLOUR = new Color(0, 0, 0);
+        private float mFlashTimer = FLASH_TIME;
+        private bool mFlashSet = false;
+
         public Player(IController pController, Avatar pAvatar)
         {
             Controller = pController;
@@ -47,9 +53,24 @@ namespace Tankontroller
 
         public bool DoTankControls(float pSeconds)
         {
+            mFlashTimer -= pSeconds;
+            if (mFlashSet && mFlashTimer <= 0.0f)
+            {
+                mFlashSet = false;
+                mFlashTimer = FLASH_TIME;
+                Controller.SetColour(Colour);
+            }
+
+            // Deplete charge if player is inside EMP shockwave
             bool insideShockwave = Tank.IsInsideShockwave();
             if (insideShockwave)
             {
+                if (!mFlashSet && mFlashTimer <= 0.0f)
+                {
+                    mFlashSet = true;
+                    mFlashTimer = FLASH_TIME;
+                    Controller.SetColour(FLASH_COLOUR);
+                }
                 foreach (Control control in Enum.GetValues<Control>())
                 {
                     if (control == Control.NONE) continue; // Shockwave should only affect controls that plugged in
