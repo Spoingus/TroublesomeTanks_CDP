@@ -23,7 +23,7 @@ These are the controls for the keyboard which can support two players. One playe
 
 ### Controller Controls
 
-The Controllers can be used by multiple people at once and it is recommened that each team consists of 3 members:
+The Controllers can be used by multiple people at once and it is recommeneded that each team consists of 3 members:
 - The DRIVER -- Responsible for moving the tank around the map
 - The GUNNER -- Responsible for move the turret and shooting other players
 - The ENGINEER -- Responsible for maintaining the charge of each port
@@ -41,7 +41,7 @@ These are the main features which we have added:
 
 - Plug and Play to allow for the adding/removing of controllers
 - Map Loading From Json Files. A simple way of adding new maps to the game, but the creation of maps needs simplifying
-- Pickups that spawn thoughout the map. These currently include:
+- Pickups that spawn throughout the map. These currently include:
     - Health
     - Bouncy Bullets
     - Mines
