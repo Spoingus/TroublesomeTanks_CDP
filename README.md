@@ -4,14 +4,14 @@ Troublesome tanks is a top down tank shooter where up to four teams of three com
 
 ## How to Setup and Play
 
-Download the latest release version of Troublesome Tanksfrom the release tab on the main repository and extract the files. The two main items of interest is the Tankontroller application file and the DGS.txt file in the Content folder. The DGS file allows for changes to be made to certain areas of the game, such as:
+Download the latest release version of Troublesome Tanks from the release tab on the main repository and extract the files. The two main items of interest is the Tankontroller application file and the DGS.txt file in the Content folder. The DGS file allows for changes to be made to certain areas of the game, such as:
 
 - Change the resolution
 - Adjust the tank properties such as speed and health
 - Change if pickups will spawn as well as what type of pickups can spawn
 - What controllers can be used on the main menu and if a keyboard controller is needed
 
-The Tankontroller application is wht needs to be run to launch the game.
+The Tankontroller application is what needs to be run to launch the game.
 
 ## The Controls
 
@@ -23,26 +23,33 @@ These are the controls for the keyboard which can support two players. One playe
 
 ### Controller Controls
 
+The Controllers can be used by multiple people at once and it is recommened that each team consists of 3 members:
+- The DRIVER -- Responsible for moving the tank around the map
+- The GUNNER -- Responsible for move the turret and shooting other players
+- The ENGINEER -- Responsible for maintaining the charge of each port
+
 These are the controls for one of the custom controllers:
 
 ![Layout of Controller controls](Tankontroller/Content/controller_controls.png)
 
 # Troublesome Tanks - Commercial Development Practice
 
-## Description:
-
-Troublesome Tanks is a project created by the Spooky Elephants team, managed by David Parker. This repository is for the CDP version of the project (Commercial Development Practice), the version consists of additions and changes to the code base at the requst of David as the teams client.
-The repository is a fork of the 3DP version (3D printed), which is the original repository for the project using the 3D printed controllers. The aim of this project is to create a more feature rich and complete game experience than what was offered before, updating and reworking the exisiting code to allow for new features.
+We were given the opportunity to update and modernise Troublesome Tanks by David Parker. Our main task was refactoring the game to increase the readability of the code and ensure that the game could easily be maintained by future developers. We changed how different classes interacted with each other to reduce coupling and cleaned up any redundant code that had been left over from previous versions which wasn't being used anymore. After giving it a fresh coat of paint, we focused on introducing new features into the game to increase entertainment and quality of life. 
 
 ## New Features:
-The CDP version of the game has implemented a number of new features, here is a brief list of those features:
+These are the main features which we have added:
 
-- Map Loading From Json Files
-- Power Up Abilities
-- Map Based Pickup System
-- Map Select Screen (Storing Thumbnails of the maps as images!)
-
-It should be of note that not all of these new features are in the main branch as of yet.
+- Plug and Play to allow for the adding/removing of controllers
+- Map Loading From Json Files. A simple way of adding new maps to the game, but the creation of maps needs simplifying
+- Pickups that spawn thoughout the map. These currently include:
+    - Health
+    - Bouncy Bullets
+    - Mines
+    - Bouncy EMPs
+- Pickup screen to explain each pickup to assist players
+- Map select screen which allows players to look though each map and choose one to play on
+- Updated the lights on the controllers to display the player colour and the charge level of each port
+- Brand new controllers developed by David
 
 ## Refactoring:
 The project has undergone numerous refactoring efforts over the course of the CDP version, this is a brief look into what has been refactored within this repository:
@@ -52,7 +59,7 @@ The project has undergone numerous refactoring efforts over the course of the CD
 - Manager Classes: Manager classes have been implemented for Sound, Collision and other similar aspects of the game to prevent code duplication while improving readability.
 - Game Scene / The World class changes.
 
-It should be of note that not all of these refactoring efforts are in the main branch as of yet.
+
 
 ## Solution Diagrams:
 ### Scenes - Class Diagram
@@ -66,7 +73,6 @@ classDiagram
     IScene <|-- TransitionScene
     IScene <|-- LevelSelectionScene
     SceneManager <-- IScene
-    <<Interface>> IScene
 
     class IScene{
     +Spritebatch mSpriteBatch
@@ -122,18 +128,14 @@ classDiagram
     class Button{
         +Texture2D Texture
         +Texture2D TexturePressed
-        +Color SelectedColour
-        +Press
+        +Press() bool
     }
 
     TeamGUI *-- Avatar
     TeamGUI *-- HealthBar
     class TeamGUI{
-        +Avatar m_Avatar
-        +HealthBar m_HealthBar
-        +Player m_Player
-        +Tank m_Tank
-        +PrepareAvatar(Avatar)
+        -Avatar m_Avatar
+        -HealthBar m_HealthBar
         +DrawHealthBar(SpriteBatch)
         +DrawAvatar(SpriteBatch)
     }
@@ -144,13 +146,12 @@ classDiagram
         +Draw()
     }
     class HealthBar{
-        +Texture2D mHeartColour
-        +PrepareRectangles()
+        -Texture2D mHeartColour
+        -PrepareRectangles()
         +Draw()
     }
     Player o-- TeamGUI
     Player *-- Tank
-    Player *-- Avatar
     Player *-- IController
     Player o-- Bullet
     class Player{
@@ -158,8 +159,6 @@ classDiagram
         +Tank Tank
         +IController Controller
         +Color Colour
-        +Avatar Avatar
-        List~Bullet~ Bullets
         +DoTankControls() bool
     }
     Tank o-- Bullet
@@ -168,9 +167,8 @@ classDiagram
         -Texture2D TankTextures
         +Fire() void
         +TankMovements() void
-        +TankTurrentMovements() vois
-        +Collide(Tank) void
-        +CollideWithPlayArea(Rectangle) void
+        +TankTurrentMovements() void
+        +CheckBullets(List<Tank> Tanks, PlayArea, List<Rectangle> Walls)
     }
     class Bullet{
         +Vector2 Position
